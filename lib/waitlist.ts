@@ -24,8 +24,11 @@ export type JoinResult = {
   position: number | null;
 };
 
-const URL_BASE = process.env.SUPABASE_URL;
-const KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
+const rawUrl = process.env.SUPABASE_URL?.trim();
+const rawKey = process.env.SUPABASE_PUBLISHABLE_KEY?.trim();
+
+const URL_BASE = rawUrl && rawUrl.length > 0 ? rawUrl.replace(/\/$/, "") : null;
+const KEY = rawKey && rawKey.length > 0 ? rawKey : null;
 
 export const hasStore = Boolean(URL_BASE && KEY);
 
@@ -34,7 +37,7 @@ export async function joinWaitlist(
   handle: string,
   meta: { ip?: string | null; userAgent?: string | null } = {},
 ): Promise<JoinResult> {
-  if (!hasStore) {
+  if (!hasStore || !URL_BASE || !KEY) {
     console.info("[waitlist] no store configured — signup", email, handle);
     return { status: "ok", position: null };
   }

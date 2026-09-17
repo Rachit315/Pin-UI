@@ -19,9 +19,17 @@ const DESCRIPTION =
  * right mime type, which is what every scraper wants and what hand-written tags
  * usually get wrong.
  */
+function getMetadataBase(): URL {
+  try {
+    return new URL(SITE_URL);
+  } catch {
+    return new URL("https://pinui.xyz");
+  }
+}
+
 export const metadata: Metadata = {
   /* absolute URLs for social cards resolve against the canonical site */
-  metadataBase: new URL(SITE_URL),
+  metadataBase: getMetadataBase(),
   title: "Pin UI",
   description: DESCRIPTION,
   applicationName: "Pin UI",
