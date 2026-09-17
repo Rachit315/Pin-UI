@@ -1,0 +1,29 @@
+# dependencies
+node_modules
+
+# next
+.next
+out
+next-env.d.ts
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# secrets - the Supabase key and site URL live here, never in the repo
+.env*.local
+
+# vercel cli
+.vercel
+
+# local signup store from before Supabase; nothing writes here now
+data/
+
+# os
+.DS_Store
+Thumbs.db
+
+# claude
+.claude/
+.claude
+CLAUDE.md
+*.claude*
+
