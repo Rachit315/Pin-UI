@@ -7,15 +7,23 @@ import {
   TICKET_BOX,
   TICKET_PATH,
 } from "./art";
+import { bodyWidth, handleSize, layoutEmail, TICKET } from "./ticketLayout";
 
 /**
- * Renders the waitlist ticket to a PNG on a canvas, drawing the same vector
- * paths the on-screen SVG uses.
+ * Renders the waitlist pass to a PNG on a canvas, drawing the same vector paths
+ * the on-screen SVG uses.
  *
  * Deliberately not a DOM-to-image library: those have to inline every
  * stylesheet, webfont and SVG the node touches, and fail in ways that are hard
  * to see coming. Drawing the handful of shapes directly is a few more lines and
  * cannot half-work.
+ *
+ * The printed column is not hand-placed here. It is stacked from the same
+ * `lib/ticketLayout.ts` spec the stylesheet is built from, in the same order
+ * and with the same gaps, and centred as a block — which is what the screen's
+ * flex column does. The two used to be written separately, and that is exactly
+ * why the download came out aligned differently from the pass it was a picture
+ * of.
  */
 
 export type TicketArt = {
@@ -32,24 +40,25 @@ export type TicketArt = {
 
 const SCALE = 2;
 const PAD = 56;
-const TICKET_W = 420;
-const TICKET_H = 190;
-const CODE_W = 100;
-const CODE_H = 120;
+const TICKET_W = TICKET.width;
+const TICKET_H = TICKET.height;
 const W = TICKET_W + PAD * 2;
 const H = TICKET_H + PAD * 2;
 
+/** Line box heights, matching the stylesheet. */
+const LINE = { word: 1, caption: 1.2, email: TICKET.email.leading, handle: 1.3 };
+
 function drawPin(
   ctx: CanvasRenderingContext2D,
-  cx: number,
-  cy: number,
-  size: number,
+  x: number,
+  top: number,
+  height: number,
   body: string,
   star: string,
 ) {
-  const scale = size / PIN_BOX.h;
+  const scale = height / PIN_BOX.h;
   ctx.save();
-  ctx.translate(cx - (PIN_BOX.w * scale) / 2, cy - (PIN_BOX.h * scale) / 2);
+  ctx.translate(x, top);
   ctx.scale(scale, scale);
   ctx.fillStyle = body;
   for (const d of PIN_BODY_PATHS) ctx.fill(new Path2D(d));
@@ -69,75 +78,19 @@ export function fitName(name: string, ctx: CanvasRenderingContext2D, max: number
 }
 
 /**
- * Break a line into at most `maxLines` that each fit `max`.
- *
- * Greedy and character-by-character, because an email has no spaces to break
- * on. Returns null when it cannot be done at this size, which is the fitting
- * loop's signal to go smaller.
+ * Draw one line the way CSS would inside a line box of `lineHeight`: the text
+ * sits in the middle of the box, with the leading split above and below it.
  */
-export function wrapToLines(
-  text: string,
+function drawLine(
   ctx: CanvasRenderingContext2D,
-  max: number,
-  maxLines: number,
-) {
-  const lines: string[] = [];
-  let rest = text;
-
-  while (rest.length > 0) {
-    if (lines.length === maxLines) return null;
-
-    if (ctx.measureText(rest).width <= max) {
-      lines.push(rest);
-      break;
-    }
-
-    let cut = rest.length;
-    while (cut > 1 && ctx.measureText(rest.slice(0, cut)).width > max) cut -= 1;
-
-    lines.push(rest.slice(0, cut));
-    rest = rest.slice(cut);
-  }
-
-  return lines.length > 0 ? lines : [text];
-}
-
-/**
- * Set the largest type size at which `text` fits in `maxLines`, and hand back
- * both the size and the broken lines.
- *
- * The screen shrinks the address and wraps it rather than cutting it short, so
- * the export has to do the same or the PNG would not match the pass it was
- * taken from.
- */
-export function fitLines(
   text: string,
-  ctx: CanvasRenderingContext2D,
-  max: number,
-  {
-    weight,
-    from,
-    to,
-    font,
-    maxLines,
-  }: {
-    weight: number;
-    from: number;
-    to: number;
-    font: string;
-    maxLines: number;
-  },
+  x: number,
+  boxTop: number,
+  size: number,
+  lineHeight: number,
 ) {
-  for (let size = from; size > to; size -= 0.5) {
-    ctx.font = `${weight} ${size}px ${font}`;
-    const lines = wrapToLines(text, ctx, max, maxLines);
-    if (lines) return { size, lines };
-  }
-
-  /* nothing fits: take the floor and ellipse whatever is left over */
-  ctx.font = `${weight} ${to}px ${font}`;
-  const lines = wrapToLines(text, ctx, max, maxLines) ?? [text];
-  return { size: to, lines: lines.map((l, i) => (i === maxLines - 1 ? fitName(l, ctx, max) : l)) };
+  ctx.textBaseline = "top";
+  ctx.fillText(text, x, boxTop + (size * lineHeight - size) / 2);
 }
 
 export function drawTicket(canvas: HTMLCanvasElement, art: TicketArt) {
@@ -166,68 +119,116 @@ export function drawTicket(canvas: HTMLCanvasElement, art: TicketArt) {
   ctx.fill(new Path2D(TICKET_PATH));
   ctx.restore();
 
-  /* --- the stub: the barcode, same pattern and proportions as the screen --- */
-  const stubCx = PAD + TICKET_W * 0.19;
   const centre = PAD + TICKET_H / 2;
 
+  /* --- the stub: the barcode, centred in its half of the perforation --- */
+  const stubCx = PAD + TICKET_W * (TICKET.split / 2);
   const widths = barcodePattern(art.handle);
-  const unit = CODE_W / barcodeUnits(widths);
-  const codeX = stubCx - CODE_W / 2;
-  const codeY = centre - CODE_H / 2;
+  const unit = TICKET.code.width / barcodeUnits(widths);
+  const codeX = stubCx - TICKET.code.width / 2;
+  const codeY = centre - TICKET.code.height / 2;
 
   ctx.fillStyle = art.ink;
   let barX = codeX;
   widths.forEach((width, index) => {
-    if (index % 2 === 0) ctx.fillRect(barX, codeY, width * unit, CODE_H);
+    if (index % 2 === 0) {
+      ctx.fillRect(barX, codeY, width * unit, TICKET.code.height);
+    }
     barX += width * unit;
   });
 
-  ctx.textBaseline = "alphabetic";
+  /* --- the body, stacked exactly as the flex column is --- */
+  const bodyX = PAD + TICKET_W * TICKET.split + TICKET.body.left;
+  const bodyMax = bodyWidth(TICKET_W);
 
-  /* --- the body: lockup, then the pass details --- */
-  const bodyX = PAD + TICKET_W * 0.38 + 26;
-  const bodyMax = TICKET_W - (bodyX - PAD) - 34;
+  const email = layoutEmail(art.email, bodyMax, art.font);
+  const handle = handleSize(email.size);
+
+  const lockupH = Math.max(
+    TICKET.lockup.pinHeight,
+    TICKET.lockup.word * LINE.word,
+  );
+  const captionH = TICKET.caption * LINE.caption;
+  const emailH = email.lines.length * email.size * LINE.email;
+  const handleH = handle * LINE.handle;
+
+  const stackH =
+    lockupH +
+    TICKET.gaps.lockupToCaption +
+    captionH +
+    TICKET.gaps.captionToEmail +
+    emailH +
+    TICKET.gaps.emailToHandle +
+    handleH;
+
+  /* the column is centred in the ticket, the same as `justify-content: center` */
+  let y = centre - stackH / 2;
 
   ctx.textAlign = "left";
   ctx.fillStyle = art.ink;
 
-  const lockupY = centre - 40;
-  drawPin(ctx, bodyX + 8.5, lockupY, 20, art.ink, art.from);
-  ctx.font = `500 19px ${art.font}`;
-  ctx.fillText("Pin UI", bodyX + 24, lockupY + 7);
+  /* the lockup: pin and wordmark, centred against each other */
+  drawPin(
+    ctx,
+    bodyX,
+    y + (lockupH - TICKET.lockup.pinHeight) / 2,
+    TICKET.lockup.pinHeight,
+    art.ink,
+    art.from,
+  );
+  ctx.font = `500 ${TICKET.lockup.word}px ${art.font}`;
+  drawLine(
+    ctx,
+    "Pin UI",
+    bodyX + TICKET.lockup.pinWidth + TICKET.lockup.gap,
+    y + (lockupH - TICKET.lockup.word * LINE.word) / 2,
+    TICKET.lockup.word,
+    LINE.word,
+  );
+  y += lockupH + TICKET.gaps.lockupToCaption;
 
-  ctx.font = `500 10px ${art.font}`;
+  /* the caption, tracked out the way the stylesheet tracks it */
+  ctx.font = `500 ${TICKET.caption}px ${art.font}`;
+  const tracking = `${TICKET.caption * 0.18}px`;
+  const hasTracking = "letterSpacing" in ctx;
+  if (hasTracking) ctx.letterSpacing = tracking;
   ctx.globalAlpha = 0.7;
-  ctx.fillText(spaced("WAITLIST PASS"), bodyX, centre + 2);
+  drawLine(
+    ctx,
+    hasTracking ? "WAITLIST PASS" : spaced("WAITLIST PASS"),
+    bodyX,
+    y,
+    TICKET.caption,
+    LINE.caption,
+  );
   ctx.globalAlpha = 1;
+  if (hasTracking) ctx.letterSpacing = "0px";
+  y += captionH + TICKET.gaps.captionToEmail;
 
-  /* the email gives up size, then a second line, before it gives up characters */
-  const email = fitLines(art.email, ctx, bodyMax, {
-    weight: 500,
-    from: 24,
-    to: 11,
-    font: art.font,
-    maxLines: 2,
+  /* the address, at whatever size and breaks the shared spec settled on */
+  ctx.font = `500 ${email.size}px ${art.font}`;
+  email.lines.forEach((part, i) => {
+    drawLine(
+      ctx,
+      fitName(part, ctx, bodyMax),
+      bodyX,
+      y + i * email.size * LINE.email,
+      email.size,
+      LINE.email,
+    );
   });
+  y += emailH + TICKET.gaps.emailToHandle;
 
-  const leading = email.size * 1.15;
-  email.lines.forEach((line, i) => {
-    ctx.fillText(line, bodyX, centre + 28 + i * leading);
-  });
-
-  /* The handle sits under whatever the address took, and follows it down in
-     size the same way it does on screen: it is the quieter of the two lines and
-     must not end up the larger one. */
-  const handleY = centre + 28 + (email.lines.length - 1) * leading + 22;
-  ctx.font = `400 ${Math.max(10, Math.min(16, email.size - 3))}px ${art.font}`;
+  /* the handle, trailing it in size */
+  ctx.font = `400 ${handle}px ${art.font}`;
   ctx.globalAlpha = 0.85;
-  ctx.fillText(fitName(art.handle, ctx, bodyMax), bodyX, handleY);
+  drawLine(ctx, fitName(art.handle, ctx, bodyMax), bodyX, y, handle, LINE.handle);
   ctx.globalAlpha = 1;
 }
 
-/** Canvas has no letter-spacing everywhere yet, so widen the caps by hand. */
+/** Older canvases have no letter-spacing, so widen the caps by hand. */
 function spaced(text: string) {
-  return text.split("").join(" ");
+  return text.split("").join(" ");
 }
 
 export async function ticketBlob(art: TicketArt): Promise<Blob> {

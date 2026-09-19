@@ -147,7 +147,8 @@ Rather than loading pre-recorded audio files (`.mp3`/`.wav`) that produce networ
 ### 4. Digital Ticket & Vector Canvas Export
 
 Upon signup, an access ticket is dynamically rendered on stage:
-- **Dynamic Type Fitting**: Long emails automatically downscale half a pixel at a time down to `11px` (`useTicketType`) so addresses never wrap or clip.
+- **One Layout Spec**: `lib/ticketLayout.ts` holds the pass's geometry once at a 540px reference width. The stylesheet scales it in `cqw` and the canvas scales it by its own width, so the screen and the exported PNG agree to within half a pixel on every element instead of drifting apart.
+- **Dynamic Type Fitting**: `layoutEmail` finds the largest size at which an address fits on one line; below a readable floor it breaks after the `@` and takes whichever gives the larger type. A 46-character address gets two lines at the full `24px` rather than one line at `9.5px`, and it never breaks mid-domain.
 - **Deterministic Barcode**: Barcode guard pairs and thin-weighted bar distributions are computed from a SHA hash of the user's handle.
 - **Canvas PNG Export**: Renders exact SVG vector paths directly to an off-screen `<canvas>` at device pixel ratio, reading active CSS variables to match the selected theme.
 - **Native Sharing**: One-click composer link pre-fills X posts with verified handles and canonical references.

@@ -447,10 +447,20 @@ a {
 
 /* --- the ticket (Figma 245:140) ------------------------------------------- */
 
+/*
+ * The pass. Every measurement below is a share of the ticket's own width
+ * (`cqw`), taken from `lib/ticketLayout.ts` at its 540px reference: 19px type
+ * is 19/540 = 3.5185cqw, and so on. That means the whole pass scales as one
+ * object at any width — no second set of numbers in a media query, no chance of
+ * the type and the box drifting apart — and the PNG export, which scales the
+ * same spec by its own width, comes out identical.
+ */
 .ticket {
   position: relative;
-  width: 420px;
-  height: 190px;
+  width: min(540px, 92vw);
+  /* the artwork's own proportions, so the notches stay round */
+  aspect-ratio: 540 / 245;
+  container-type: inline-size;
 }
 
 .ticket__shape {
@@ -477,17 +487,15 @@ a {
 
 .ticket__stub {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10px;
   color: var(--pin-ticket-ink);
 }
 
 .ticket__code {
   display: block;
-  width: 100px;
-  height: 120px;
+  width: 23.7037cqw; /* 128 */
+  height: 28.7037cqw; /* 155 */
 }
 
 .ticket__bars {
@@ -500,7 +508,7 @@ a {
 .ticket__brand {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 1.2963cqw; /* 7 */
   /* the mark is printed in the ticket's ink, star punched out of it */
   --pin-mark: var(--pin-ticket-ink);
   --pin-mark-star: var(--pin-ticket-from);
@@ -508,73 +516,81 @@ a {
 
 .ticket__pin {
   display: block;
-  width: 17px;
-  height: 20px;
+  width: 3.1481cqw; /* 17 */
+  height: 3.7037cqw; /* 20 */
 }
 
 .ticket__brandWord {
-  font-size: 19px;
+  font-size: 3.5185cqw; /* 19 */
   font-weight: 500;
   letter-spacing: -0.02em;
   line-height: 1;
 }
 
+/*
+ * The printed column.
+ *
+ * The rhythm is carried by one `gap` plus two explicit margins, rather than the
+ * ad-hoc `margin-top` on each row it used to use — that left the handle with no
+ * separation from the address at all, which is what made the block read as
+ * crowded at the bottom.
+ */
 .ticket__body {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  gap: 0;
-  padding: 0 34px 0 26px;
+  padding-left: 5.1852cqw; /* 28 */
+  padding-right: 6.2963cqw; /* 34 */
   min-width: 0;
   /* the welcome column is centred; a printed pass reads left-aligned */
   text-align: left;
 }
 
 .ticket__caption {
-  margin-top: 12px;
-  font-size: 10px;
+  margin-top: 2.5926cqw; /* 14 */
+  font-size: 1.8519cqw; /* 10 */
+  /* explicit, so the PNG export can reproduce the same line box */
+  line-height: 1.2;
   font-weight: 500;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   opacity: 0.7;
 }
 
-.ticket__handle {
-  display: block;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 /*
- * The email. It is allowed two lines and breaks anywhere, because addresses
- * carry no spaces and a long one would otherwise have to shrink past legibility
- * to stay on a single line — a university address needed 9.5px, where two lines
- * hold it at around 17px.
- *
- * `max-height` is in `em`, so it tracks the font size as the fitting loop
- * shrinks it and always means "two lines".
+ * The address. Its size and its line breaks are decided in
+ * `lib/ticketLayout.ts` and applied inline, because where a long address breaks
+ * is a design decision — after the `@`, never mid-domain — and not something to
+ * leave to the browser.
  */
 .ticket__name {
   display: block;
   max-width: 100%;
-  margin-top: 2px;
-  font-size: 24px;
+  margin-top: 1.2963cqw; /* 7 */
+  font-size: 4.4444cqw; /* 24, the ceiling before fitting */
   font-weight: 500;
-  line-height: 1.15;
+  line-height: 1.18;
   letter-spacing: -0.02em;
-  white-space: normal;
-  overflow-wrap: anywhere;
-  max-height: 2.3em;
+}
+
+.ticket__emailLine {
+  display: block;
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ticket__handle {
-  font-size: 16px;
+  display: block;
+  max-width: 100%;
+  margin-top: 1.2963cqw; /* 7 */
+  font-size: 2.963cqw; /* 16 */
   line-height: 1.3;
   opacity: 0.85;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .welcome__title {
@@ -963,41 +979,8 @@ a {
     font-size: 24px;
   }
 
-  .ticket {
-    width: 300px;
-    height: 136px;
-  }
-
-  .ticket__body {
-    padding: 0 20px 0 16px;
-  }
-
-  .ticket__name {
-    font-size: 19px;
-  }
-
-  .ticket__handle {
-    font-size: 13px;
-  }
-
-  .ticket__stubLabel,
-  .ticket__caption {
-    font-size: 9px;
-  }
-
-  .ticket__code {
-    width: 70px;
-    height: 84px;
-  }
-
-  .ticket__pin {
-    width: 13px;
-    height: 15px;
-  }
-
-  .ticket__brandWord {
-    font-size: 14px;
-  }
+  /* The ticket needs no overrides here: it is sized in `cqw`, so the whole
+     pass scales with its own width and stays in proportion on any screen. */
 
   .actions {
     margin-top: 20px;

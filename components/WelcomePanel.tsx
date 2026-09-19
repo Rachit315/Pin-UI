@@ -1,69 +1,70 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import Barcode from "./Barcode";
 import PinMark from "./PinMark";
 import TicketActions from "./TicketActions";
 import TicketShape from "./TicketShape";
 import { issueSpring, spring } from "@/lib/motion";
+import {
+  bodyWidth,
+  handleSize,
+  layoutEmail,
+  TICKET,
+  type EmailLayout,
+} from "@/lib/ticketLayout";
 
 /**
- * Fit the address to the pass, and keep the handle underneath it.
+ * Set the address to the pass.
  *
- * The email is the one thing here that has to be shown in full — half an
- * address is worse than a small one — so the type gives way instead of the
- * text. The ceiling comes from the stylesheet, which leaves the breakpoints in
- * charge of how large it can be, and the floor keeps it legible.
- *
- * The handle then follows it down. It is the quieter of the two lines, and a
- * long address that has shrunk below its own handle reads as though the pass
- * were built around the wrong field.
+ * The ticket's rendered width is the only thing measured; everything else comes
+ * out of `lib/ticketLayout.ts`, which is the same module the PNG export uses.
+ * That is deliberate — the two used to lay the column out separately and drift,
+ * so the downloaded file was aligned differently from the pass it was a picture
+ * of.
  */
-function useTicketType(email: string, min = 11) {
-  const emailRef = useRef<HTMLElement | null>(null);
-  const handleRef = useRef<HTMLElement | null>(null);
+function useEmailLayout(email: string) {
+  const ticketRef = useRef<HTMLDivElement | null>(null);
+  const [layout, setLayout] = useState<EmailLayout | null>(null);
+  const [scale, setScale] = useState(1);
 
   useEffect(() => {
-    const el = emailRef.current;
-    if (!el) return;
+    const ticket = ticketRef.current;
+    if (!ticket) return;
 
-    const fit = () => {
-      /* clear ours first, so a re-fit does not start from the size we last
-         shrank it to */
-      el.style.fontSize = "";
-      const ceiling = parseFloat(getComputedStyle(el).fontSize) || 20;
+    const measure = () => {
+      /* offsetWidth, not a bounding rect: the pass sits at a slight angle, and
+         a rect would hand back the rotated box, which is a couple of per cent
+         wider than the ticket actually is */
+      const width = ticket.offsetWidth;
+      if (!width) return;
 
-      /* the box is two lines tall, so overflowing its height is the signal to
-         shrink — width never overflows now that the address can wrap */
-      let size = ceiling;
-      while (size > min && el.scrollHeight > el.clientHeight) {
-        size -= 0.5;
-        el.style.fontSize = `${size}px`;
-      }
+      const font =
+        getComputedStyle(document.documentElement)
+          .getPropertyValue("--pin-font")
+          .trim() || "system-ui, sans-serif";
 
-      const handle = handleRef.current;
-      if (handle) {
-        handle.style.fontSize = "";
-        const base = parseFloat(getComputedStyle(handle).fontSize) || 16;
-        handle.style.fontSize = `${Math.max(10, Math.min(base, size - 3))}px`;
-      }
+      /* the spec is quoted at the reference width */
+      const ratio = width / TICKET.width;
+      setScale(ratio);
+      setLayout(layoutEmail(email, bodyWidth(width), font, ratio));
     };
 
-    fit();
+    measure();
 
-    /* the webfont arrives after first paint and is wider than the fallback, so
-       whatever fitted against the fallback has to be measured again */
-    void document.fonts?.ready.then(fit).catch(() => {
-      /* no font loading API — the first fit stands */
+    /* the webfont is wider than the fallback it replaces, so anything fitted
+       before it arrives has to be measured again */
+    void document.fonts?.ready.then(measure).catch(() => {
+      /* no font loading API — the first measurement stands */
     });
 
-    const observer = new ResizeObserver(fit);
-    observer.observe(el);
+    const observer = new ResizeObserver(measure);
+    observer.observe(ticket);
     return () => observer.disconnect();
-  }, [email, min]);
+  }, [email]);
 
-  return { emailRef, handleRef };
+  return { ticketRef, layout, scale };
 }
 
 function withAt(handle: string) {
@@ -117,11 +118,12 @@ export default function WelcomePanel({
         } as const);
 
   const displayHandle = withAt(handle);
-  const { emailRef, handleRef } = useTicketType(email);
+  const { ticketRef, layout, scale } = useEmailLayout(email);
 
   return (
     <div className="welcome">
       <motion.div
+        ref={ticketRef}
         className="ticket"
         initial={
           reduced
@@ -169,15 +171,23 @@ export default function WelcomePanel({
             </motion.span>
             <motion.strong
               className="ticket__name"
-              ref={emailRef as React.RefObject<HTMLElement>}
               title={email}
+              style={layout ? { fontSize: `${layout.size}px` } : undefined}
               {...line(BEAT.name)}
             >
-              {email}
+              {(layout?.lines ?? [email]).map((part) => (
+                <span className="ticket__emailLine" key={part}>
+                  {part}
+                </span>
+              ))}
             </motion.strong>
             <motion.span
               className="ticket__handle"
-              ref={handleRef as React.RefObject<HTMLSpanElement>}
+              style={
+                layout
+                  ? { fontSize: `${handleSize(layout.size, scale)}px` }
+                  : undefined
+              }
               {...line(BEAT.handle)}
             >
               {displayHandle}
