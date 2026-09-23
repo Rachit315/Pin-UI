@@ -1,0 +1,330 @@
+/* ===========================================================================
+   Add To Cart
+   ---------------------------------------------------------------------------
+   A product card that is only a photo until you open it. The two collapsible
+   regions are measured and then sprung, so they are never given a hard-coded
+   height that the type inside could outgrow.
+=========================================================================== */
+
+.pcart {
+  --pcart-ink: #151515;
+  --pcart-tile: #e9e9e9;
+  --pcart-rail: #2b2b2c;
+  --pcart-red: #e0182d;
+  --pcart-green: #2fbf5f;
+
+  position: relative;
+  width: 302px;
+  max-width: 100%;
+  font-family: Inter, "SF Pro Display", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: #ffffff;
+  text-align: left;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.pcart *,
+.pcart *::before,
+.pcart *::after {
+  box-sizing: border-box;
+}
+
+/*
+ * `:where()` carries no specificity, so this reset sits *below* the component's
+ * own class rules instead of above them. Written as a bare `.pcart button` it
+ * would outrank every single-class rule in this file and quietly strip the type
+ * off the controls that set their own.
+ */
+.pcart :where(button) {
+  margin: 0;
+  border: 0;
+  padding: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.pcart :focus-visible {
+  outline: 2px solid rgb(255 255 255 / 0.7);
+  outline-offset: 2px;
+}
+
+.pcart__card {
+  position: relative;
+  padding: 15px;
+  border-radius: 34px;
+  background: var(--pcart-ink);
+  box-shadow:
+    0 22px 44px -22px rgb(0 0 0 / 0.45),
+    0 6px 14px -8px rgb(0 0 0 / 0.22);
+  will-change: transform;
+}
+
+/* --- the tile: the whole card while it is shut -------------------------- */
+
+.pcart__tile {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 272 / 241;
+  overflow: hidden;
+  border-radius: 26px;
+  background: var(--pcart-tile);
+  cursor: pointer;
+  will-change: transform;
+}
+
+/*
+ * The source photo sits on white, so `multiply` melts its background into the
+ * tile rather than needing a cut-out.
+ */
+.pcart__shoe {
+  position: absolute;
+  left: 3.5%;
+  top: -42%;
+  width: 93%;
+  max-width: none;
+  transform: scaleX(-1);
+  mix-blend-mode: multiply;
+  will-change: transform;
+}
+
+.pcart__heart {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  background: var(--pcart-ink);
+  will-change: transform;
+}
+
+.pcart__heartIcon {
+  position: relative;
+  width: 19px;
+  height: 19px;
+  will-change: transform;
+}
+
+/* the burst: eight dots blurred into one blob on the way out */
+.pcart__sparks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.pcart__spark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  margin: -4.5px 0 0 -4.5px;
+  border-radius: 999px;
+  background: var(--pcart-red);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* --- collapsible regions ------------------------------------------------- */
+
+.pcart__fold {
+  height: 0;
+  overflow: hidden;
+}
+
+.pcart__doneInner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding-top: 15px;
+}
+
+.pcart__doneTick {
+  display: grid;
+  place-items: center;
+  width: 19px;
+  height: 19px;
+  border-radius: 999px;
+  background: var(--pcart-green);
+}
+
+.pcart__doneTick svg {
+  width: 12px;
+  height: 12px;
+}
+
+.pcart__doneLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+/*
+ * Padding, not margin: a collapsing top margin would fall outside the measured
+ * height and the open animation would land short of the content.
+ */
+.pcart__bodyInner {
+  padding: 22px 0 8px;
+}
+
+.pcart__title {
+  margin: 0;
+  overflow: hidden;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.15;
+  color: #ffffff;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pcart__brand {
+  margin: 6px 0 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1;
+  color: #a3a3a3;
+}
+
+.pcart__priceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 30px;
+}
+
+.pcart__price {
+  display: flex;
+  align-items: baseline;
+  color: #ffffff;
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.pcart__priceNum {
+  font-variant-numeric: tabular-nums;
+}
+
+.pcart__bag {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 62px;
+  border-radius: 999px;
+  background: #ffffff;
+  will-change: transform;
+}
+
+.pcart__bag svg {
+  width: 25px;
+  height: 25px;
+}
+
+.pcart__badge {
+  position: absolute;
+  right: -2px;
+  top: -2px;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  min-width: 23px;
+  height: 23px;
+  padding: 0 5px;
+  border: 3px solid var(--pcart-ink);
+  border-radius: 999px;
+  background: var(--pcart-red);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  color: #ffffff;
+  opacity: 0;
+}
+
+/* --- slide to confirm ---------------------------------------------------- */
+
+.pcart__slider {
+  position: relative;
+  width: 100%;
+  height: 54px;
+  margin-top: 18px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--pcart-rail);
+  user-select: none;
+}
+
+.pcart__fill {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.06);
+  pointer-events: none;
+}
+
+.pcart__slideLabel {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: #a3a3a3;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.pcart__slideLabel--done {
+  color: #ffffff;
+}
+
+.pcart__knob {
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  background: #ffffff;
+  cursor: grab;
+  will-change: transform;
+}
+
+.pcart__knob:active {
+  cursor: grabbing;
+}
+
+.pcart__knobFaces {
+  position: relative;
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+.pcart__knobFaces svg {
+  position: absolute;
+  inset: 0;
+  width: 20px;
+  height: 20px;
+  will-change: transform;
+}
+
+.pcart__knobCheck {
+  opacity: 0;
+}

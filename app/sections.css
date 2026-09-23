@@ -1,0 +1,571 @@
+/* ===========================================================================
+   Below the hero — Figma 303:475 / 303:550
+   ---------------------------------------------------------------------------
+   Sized in the same `em` off `.site`, so the shelf and the footer scale with
+   the hero rather than beside it. Figma's own numbers are not followed to the
+   pixel here — they were drawn against a fixed 1280 frame and read heavy at the
+   hero's scale — but the proportions, colours and structure are.
+
+   These sections sit on the white page in both states. What inverts is the
+   emphasis: the heading and the cards trade red for black and filled for
+   outlined, which is how the design tells the two apart.
+=========================================================================== */
+
+.site {
+  --sec-ink: #0a0a0a;
+  --sec-note: #e60024;
+  --card-fill: #e60024;
+  --card-ink: #ffffff;
+  --card-edge: transparent;
+  --rail-fill: #ffffff;
+  --rail-ink: #e60024;
+  --rail-edge: #e60024;
+}
+
+:root[data-pin-theme="crimson"] .site {
+  --sec-ink: #e60024;
+  --sec-note: #0a0a0a;
+  --card-fill: #ffffff;
+  --card-ink: #e60024;
+  --card-edge: #e60024;
+  --rail-fill: #e60024;
+  --rail-ink: #ffffff;
+  --rail-edge: transparent;
+}
+
+/* everything themed crosses over on the one curve the site already uses */
+.shelf__title,
+.shelf__lead,
+.shelf__note,
+.card,
+.rail,
+.rail__rule {
+  transition:
+    color var(--pin-theme-fade) var(--pin-theme-ease),
+    background-color var(--pin-theme-fade) var(--pin-theme-ease),
+    border-color var(--pin-theme-fade) var(--pin-theme-ease);
+}
+
+/*
+ * The rail's links jump to anchors, so the page should travel rather than cut.
+ *
+ * It is keyed off an attribute that `SmoothScroll` sets after the first paint,
+ * because `scroll-behavior` on `html` also governs the browser's own jump to a
+ * fragment on load — and a deep link should land where it points rather than
+ * glide there from the top.
+ */
+html[data-pin-scroll="smooth"] {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-pin-scroll="smooth"] {
+    scroll-behavior: auto;
+  }
+}
+
+/* --- the component shelf ------------------------------------------------- */
+
+.shelf {
+  padding: 5.5em var(--hero-inset) 4em;
+}
+
+/*
+ * Larger than it was, and deliberately still short of the hero.
+ *
+ * The claim upstairs is set at 4.1625em; nothing below it should compete with
+ * that, so this sits a clear step under at 3.5em. The margin comes off it too
+ * — the standfirst under it is what separates the heading from the grid now.
+ */
+.shelf__title {
+  margin: 0;
+  text-align: center;
+  font-size: 3.5em; /* 56 at the reference root, against the hero's 66.6 */
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  color: var(--sec-ink);
+}
+
+/*
+ * The heading and its standfirst rise as one block rather than as two things
+ * on a stagger — caught mid-entrance, a staggered pair shows a gap that is
+ * not the gap the page settles at, which is exactly what it looked like.
+ */
+.shelf__head {
+  margin: 0 0 3em;
+}
+
+.shelf__lead {
+  max-width: 30em;
+  /* `em` here is this element's own 17.5px: 0.8 is 14px under a 56px heading */
+  margin: 0.8em auto 0;
+  text-align: center;
+  font-size: 1.25em; /* 20 */
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  color: var(--sec-note);
+}
+
+/*
+ * The Pinterest mark takes the sentence's own colour here.
+ *
+ * `--hero-pinterest` turns white in the crimson state, which is right over the
+ * hero's red field and invisible on this one — the shelf sits on white paper
+ * in both states. Following the type means it is always legible and always
+ * agrees with the words around it.
+ */
+.shelf__lead .hero__pinterest {
+  background-color: currentColor;
+}
+
+/*
+ * The hero's claim drops to 3.5em below 880px, and this heading must stay a
+ * step under it there too — at the same size the two would read as equals and
+ * the page would lose its order.
+ */
+@media (max-width: 880px) {
+  .shelf__title {
+    font-size: 2.875em; /* 46 */
+  }
+
+  .shelf__lead {
+    font-size: 1.125em; /* 18 */
+  }
+}
+
+.shelf__grid {
+  display: grid;
+  /* three across while they fit, then two, then one — no breakpoints needed */
+  grid-template-columns: repeat(auto-fit, minmax(20em, 1fr));
+  gap: 1.5em;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shelf__cell {
+  display: flex;
+}
+
+.card {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.9em;
+  padding: 0.8em;
+  border: var(--hero-rule) solid var(--card-edge);
+  background: var(--card-fill);
+  color: var(--card-ink);
+  text-decoration: none;
+}
+
+.card__frame {
+  display: block;
+  overflow: hidden;
+  border-radius: 0.7em;
+  /* the preview keeps the artwork's own proportions at every column width */
+  aspect-ratio: 384 / 226.8;
+}
+
+/*
+ * The preview is the clip itself, parked on a still frame until the card is
+ * hovered. Each recording framed its component at a different size, so the
+ * zoom is a per-card token — and the hover lift multiplies it rather than
+ * replacing it, or the card would snap back to 1 the moment you touched it.
+ */
+.card__video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #000000;
+  transform: scale(var(--card-zoom, 1));
+  transition: transform 0.5s cubic-bezier(0.22, 0.68, 0.16, 1);
+}
+
+.card__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+  padding: 0 0.35em 0.3em;
+}
+
+.card__title {
+  font-size: 1.75em; /* 28 */
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.card__arrow {
+  display: block;
+  flex: 0 0 auto;
+  width: 1.6em;
+  height: 1.6em;
+  transition: transform 0.4s cubic-bezier(0.22, 0.68, 0.16, 1);
+}
+
+.card__arrow svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (hover: hover) {
+  .card:hover .card__video {
+    transform: scale(calc(var(--card-zoom, 1) * 1.03));
+  }
+
+  .card:hover .card__arrow {
+    transform: translate(0.22em, -0.22em);
+  }
+}
+
+.shelf__note {
+  margin: 2.4em 0 0;
+  text-align: center;
+  font-size: 1.125em; /* 18 */
+  letter-spacing: -0.01em;
+  color: var(--sec-note);
+}
+
+/* --- the rail ------------------------------------------------------------ */
+
+.rail {
+  position: fixed;
+  top: 50%;
+  right: var(--hero-inset);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.05em;
+  padding: 1.4em 1em;
+  width: 7em;
+  border: var(--hero-rule) solid var(--rail-edge);
+  /* a full pill, the way the design draws it */
+  border-radius: 3.5em;
+  background: var(--rail-fill);
+  color: var(--rail-ink);
+  box-shadow: 0 1.2em 2.4em rgb(0 0 0 / 0.1);
+}
+
+.rail__mark {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  line-height: 0;
+  color: inherit;
+  /* a button takes the browser's own type otherwise, and everything here is em */
+  font: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.rail__mark:focus-visible {
+  outline: 0.14em solid currentColor;
+  outline-offset: 0.3em;
+}
+
+.rail__markArt {
+  display: block;
+  width: 2.375em; /* the masthead's mark, at the same size */
+  height: 2.8125em;
+  /* the rail's own fill is what the star is knocked out of */
+  --pin-mark: var(--rail-ink);
+  --pin-mark-star: var(--rail-fill);
+}
+
+/*
+ * A short hairline between the three parts of the pill.
+ *
+ * Full width at 2px made the rail look like a stack of separate boxes rather
+ * than one object: the line was doing more work than the thing it divided.
+ * A third of the width at a single pixel, held well back from full ink, is
+ * enough to mark the break and nothing more. One value for both themes — it
+ * takes the rail's own ink, so it lightens in step with whatever it sits on.
+ */
+.rail__rule {
+  display: block;
+  width: 1.5em; /* 21 — about a third of the pill's inner width */
+  height: 1px;
+  background: currentColor;
+  opacity: 0.5;
+}
+
+.rail__links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3em;
+}
+
+.rail__link {
+  font-size: 1.0625em; /* 17 */
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: inherit;
+  text-decoration: none;
+  opacity: 0.9;
+  transition: opacity 0.24s ease;
+}
+
+.rail__github {
+  position: relative;
+  display: block;
+  width: 2.25em;
+  height: 2.25em;
+}
+
+.rail__githubMark {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transition: opacity var(--pin-theme-fade) var(--pin-theme-ease);
+}
+
+.rail__githubMark--alt {
+  position: absolute;
+  inset: 0;
+}
+
+@media (hover: hover) {
+  .rail__link:hover {
+    opacity: 1;
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
+}
+
+/*
+ * Narrow: the rail lies down and moves to the top of the screen.
+ *
+ * A vertical pill against the right edge needs a margin that only a wide
+ * window has, so this used to be hidden outright below 1080 — which left a
+ * phone with no navigation at all once the hero had scrolled away. The same
+ * markup turns on its side instead: same pill, same contents, at the top
+ * where it stays visible and out of the way of the main content.
+ *
+ * It is centred with `left: 0; right: 0; margin-inline: auto` rather than the
+ * usual half-width translate, because the entrance is a transform and the two
+ * would overwrite each other.
+ */
+@media (max-width: 1080px) {
+  .rail {
+    top: calc(var(--hero-inset) + 0.5em);
+    right: 0;
+    left: 0;
+    bottom: auto;
+    width: max-content;
+    max-width: calc(100% - 2 * var(--hero-inset));
+    margin-inline: auto;
+    flex-direction: row;
+    gap: 0.95em;
+    padding: 0.7em 1.15em;
+    border-radius: 3.5em;
+  }
+
+  /* the divider turns with everything else */
+  .rail__rule {
+    width: 1px;
+    height: 1.55em;
+  }
+
+  .rail__links {
+    flex-direction: row;
+    gap: 1em;
+  }
+
+  .rail__markArt {
+    width: 1.75em;
+    height: 2.07em;
+  }
+
+  .rail__github {
+    width: 1.75em;
+    height: 1.75em;
+  }
+
+  /*
+   * The links carry their own padding here so that each one is a target a
+   * thumb can actually hit. Lying down, the pill is only as tall as the type
+   * inside it — about fifteen pixels — and a fifteen-pixel link at the bottom
+   * of a phone is a link you miss.
+   */
+  .rail__link {
+    font-size: 1em;
+    padding: 0.5em 0.25em;
+  }
+}
+
+/*
+ * Phone gutters.
+ *
+ * `--hero-inset` is the hero frame's own inset — 10px, which is right for a
+ * rule drawn around the edge of the screen and much too tight for a paragraph
+ * set against it. Below the hero the sections take a gutter of their own.
+ * The navigation pill now floats at the top of the screen, so the footer no
+ * longer needs the extra bottom clearance it once had.
+ */
+@media (max-width: 700px) {
+  .shelf {
+    padding: 3.6em 1.6em 2.8em;
+  }
+
+  .shelf__lead {
+    max-width: 26em;
+  }
+
+  /* the rail now sits at the top, so the footer no longer needs extra bottom
+     padding to dodge it — a normal bottom margin is enough */
+  .foot {
+    padding: 2.6em 1.6em 1.6em;
+  }
+}
+
+/* the tightest phones: the pill spans the width it is given */
+@media (max-width: 380px) {
+  .rail {
+    gap: 0.7em;
+    padding: 0.6em 0.9em;
+  }
+
+  .rail__links {
+    gap: 0.75em;
+  }
+}
+
+/* --- the footer ---------------------------------------------------------- */
+
+.foot {
+  padding: 3em var(--hero-inset) 1.6em;
+}
+
+.foot__lockup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1em;
+  /* room for the mark to lean without the row reflowing around it */
+  padding: 2em 0 1em;
+}
+
+.foot__mark {
+  flex: 0 0 auto;
+  will-change: transform;
+}
+
+.foot__markArt {
+  display: block;
+  width: 17em;
+  height: 20.13em; /* 38:45, the mark's own ratio */
+  --pin-mark: #e60024;
+  --pin-mark-star: #ffffff;
+}
+
+.foot__word {
+  font-size: 20em;
+  font-weight: 500;
+  line-height: 0.82;
+  letter-spacing: -0.03em;
+  color: #e60024;
+  white-space: nowrap;
+}
+
+.foot__dm {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.55em;
+  margin-top: 1em;
+  color: #e60024;
+}
+
+.foot__dmLabel {
+  font-size: 1em;
+  letter-spacing: -0.01em;
+}
+
+.foot__social {
+  display: block;
+  width: 1.4em;
+  height: 1.4em;
+  color: inherit;
+  transition: transform 0.3s cubic-bezier(0.22, 0.68, 0.16, 1);
+}
+
+.foot__social svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (hover: hover) {
+  .foot__social:hover {
+    transform: translateY(-0.15em) scale(1.08);
+  }
+}
+
+.foot__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8em 2em;
+  margin-top: 2.2em;
+}
+
+.foot__small {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65em;
+  margin: 0;
+  font-size: 1em;
+  letter-spacing: -0.01em;
+  color: #e60024;
+}
+
+.foot__dot {
+  opacity: 0.6;
+}
+
+.foot__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+@media (hover: hover) {
+  .foot__link:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
+}
+
+/*
+ * The lockup is the one thing that cannot just scale down — at the hero's small
+ * end the wordmark would run past the page. It stacks rather than shrinking
+ * past reading size.
+ */
+@media (max-width: 900px) {
+  .foot__lockup {
+    flex-direction: column;
+    gap: 0.3em;
+  }
+
+  .foot__word {
+    font-size: min(13em, 28vw);
+  }
+
+  .foot__markArt {
+    width: 11em;
+    height: 13.03em;
+  }
+
+  .foot__bar {
+    justify-content: flex-start;
+  }
+}

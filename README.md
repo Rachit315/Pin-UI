@@ -1,210 +1,230 @@
-<div align="center">
-  <img src="Logo/Logo.svg" alt="Pin UI Logo" width="100" />
-  <h1>Pin UI</h1>
-  <p><strong>Cool UI components for GenZ & Vibecoders.</strong></p>
-  <p>A high-craft waitlist & showcase experience engineered with Next.js App Router, Motion, and Karplus-Strong physical audio synthesis.</p>
+<p align="center">
+  <img src=".github/banner.svg" alt="Pin UI — static designs, turned into components" width="100%">
+</p>
 
-  <p>
-    <a href="https://nextjs.org/"><img src="https://img.shields.io/badge/Next.js-16.3-black?style=flat-square&logo=next.js" alt="Next.js" /></a>
-    <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-19-087ea4?style=flat-square&logo=react" alt="React" /></a>
-    <a href="https://motion.dev/"><img src="https://img.shields.io/badge/Motion-v13-f08?style=flat-square" alt="Motion" /></a>
-    <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.7-3178c6?style=flat-square&logo=typescript" alt="TypeScript" /></a>
-    <a href="https://supabase.com/"><img src="https://img.shields.io/badge/Supabase-Database-3ecf8e?style=flat-square&logo=supabase" alt="Supabase" /></a>
-  </p>
-</div>
+<p align="center">
+  <a href="https://pinui.xyz"><b>pinui.xyz</b></a>
+  &nbsp;·&nbsp;
+  <a href="https://in.pinterest.com/rachitrampage23/pin-ui/">the board</a>
+  &nbsp;·&nbsp;
+  <a href="https://x.com/RachitThakur146">@RachitThakur146</a>
+</p>
 
----
-
-## ⚡ Overview
-
-**Pin UI** is a digital stage and interactive waitlist crafted for modern developers and creators. Built with obsessive attention to craft, micro-interactions, and design engineering, it combines physics-based animations, mathematical acoustic modeling, and zero-flash theme persistence.
-
-### Key Pages
-
-| Route | Purpose | Description |
-| :--- | :--- | :--- |
-| `/` | **Landing Stage** | Ultra-minimalist hero: one line, one link, centered. The hover arrow emerges seamlessly out of zero width. |
-| `/waitlist` | **Waitlist Experience** | Interactive 3-stage progressive registration, floating demo strip, and a personalized digital access pass. |
+<p align="center">
+  <img alt="Next.js 16" src="https://img.shields.io/badge/Next.js-16.3-0a0a0a?style=flat-square">
+  <img alt="React 19" src="https://img.shields.io/badge/React-19.1-0a0a0a?style=flat-square">
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.7-0a0a0a?style=flat-square">
+  <img alt="Motion" src="https://img.shields.io/badge/Motion-13.4-e60024?style=flat-square">
+  <img alt="No Tailwind" src="https://img.shields.io/badge/CSS-hand--written-e60024?style=flat-square">
+</p>
 
 ---
 
-## ✨ Features & Craft
+## The idea
 
-- 🎯 **Progressive Reveal Form**: Starts as a single email input; dynamically expands into handle and consent fields on focus using Motion `layout` without jumping or shifting layout unexpectedly.
-- 🌊 **Seamless Floating Demo Strip**: Drifting interactive preview cards under a bespoke 6-layer progressive `backdrop-filter` blur (ramping smoothly from 0 to 12px) running on the GPU off the main thread.
-- 🎸 **Karplus-Strong Sound Engine**: Zero audio samples or external audio downloads. All interaction audio is physically synthesized in real time via JavaScript and the Web Audio API using Karplus-Strong noise-feedback string modeling.
-- 🎟️ **Algorithmic Digital Ticket**: After joining, visitors receive a personalized vector access ticket with dynamic client-side font fitting, deterministic handle-hashed barcode symbology, high-resolution canvas PNG download, and 1-click X sharing.
-- 🎨 **Instant Dual-Theme System**: Switch between Default Light (crimson on white) and Crimson (white on crimson) via the interactive pin mark, synchronized with localStorage, SSR-safe, and instantly tied to SVG tab favicons.
-- 🔒 **Zero-Exposure Supabase Security**: PostgREST waitlist API with Row-Level Security enabled and zero table grants. Interactions route through a strictly secured `SECURITY DEFINER` PostgreSQL function with rate limiting.
+Pinterest is full of interface design that never becomes interface. Someone
+draws a beautiful card, a hundred people save it, and that is where it stops —
+a still image of something that was meant to move.
 
----
+**Pin UI takes pins off that board and finishes them.** Each one is rebuilt as a
+real React component: animated, interactive, accessible, and small enough to
+read in one sitting. You install it with a command you already have, and the
+code that lands in your project is the same code running on the page you
+installed it from.
 
-## 🚀 Quick Start
-
-### Prerequisites
-
-- **Node.js**: `>= 20.9.0`
-- **npm**, **pnpm**, or **yarn**
-
-### Installation
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/Rachit315/Pin-UI.git
-   cd Pin-UI
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Configure environment variables:**
-   ```bash
-   cp .env.example .env.local
-   ```
-   Fill in your Supabase project credentials (optional for local mock testing):
-   ```env
-   SUPABASE_URL=https://your-project.supabase.co
-   SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
-   NEXT_PUBLIC_SITE_URL=http://localhost:3100
-   ```
-
-4. **Run the development server:**
-   ```bash
-   npm run dev
-   ```
-   Visit [http://localhost:3100](http://localhost:3100) in your browser.
-
-5. **Build for production:**
-   ```bash
-   npm run build
-   npm run start
-   ```
+Three components today. Three new ones every week.
 
 ---
 
-## 🏗️ Project Structure
+## What is in the box
 
-```text
-Pin UI/
-├── app/
-│   ├── api/waitlist/route.ts       # Secure serverless signup endpoint
-│   ├── waitlist/page.tsx           # Interactive waitlist page
-│   ├── globals.css                 # Design tokens, typography & CSS animations
-│   ├── layout.tsx                  # Root layout & SSR theme bootstrap
-│   ├── page.tsx                    # Minimalist landing stage
-│   ├── robots.ts & sitemap.ts      # Automated SEO endpoints
-│   └── opengraph-image.png         # Social preview cards
-├── components/
-│   ├── BrandMark.tsx               # Theme switcher pin & brand mark
-│   ├── MediaStrip.tsx              # Progressive blur floating demo strip
-│   ├── TicketShape.tsx             # Vector access pass SVG
-│   ├── WaitlistForm.tsx            # Progressive 3-step waitlist form
-│   ├── WelcomePanel.tsx            # Post-signup state with barcode & pass
-│   └── ...                         # Supporting UI components
-├── lib/
-│   ├── sound.ts                    # Karplus-Strong physical audio synthesizer
-│   ├── motion.ts                   # Unified spring physics definitions
-│   ├── theme.ts                    # SSR sync external store for theme state
-│   ├── art.ts                      # High-res vector canvas PNG ticket renderer
-│   └── waitlist.ts                 # Direct-fetch Supabase PostgREST client
-├── public/
-│   ├── demo/                       # Demo video clips for floating strip
-│   └── icons & favicons            # Light/crimson dynamic theme icons
-└── supabase/                       # Supabase schema & secure RPC functions
-```
+| Component | What it does | Install |
+| :-- | :-- | :-- |
+| **Selection List** | A session broken into blocks, counting down in real time. The track is a clock, not a progress bar. | `npx shadcn@latest add "https://pinui.xyz/r/session-list.json"` |
+| **Balance Card** | A counting balance, a liquid currency selector and a drawer that settles. | `npx shadcn@latest add "https://pinui.xyz/r/balance-card.json"` |
+| **Add To Cart** | A product card that is only a photo until you open it. | `npx shadcn@latest add "https://pinui.xyz/r/cart-card.json"` |
 
----
-
-## 🔬 Architectural Deep Dive
-
-### 1. The Form Reveals Itself
-
-The registration form is designed as a single continuous flow rather than multi-step wizard screens:
-1. Opens as a single **Email** field above the action button.
-2. Focusing the email row drops in the **X / Twitter handle** field.
-3. Focusing the handle drops in the **consent** confirmation line.
-
-Rows only ever expand; focus never makes the form jerk or jump downwards. The container recenters itself dynamically within the viewport using Motion `layout` transitions. Submitting early automatically reveals the required row with descriptive feedback.
-
-### 2. The Floating Demo Strip & Progressive Blur
-
-Three interactive preview cards drift sideways across the lower stage:
-- **Progressive Blur**: Six stacked `backdrop-filter` layers compound into a continuous haze ramping from `0` to `12px` without edge halation or banding.
-- **Off-the-Main-Thread**: The drift is managed via CSS animation (`animation-play-state: paused` on hover) while individual cards use Motion spring transforms.
-- **Active Playback**: Only an expanded card plays media on loop; others sit paused on their first frame to conserve memory and decode performance.
-- **Interactive Escape**: Click any card to pop it `120px` clear of the strip with a 10% scale up. Press <kbd>Esc</kbd> or click outside to dismiss.
-
-### 3. Karplus-Strong Physical Sound Engine
-
-Rather than loading pre-recorded audio files (`.mp3`/`.wav`) that produce network overhead and latency, interaction sounds are synthesized in real time via physical modeling:
-- A one-period buffer filled with white noise is fed through an internal single-pole lowpass filter (`AudioBuffer`).
-- The noise reorganizes into pitch while higher frequencies decay naturally, matching the timbre of an acoustic plucked string.
-- Damping coefficients are analytically solved per-pitch to balance high shimmer notes (`1760Hz`) with low resonant roots (`293Hz`).
-- `playOpen`, `playClose`, and `playConfirm` provide tactile, auditory confirmation for navigation and submissions.
-
-### 4. Digital Ticket & Vector Canvas Export
-
-Upon signup, an access ticket is dynamically rendered on stage:
-- **One Layout Spec**: `lib/ticketLayout.ts` holds the pass's geometry once at a 540px reference width. The stylesheet scales it in `cqw` and the canvas scales it by its own width, so the screen and the exported PNG agree to within half a pixel on every element instead of drifting apart.
-- **Dynamic Type Fitting**: `layoutEmail` finds the largest size at which an address fits on one line; below a readable floor it breaks after the `@` and takes whichever gives the larger type. A 46-character address gets two lines at the full `24px` rather than one line at `9.5px`, and it never breaks mid-domain.
-- **Deterministic Barcode**: Barcode guard pairs and thin-weighted bar distributions are computed from a SHA hash of the user's handle.
-- **Canvas PNG Export**: Renders exact SVG vector paths directly to an off-screen `<canvas>` at device pixel ratio, reading active CSS variables to match the selected theme.
-- **Native Sharing**: One-click composer link pre-fills X posts with verified handles and canonical references.
-
-### 5. Dual-Theme Architecture
-
-Toggle between **Light** and **Crimson** by clicking the brand pin:
-
-| Token | Light (Default) | Crimson |
-| :--- | :--- | :--- |
-| **Page Background** | `#ffffff` | `#e60024` |
-| **Pin / Wordmark** | `#e60024` | `#ffffff` |
-| **Inputs** | Crimson on White | White on Crimson |
-| **Button** | `#0a0a0a` | `#0a0a0a` |
-
-- Applied to `<html data-pin-theme="...">` and cached in `localStorage`.
-- Zero-flash execution: an inline script in `app/layout.tsx` determines and injects the active theme before first paint.
-- Tab favicons (`<link rel="icon">`) and `<meta name="theme-color">` dynamically update on theme changes.
-
-### 6. Supabase & Database Security
-
-- The `public.waitlist` table enforces Row-Level Security (RLS) with **no public policies** and **zero table grants**. Direct REST queries return `42501 permission denied`.
-- Data is processed exclusively through `public.join_waitlist(email, handle, ip, user_agent)`, a PostgreSQL `SECURITY DEFINER` function with pinned `search_path`.
-- Implements email normalization, rate-limiting (max 5 signups per IP per 10 minutes), and idempotent conflict resolution.
-- Graceful offline fallback: if `SUPABASE_URL` is omitted, requests are logged locally and return mock success to prevent blocking local development or preview environments.
-
----
-
-## 🛠️ Tech Stack
-
-- **Framework**: [Next.js 16 (App Router)](https://nextjs.org/)
-- **UI Library**: [React 19](https://react.dev/)
-- **Animation**: [Motion v13](https://motion.dev/)
-- **Language**: [TypeScript 5.7](https://www.typescriptlang.org/)
-- **Styling**: Vanilla CSS Design System with CSS Custom Properties
-- **Audio**: Web Audio API (Karplus-Strong Algorithm)
-- **Database**: [Supabase](https://supabase.com/) (PostgreSQL + PostgREST)
-- **Deployment**: [Vercel](https://vercel.com/)
-
----
-
-## 🚢 Deployment
-
-The project is zero-config ready for Vercel:
+There is **no Pin UI CLI to install**, and that is deliberate. `shadcn`'s own
+`add` command takes any URL that answers with a registry item, and every
+component here is served as one. So the install command is a link, the registry
+is four static JSON files, and there is no package of ours between you and the
+source.
 
 ```bash
-npx vercel --prod
+# npm · pnpm · bun · yarn — pick the one you already use
+npx shadcn@latest add "https://pinui.xyz/r/balance-card.json"
+pnpm dlx shadcn@latest add "https://pinui.xyz/r/balance-card.json"
+bunx --bun shadcn@latest add "https://pinui.xyz/r/balance-card.json"
+yarn dlx shadcn@latest add "https://pinui.xyz/r/balance-card.json"
 ```
 
-Configure your environment variables in **Project Settings -> Environment Variables**:
-- `SUPABASE_URL`
-- `SUPABASE_PUBLISHABLE_KEY`
-- `NEXT_PUBLIC_SITE_URL`
+Two files land in `components/pinui/` — the component and the stylesheet it
+imports. The only runtime dependency is [Motion](https://motion.dev). The whole
+shelf at once lives at [`/r/registry.json`](https://pinui.xyz/r/registry.json).
 
 ---
 
-## 📄 License
+## Principles
 
-MIT © [Rachit](https://github.com/Rachit315)
+Six rules the whole thing is built on. They are not decoration; every one of
+them shows up in the code.
+
+**1 · The demo is the source.**
+Component pages read their own files off disk at build time and print them. The
+registry JSON is built from the same read. Nothing can drift, because there is
+only one copy.
+
+**2 · Everything moves on a spring.**
+No durations, no easing curves picked by eye. One set of spring tokens in
+`lib/motion.ts` gives the whole interface a single physical character — the same
+mass and damping behind a card entrance, a drawer settling and a mark flipping.
+
+**3 · Sound is synthesised, never sampled.**
+Every cue is a *struck string* — Karplus-Strong, solved in plain JavaScript into
+an AudioBuffer. Noise is filtered into a pitch that starts bright and darkens as
+it rings. No audio files ship, and nothing sounds like the sine blip every other
+site uses.
+
+**4 · Two themes, one gesture.**
+The pin is the switch, wherever it appears. Light is crimson on white; crimson
+is white on crimson. The choice is written to `<html data-pin-theme>` before
+first paint, so there is no flash, and it follows you between pages.
+
+**5 · One dial per surface.**
+The page is sized in `em` off a single clamped root, so a composition scales as
+one object instead of needing a breakpoint per element. Phones get their own
+dial rather than the bottom of the desktop one.
+
+**6 · Square corners on chrome.**
+Structure is carried by hairline rules and 1px gaps, not rounded panels and
+heavy shadows. The components keep whatever radii their own designs use — they
+are artwork, the site is not.
+
+---
+
+## The site
+
+| Route | What it is |
+| :-- | :-- |
+| `/` | The landing: masthead, a band of live component recordings, the shelf. |
+| `/components/<slug>` | The workbench — one component running on its own stage, with its write-up, install command, props and full source underneath. |
+| `/waitlist` | Progressive signup, ending in a generated access pass you can download or post. |
+| `/privacy`, `/terms` | Written against what the code does, not from a template. |
+| `/r/<slug>.json` | A shadcn registry item. Prerendered, CORS-open, cacheable. |
+| `/r/registry.json` | The whole shelf in one document. |
+| `/sitemap.xml`, `/robots.txt` | Generated from the real route list. |
+| `/api/waitlist` | The only dynamic route in the project. |
+
+Everything else is static or prerendered.
+
+---
+
+## Details worth knowing
+
+**The band never stops.** The hero's recordings loop continuously and the track
+is driven frame by frame rather than by a CSS animation — because slowing a CSS
+animation recomputes its position from the original start time, so the strip
+jumps the instant your pointer arrives. Holding the offset ourselves lets the
+speed ease down instead. Hovering slows it to a crawl; it does nothing else.
+
+**The Pinterest mark is a door.** Point at it anywhere in the copy and the board
+these components came from opens on a card that trails your cursor on a spring.
+It is built from the real recordings rather than embedded, because Pinterest
+answers with `X-Frame-Options: DENY` and there is no live frame to be had.
+
+**The mark travels.** Scroll past the hero and the masthead hands its lockup to
+the rail through a shared `layoutId`, so the pin moves rather than fading out in
+one place and in again in another. On a phone that rail lies down and becomes a
+pill at the foot of the screen, where a thumb already is.
+
+**The code panel opens downward.** Nothing on a component page covers the
+component. The write-up and the source give up the bottom of the window and
+arrive under the stage, so the thing you came to look at stays where it was.
+
+**No signup data leaves the server.** The waitlist writes through a Supabase
+`SECURITY DEFINER` function with row-level security on and zero table grants.
+Only the publishable key is used, only server-side. There is no service-role key
+anywhere in this repository.
+
+---
+
+## Running it
+
+```bash
+npm install
+npm run dev     # http://localhost:3100
+```
+
+```bash
+npm run build   # production build
+npm start       # serve the build
+```
+
+Node 20.9 or newer.
+
+### Environment
+
+Every variable is optional — without them the site builds, runs and renders
+identically; only the waitlist write is skipped.
+
+| Variable | Used for |
+| :-- | :-- |
+| `NEXT_PUBLIC_SITE_URL` | Canonical origin for metadata, the sitemap and the install commands. Falls back to the Vercel URL, then to `https://pinui.xyz`. |
+| `SUPABASE_URL` | PostgREST endpoint for the waitlist. Server-side only. |
+| `SUPABASE_PUBLISHABLE_KEY` | Publishable key. Server-side only. Never the service-role key. |
+
+The schema and the signup function live in [`supabase/migrations`](supabase/migrations).
+
+---
+
+## Layout
+
+```
+app/
+├─ page.tsx                 the landing
+├─ components/[slug]/       the workbench, one page per component
+├─ r/[slug]/                registry items, prerendered to static JSON
+├─ waitlist/ · privacy/ · terms/
+├─ api/waitlist/            the one dynamic route
+├─ hero.css · sections.css · globals.css
+components/
+├─ hero/                    masthead, band, rail, footer, Pinterest peek
+├─ library/                 the three components, the registry, the workbench
+├─ legal/                   the policy shell
+lib/
+├─ motion.ts                spring tokens — the whole site's physics
+├─ sound.ts                 the Karplus-Strong string
+├─ theme.ts                 the theme store, and the mark's turn count
+├─ art.ts                   shared vector paths
+├─ links.ts                 every off-site address, in one place
+├─ registryItem.ts          components → shadcn registry items
+└─ waitlist.ts              the Supabase client
+public/
+├─ clips/                   component recordings
+├─ fonts/                   Inter & Inter Tight, self-hosted
+└─ hero/ · library/
+```
+
+---
+
+## Using the components
+
+Every component published here is offered under the
+[MIT licence](https://opensource.org/license/mit): copy them, change them, ship
+them in work you sell, and you owe nothing and need not ask — keep the licence
+notice with the code if you redistribute the components themselves. What that
+does **not** cover is the Pin UI name and mark, or any photograph or recording
+used to demonstrate a component. Those stay with their owners. The full wording
+is on [the terms page](https://pinui.xyz/terms).
+
+Each component is also a standalone project of its own:
+[Balance-Card](https://github.com/Rachit315/Balance-Card) is the original build
+of that one.
+
+---
+
+<p align="center">
+  <sub>Built by <a href="https://github.com/Rachit315">Rachit</a> · found on
+  <a href="https://in.pinterest.com/rachitrampage23/pin-ui/">Pinterest</a> ·
+  <a href="https://pinui.xyz">pinui.xyz</a></sub>
+</p>

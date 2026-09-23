@@ -17,6 +17,18 @@ export type { PinTheme };
  * a plain subscribable store is both simpler and boundary-proof.
  */
 let current: PinTheme = DEFAULT_THEME;
+/*
+ * How many times the switch has been thrown this session.
+ *
+ * The mark turns a full circle on every flip, and a counter is what makes it
+ * keep turning the same way instead of winding back on the second press. It
+ * lives here rather than in a component because the same lockup exists in four
+ * places — the masthead, the rail, the component page's bar and the workbench
+ * sidebar — and two of those hand the mark to each other mid-flight through a
+ * shared `layoutId`. A local counter would mean the arriving mark started from
+ * zero and spun back.
+ */
+let turns = 0;
 let adopted = false;
 const listeners = new Set<() => void>();
 
@@ -37,6 +49,14 @@ function getSnapshot(): PinTheme {
   return current;
 }
 
+function getTurns(): number {
+  return turns;
+}
+
+function getServerTurns(): number {
+  return 0;
+}
+
 /** Server and first client render agree; the DOM value is adopted after mount. */
 function getServerSnapshot(): PinTheme {
   return DEFAULT_THEME;
@@ -45,6 +65,7 @@ function getServerSnapshot(): PinTheme {
 export function setTheme(next: PinTheme) {
   if (next === current) return;
   current = next;
+  turns += 1;
   document.documentElement.dataset.pinTheme = next;
   try {
     window.localStorage.setItem(THEME_STORAGE_KEY, next);
@@ -56,6 +77,8 @@ export function setTheme(next: PinTheme) {
 
 export function usePinTheme() {
   const theme = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  /* a second scalar off the same subscription, so the two never disagree */
+  const turnCount = useSyncExternalStore(subscribe, getTurns, getServerTurns);
 
   /* Pick up whatever the no-flash script wrote, once, after hydration. */
   useEffect(() => {
@@ -72,5 +95,5 @@ export function usePinTheme() {
     setTheme(current === "light" ? "crimson" : "light");
   }, []);
 
-  return { theme, toggleTheme };
+  return { theme, turns: turnCount, toggleTheme };
 }

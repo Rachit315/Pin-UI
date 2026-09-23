@@ -1,3 +1,28 @@
+/*
+ * The two faces the library's components are drawn in, self-hosted.
+ *
+ * They are declared under their real family names rather than through a
+ * generated one, so a component's stylesheet can ask for `Inter` plainly and
+ * still be copy-paste-able into a project that loads Inter its own way. Both
+ * are variable, latin-subset, and served from this origin — nothing is fetched
+ * from a third party at runtime.
+ */
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/inter-var-latin.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter Tight";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/inter-tight-var-latin.woff2") format("woff2");
+}
+
 /* ---------------------------------------------------------------------------
    Pin UI — global tokens & base styles
 
@@ -942,6 +967,20 @@ a {
 }
 
 /* --- utilities ------------------------------------------------------------ */
+
+/*
+ * The wrapper the pin turns inside.
+ *
+ * Every lockup on the site uses it, so the flip is one animation in one place
+ * rather than a per-lockup reimplementation that drifts. The rotation itself
+ * is driven by Motion off the theme store's turn count.
+ */
+.pinFlip {
+  display: block;
+  line-height: 0;
+  transform-style: preserve-3d;
+  perspective: 40em;
+}
 
 .sr-only {
   position: absolute;

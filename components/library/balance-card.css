@@ -1,0 +1,480 @@
+/* ===========================================================================
+   Balance Card
+   ---------------------------------------------------------------------------
+   Every value the component needs is a token on the root element, so a copy of
+   this file can be retuned without touching the markup. The component ships
+   its own dark palette on purpose: it is a card, not a page, and it should
+   look the same wherever it is dropped.
+=========================================================================== */
+
+.pbal {
+  --pbal-card: #070707;
+  --pbal-chip: #2b2b2b;
+  --pbal-soft: #242424;
+  --pbal-accent: #0a84ff;
+  --pbal-up: #31d158;
+  --pbal-sheet: #141414;
+  --pbal-well: #111111;
+
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  /* the balance is sized in `cqw`, so the card must be its own query container */
+  container-type: inline-size;
+  font-family: "Inter Tight", Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: #ffffff;
+  text-align: left;
+}
+
+.pbal *,
+.pbal *::before,
+.pbal *::after {
+  box-sizing: border-box;
+}
+
+/*
+ * `:where()` carries no specificity, so this reset sits *below* the component's
+ * own class rules instead of above them. Written as a bare `.pbal button` it
+ * would outrank every single-class rule in this file and quietly strip the type
+ * off the controls that set their own.
+ */
+.pbal :where(button) {
+  margin: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.pbal :focus-visible {
+  outline: 2px solid var(--pbal-accent);
+  outline-offset: 3px;
+  border-radius: 999px;
+}
+
+/* the figures must not reflow as they count */
+.pbal__tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* --- the card ------------------------------------------------------------ */
+
+/*
+ * The measurements come off the reference art, scaled to the card's own 400px
+ * width: 400 × 243 overall, a 37px corner, and the rhythm below it.
+ */
+.pbal__card {
+  position: relative;
+  padding: 26px 22px 22px;
+  border-radius: 37px;
+  background: var(--pbal-card);
+  box-shadow: 0 10px 24px -14px rgb(0 0 0 / 0.5);
+}
+
+/* a soft light that follows the pointer across the card */
+.pbal__glow {
+  position: absolute;
+  inset: -1px;
+  overflow: hidden;
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    320px circle at var(--pbal-mx, 50%) var(--pbal-my, 0%),
+    rgb(10 132 255 / 0.16),
+    transparent 60%
+  );
+}
+
+.pbal__inner {
+  position: relative;
+}
+
+.pbal__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.pbal__label {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
+  color: rgb(255 255 255 / 0.4);
+}
+
+.pbal__amount {
+  display: flex;
+  align-items: baseline;
+  margin: 8px 0 0;
+  /* fluid, so it never collides with the currency pill on a narrow card */
+  font-size: clamp(24px, 8.5cqw, 34px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.pbal__sign {
+  margin-right: 2px;
+}
+
+/* --- currency selector ---------------------------------------------------- */
+
+.pbal__currency {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.pbal__currencyBtn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 13px 25px 13px 21px;
+  border-radius: 999px;
+  background: #ffffff;
+  font-size: 17px;
+  font-weight: 700;
+  /* a button's own `normal` leading would make the pill four pixels too tall */
+  line-height: 1;
+  color: #000000;
+}
+
+.pbal__chev {
+  width: 19px;
+  height: 19px;
+}
+
+.pbal__menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 20;
+  width: 140px;
+  transform-origin: top right;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pbal__sheet {
+  position: relative;
+  padding: 6px;
+  border-radius: 18px;
+  background: var(--pbal-sheet);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.1),
+    0 12px 28px -12px rgb(0 0 0 / 0.7);
+}
+
+/*
+ * The liquid layer. Two white pills sit under the rows and are blurred into a
+ * single shape by the SVG filter; the head snaps to the hovered row while the
+ * tail lags behind, so the two stretch apart and pull back together. The rows
+ * ride on top un-blurred.
+ */
+.pbal__goo {
+  position: absolute;
+  inset: 6px;
+  z-index: 0;
+  pointer-events: none;
+  filter: url(#pbal-goo);
+}
+
+.pbal__blob {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 38px;
+  border-radius: 999px;
+  background: #ffffff;
+  opacity: 0;
+}
+
+.pbal__list {
+  position: relative;
+  z-index: 10;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pbal__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  transition: color 0.2s ease;
+}
+
+.pbal__row--on {
+  color: #000000;
+}
+
+.pbal__rowSign {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.45;
+}
+
+/* --- trend chip ----------------------------------------------------------- */
+
+.pbal__chipRow {
+  margin-top: 20px;
+}
+
+.pbal__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  border-radius: 999px;
+  background: var(--pbal-chip);
+}
+
+.pbal__arrow {
+  width: 14px;
+  height: 14px;
+  color: var(--pbal-up);
+}
+
+.pbal__pct {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--pbal-up);
+}
+
+.pbal__since {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  color: rgb(255 255 255 / 0.9);
+}
+
+/* --- actions -------------------------------------------------------------- */
+
+.pbal__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.pbal__action {
+  padding: 22px 0;
+  border-radius: 999px;
+  background: var(--pbal-soft);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  color: #ffffff;
+}
+
+.pbal__action--accent {
+  position: relative;
+  overflow: hidden;
+  background: var(--pbal-accent);
+}
+
+.pbal__ripple {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.3);
+  pointer-events: none;
+}
+
+/* --- drawer --------------------------------------------------------------- */
+
+.pbal__drawer {
+  height: 0;
+  overflow: hidden;
+}
+
+.pbal__drawerInner {
+  padding-top: 14px;
+}
+
+.pbal__well {
+  padding: 12px;
+  border-radius: 20px;
+  background: var(--pbal-well);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.07);
+}
+
+.pbal__wellTitle {
+  margin: 0;
+  padding: 0 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgb(255 255 255 / 0.45);
+}
+
+.pbal__presets {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.pbal__preset {
+  padding: 10px 0;
+  border-radius: 12px;
+  background: var(--pbal-soft);
+  font-size: 12px;
+  font-weight: 700;
+  color: rgb(255 255 255 / 0.85);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.pbal__preset--on {
+  background: #ffffff;
+  color: #000000;
+}
+
+.pbal__confirmRow {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.pbal__cancel {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: 999px;
+  background: var(--pbal-soft);
+  font-size: 13px;
+  font-weight: 700;
+  color: rgb(255 255 255 / 0.7);
+}
+
+.pbal__confirm {
+  flex: 1.6;
+  padding: 10px 0;
+  border-radius: 999px;
+  background: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  color: #000000;
+}
+
+.pbal__confirm:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* --- toast ---------------------------------------------------------------- */
+
+.pbal__toast {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 16px;
+  z-index: 30;
+  display: flex;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pbal__toastBody {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  color: #000000;
+  box-shadow: 0 10px 22px -12px rgb(0 0 0 / 0.8);
+}
+
+.pbal__toastTick {
+  width: 14px;
+  height: 14px;
+}
+
+/* the filter host never draws anything itself */
+.pbal__defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+/* --- the credit line ------------------------------------------------------ */
+
+.pbal__credit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.pbal__creditText {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1;
+  color: rgb(255 255 255 / 0.35);
+}
+
+.pbal__creditLink {
+  font-weight: 500;
+  color: rgb(255 255 255 / 0.7);
+  text-decoration: underline;
+  text-decoration-color: rgb(255 255 255 / 0.25);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  transition: color 0.2s ease;
+}
+
+.pbal__sfx {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  color: rgb(255 255 255 / 0.35);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.pbal__sfx svg {
+  display: block;
+  width: 14px;
+  height: 14px;
+}
+
+@media (hover: hover) {
+  .pbal__creditLink:hover {
+    color: #ffffff;
+    text-decoration-color: rgb(255 255 255 / 0.7);
+  }
+
+  .pbal__sfx:hover {
+    background: rgb(255 255 255 / 0.05);
+    color: rgb(255 255 255 / 0.7);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pbal__glow {
+    display: none;
+  }
+}

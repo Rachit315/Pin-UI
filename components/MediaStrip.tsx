@@ -25,7 +25,17 @@ import { softSpring, spring } from "@/lib/motion";
  *    the tail of the track walks into view and leaves a gap at the right edge.
  */
 
-const SOURCES = ["/demo/demo-2.mp4", "/demo/demo-3.mp4", "/demo/demo-4.mp4"];
+/*
+ * The three components the library ships, the same recordings the landing
+ * page runs. They used to be `/demo/demo-*.mp4`, which stopped existing when
+ * the clips were renamed and moved under `/clips` — the strip was asking for
+ * three files that answered 404.
+ */
+const SOURCES = [
+  "/clips/session-list.mp4",
+  "/clips/balance-card.mp4",
+  "/clips/cart-card.mp4",
+];
 
 /** How fast the strip drifts, in CSS pixels per second. */
 const SPEED = 26;

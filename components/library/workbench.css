@@ -1,0 +1,1102 @@
+/* ===========================================================================
+   The component workbench — Figma 345:21
+   ---------------------------------------------------------------------------
+   A full-height workspace rather than a page: a fixed sidebar listing the
+   library, and a stage that holds the live component. Nothing scrolls except
+   the code drawer, because a tool you are poking at should not move under you.
+
+   The design is drawn at 1280×832. Everything here is sized in the same `em`
+   off `.site` as the rest of the site, and that root holds at 14px from about
+   1000px upward — so at the width it was drawn for, these numbers *are* the
+   Figma numbers, and below it the whole workspace scales down together.
+=========================================================================== */
+
+.site.site--wb {
+  --wb-title: #e60024;
+  --wb-item: rgb(0 0 0 / 0.6);
+  --wb-icon: #e60024;
+  --wb-rail: rgb(0 0 0 / 0.4);
+  --wb-pin: #e60024;
+  --wb-edge: #e60024;
+  --wb-bar: #ffffff;
+  --wb-bar-ink: #0f0f0f;
+  --wb-bar-hover: rgb(0 0 0 / 0.07);
+  --wb-bar-edge: rgb(0 0 0 / 0.08);
+
+  /* the mark keeps its red in both states here — only the wordmark inverts */
+  --pin-mark: #e60024;
+  --pin-mark-star: #ffffff;
+
+  display: flex;
+  height: 100dvh;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+:root[data-pin-theme="crimson"] .site.site--wb {
+  --wb-title: #ffffff;
+  --wb-item: #aaaaaa;
+  --wb-icon: #aaaaaa;
+  --wb-rail: rgb(255 255 255 / 0.4);
+  --wb-bar: #0f0f0f;
+  --wb-bar-ink: #e5e5e5;
+  --wb-bar-hover: rgb(255 255 255 / 0.12);
+  --wb-bar-edge: rgb(255 255 255 / 0.14);
+
+  --pin-mark: #e60024;
+  --pin-mark-star: #ffffff;
+
+  background: linear-gradient(180deg, #0f0f0f 0%, #0a0a0a 100%);
+}
+
+.site--wb *,
+.site--wb *::before,
+.site--wb *::after {
+  box-sizing: border-box;
+}
+
+/*
+ * Scoped to the workbench's OWN controls, never to `button` inside the stage: a
+ * container that hosts other people's markup does not get to restyle their
+ * elements.
+ *
+ * And wrapped in `:where()`, which carries no specificity, so it sits BELOW the
+ * class rules instead of above them. Written plainly it outranked every
+ * single-class rule here — which is exactly how the expand control lost its
+ * fill and its icon colour and became a floating shadow.
+ */
+:where(.wbnav button, .wbbar button, .wbstage__expand) {
+  margin: 0;
+  border: 0;
+  padding: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.site--wb button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.wbnav :focus-visible,
+.wbbar :focus-visible,
+.wbstage__expand:focus-visible {
+  outline: 2px solid var(--wb-pin);
+  outline-offset: 3px;
+}
+
+/* --- the sidebar ---------------------------------------------------------- */
+
+.wbnav {
+  position: relative;
+  flex: 0 0 auto;
+  /* 362 at the reference root: content gutter 40, rail at 306 */
+  width: 25.857em;
+  padding: 3.857em 0 0 2.857em;
+  overflow: hidden;
+}
+
+.wbnav__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  /* the collapse control sits on the rail's guide, not the panel edge */
+  padding-right: 2.857em;
+}
+
+.wbnav__lockup {
+  display: flex;
+  align-items: center;
+  gap: 0.586em;
+  text-decoration: none;
+}
+
+.wbnav__mark {
+  display: block;
+  flex: 0 0 auto;
+  width: 2.228em;
+  height: 2.639em;
+}
+
+.wbnav__markButton {
+  display: block;
+  line-height: 0;
+  /* a button takes the browser's own type otherwise, and everything here is em */
+  font: inherit;
+}
+
+.wbnav__word {
+  font-size: 2.111em;
+  font-weight: 500;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  color: var(--wb-title);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* the `button` reset above outranks a lone class, so the offset is scoped */
+.wbnav__head .wbnav__collapse {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 2.286em;
+  height: 2.286em;
+  margin-top: 0.143em;
+  color: var(--wb-icon);
+}
+
+.wbnav__collapse svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.wbnav__title {
+  /*
+   * 44px of air below the lockup, in *this* element's em, which is 32px. The
+   * file quotes 60, but it drew three rows of placeholder text; with real names
+   * under it that much dead space reads as a gap rather than as grouping.
+   */
+  margin: 1.375em 0 0;
+  font-size: 2.286em;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--wb-title);
+}
+
+/* --- the list, and the pin that marks your place -------------------------- */
+
+.wbnav__list {
+  position: relative;
+  margin: 1.857em 0 0; /* 26px: the rows carry padding of their own on top */
+  padding: 0;
+  list-style: none;
+}
+
+/*
+ * The file sets these rows as "Components 1" three times; with real names they
+ * need more room than that. The type is a touch smaller and the rows a touch
+ * further apart, which reads as a list rather than as a stack, and the one you
+ * are on carries weight instead of only losing transparency — dimming alone is
+ * a weak signal once every row says something different.
+ */
+.wbnav__link {
+  display: block;
+  padding: 0.4em 0;
+  font-size: 1.357em;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  color: var(--wb-item);
+  text-decoration: none;
+  /*
+   * A name is one line. Without this the rows re-wrap while the panel is
+   * closing, which changes their heights — and anything measuring them at that
+   * moment reads the wrapped layout.
+   */
+  white-space: nowrap;
+  opacity: 0.55;
+  transition:
+    opacity 0.25s ease,
+    color 0.25s ease,
+    transform 0.35s cubic-bezier(0.22, 0.68, 0.16, 1);
+}
+
+.wbnav__item + .wbnav__item {
+  margin-top: 0.643em; /* 46px between rows, of which 37 is the row */
+}
+
+.wbnav__link[aria-current="page"] {
+  opacity: 1;
+  font-weight: 500;
+  color: var(--wb-title);
+}
+
+@media (hover: hover) {
+  .wbnav__link:not([aria-current="page"]):hover {
+    transform: translateX(0.15em);
+  }
+}
+
+/*
+ * The rail runs the height of the list and the pin drops onto whichever
+ * component you are looking at — the one piece of furniture on this screen that
+ * says where you are, which is why it moves rather than being redrawn.
+ */
+.wbnav__rail {
+  position: absolute;
+  /* 306 from the panel edge, less the 40 gutter the list starts at */
+  left: 19em;
+  width: 0.143em;
+  border-radius: 999px;
+  background: var(--wb-rail);
+}
+
+.wbnav__pin {
+  position: absolute;
+  /* centred on the rail: 301 from the panel edge, 12 wide */
+  left: 18.643em;
+  width: 0.857em;
+  height: 0.857em;
+  border-radius: 999px;
+  background: var(--wb-pin);
+  transform: translateY(-50%);
+  transition: top 0.55s cubic-bezier(0.22, 0.68, 0.16, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wbnav__pin {
+    transition: none;
+  }
+}
+
+/* the soft white centre the design blurs into the pin */
+.wbnav__pin::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0.357em;
+  height: 0.357em;
+  margin: -0.179em 0 0 -0.179em;
+  border-radius: 999px;
+  background: #ffffff;
+  filter: blur(0.143em);
+}
+
+/* --- the stage ------------------------------------------------------------ */
+
+.wbstage {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 1.286em 1.286em 1.286em 0;
+  /* a themed gutter rather than the platform's grey slab */
+  scrollbar-width: thin;
+  scrollbar-color: var(--wb-pin) transparent;
+}
+
+/*
+ * Shrunk, the frame gives up the bottom of the window and the write-up takes
+ * that room; the column scrolls, and the frame stops being centred so the
+ * reading starts where the stage ends rather than a screen below it.
+ */
+.wbstage--compact {
+  justify-content: flex-start;
+  overflow-y: auto;
+}
+
+.wbstage__frame {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border: 0.8px solid var(--wb-edge);
+  border-radius: 1.429em;
+  transition: height 0.5s cubic-bezier(0.22, 0.68, 0.16, 1);
+}
+
+/* the second of the two heights the design draws: 600 of the full 796 */
+.wbstage__frame--compact {
+  height: 75.4%;
+}
+
+/* the component's own field, so it is shown the way it was designed to be */
+.wbstage__field {
+  position: absolute;
+  inset: 0;
+}
+
+/*
+ * Wide enough that every component gets the width it was designed at — the
+ * balance card is the widest at 400 — and no wider, so nothing is stretched.
+ * Each component caps itself; the stage only centres them.
+ */
+.wbstage__hold {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 34em;
+  max-height: 100%;
+  padding: 2em;
+  /*
+   * A component taller than the shrunk stage scrolls inside it. Scaling it to
+   * fit would be prettier and wrong: the cart reads pointer deltas in CSS
+   * pixels, so a scaled card would drag at the wrong rate.
+   */
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.35) transparent;
+}
+
+/* --- the toolbar ---------------------------------------------------------- */
+
+.wbbar {
+  position: absolute;
+  left: 50%;
+  bottom: 0.8em;
+  z-index: 3;
+  /*
+   * `left: 50%` puts the bar's LEFT edge on the centre line; the translate is
+   * what pulls it back by half its own width. Without it the bar sits half its
+   * width to the right, and the wider it gets the more obvious that is.
+   */
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.43em;
+  height: 2.857em;
+  padding: 0 0.5em;
+  border-radius: 999px;
+  background: var(--wb-bar);
+  color: var(--wb-bar-ink);
+  /*
+   * A hairline does the separating and the shadow only suggests height. The
+   * other way round — a heavy drop and no edge — is what made these read as
+   * smudges rather than as objects.
+   */
+  box-shadow:
+    0 0 0 1px var(--wb-bar-edge),
+    0 0.35em 0.9em rgb(0 0 0 / 0.14);
+}
+
+/*
+ * The hit area is the whole rounded square, not just the 20px glyph — the icon
+ * keeps the size the design draws while the target stays a comfortable 34px,
+ * and that square is what carries the hover.
+ */
+.wbbar__button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 2.43em;
+  height: 2.43em;
+  border-radius: 999px;
+  color: inherit;
+  opacity: 0.75;
+  transition:
+    opacity 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s cubic-bezier(0.22, 0.68, 0.16, 1);
+}
+
+.wbbar__button svg {
+  display: block;
+  width: 1.429em;
+  height: 1.429em;
+}
+
+.wbbar__button[aria-pressed="true"] {
+  opacity: 1;
+  color: var(--wb-pin);
+}
+
+.wbbar__button:active {
+  transform: scale(0.92);
+}
+
+@media (hover: hover) {
+  .wbbar__button:hover {
+    opacity: 1;
+    background: var(--wb-bar-hover);
+    transform: translateY(-0.1em);
+  }
+
+  .wbnav__link:hover {
+    opacity: 1;
+  }
+}
+
+/* --- the code panel (shared by every code block) -------------------------- */
+
+/*
+ * It reads on the page now rather than inside a dark drawer, so it takes the
+ * theme with everything else. Only the token hues change between the two: the
+ * structure, the tab rule and the copy control are the same object.
+ */
+.site.site--wb {
+  --code-bg: #fbfbfb;
+  --code-edge: rgb(0 0 0 / 0.12);
+  --code-ink: #1c1c1c;
+  --code-dim: rgb(0 0 0 / 0.5);
+  --code-rule: rgb(0 0 0 / 0.1);
+  --tok-comment: #6b7785;
+  --tok-string: #a04100;
+  --tok-keyword: #cf222e;
+  --tok-number: #0550ae;
+  --tok-type: #0a7a5e;
+  --tok-prop: #6f42c1;
+}
+
+:root[data-pin-theme="crimson"] .site.site--wb {
+  --code-bg: #0f0f0f;
+  --code-edge: rgb(255 255 255 / 0.14);
+  --code-ink: #e6e6e6;
+  --code-dim: rgb(255 255 255 / 0.5);
+  --code-rule: rgb(255 255 255 / 0.12);
+  --tok-comment: #7e8a97;
+  --tok-string: #ffb38a;
+  --tok-keyword: #ff5f78;
+  --tok-number: #a5d6ff;
+  --tok-type: #7ee3c0;
+  --tok-prop: #c7a4ff;
+}
+
+.code {
+  border: 1px solid var(--code-edge);
+  border-radius: 0.9em;
+  background: var(--code-bg);
+  overflow: hidden;
+  transition:
+    background-color var(--pin-theme-fade) var(--pin-theme-ease),
+    border-color var(--pin-theme-fade) var(--pin-theme-ease);
+}
+
+.code__bar {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 1em;
+  border-bottom: 1px solid var(--code-rule);
+}
+
+.code__tabs {
+  display: flex;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.code__tab {
+  position: relative;
+  flex: 0 0 auto;
+  padding: 0.85em 1.2em;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.875em;
+  color: var(--code-dim);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+.code__tab--on {
+  color: var(--code-ink);
+}
+
+.code__tabRule {
+  position: absolute;
+  inset-inline: 0.7em;
+  bottom: 0;
+  height: 2px;
+  background: var(--wb-pin);
+}
+
+.code__copy {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  padding: 0 1.2em;
+  border: 0;
+  border-left: 1px solid var(--code-rule);
+  background: none;
+  font: inherit;
+  font-size: 0.875em;
+  color: var(--code-dim);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.code__copy:hover {
+  color: var(--code-ink);
+}
+
+.code__copyFace {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  white-space: nowrap;
+}
+
+.code__copyFace svg {
+  width: 1.05em;
+  height: 1.05em;
+}
+
+.code__scroll {
+  max-height: 34em;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--code-dim) transparent;
+}
+
+.code__pre {
+  margin: 0;
+  padding: 1.2em 1.4em;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.8125em;
+  line-height: 1.7;
+  color: var(--code-ink);
+  tab-size: 2;
+}
+
+.code__pre:focus-visible {
+  outline: 2px solid var(--wb-pin);
+  outline-offset: -2px;
+}
+
+.code__foot {
+  margin: 0;
+  padding: 0.7em 1.4em;
+  border-top: 1px solid var(--code-rule);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.75em;
+  color: var(--code-dim);
+}
+
+.tok--comment {
+  color: var(--tok-comment);
+  font-style: italic;
+}
+
+.tok--string {
+  color: var(--tok-string);
+}
+
+.tok--keyword,
+.tok--selector {
+  color: var(--tok-keyword);
+}
+
+.tok--number {
+  color: var(--tok-number);
+}
+
+.tok--type {
+  color: var(--tok-type);
+}
+
+.tok--prop {
+  color: var(--tok-prop);
+}
+
+/* --- the write-up the shrink uncovers ------------------------------------- */
+
+/*
+ * Every block rises as it arrives, staggered by an inline delay. The animation
+ * fills `backwards`, so the resting state is the visible one and the movement
+ * is only dressing — a page that never produces a frame still reads correctly.
+ */
+@keyframes wbrise {
+  from {
+    opacity: 0;
+    transform: translateY(1.2em);
+  }
+}
+
+.wbinfo {
+  padding-top: 3.4em;
+  color: var(--wb-title);
+}
+
+.wbinfo > * {
+  animation: wbrise 0.55s cubic-bezier(0.22, 0.68, 0.16, 1) backwards;
+}
+
+.wbinfo__name {
+  margin: 0;
+  font-size: 2.857em;
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: var(--wb-title);
+}
+
+.wbinfo__lead {
+  max-width: 30em;
+  margin: 0.4em 0 0;
+  font-size: 1.286em;
+  line-height: 1.4;
+  letter-spacing: -0.015em;
+  color: var(--wb-item);
+  animation-delay: 0.04s;
+}
+
+.wbinfo__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  margin: 1.6em 0 0;
+  padding: 0;
+  list-style: none;
+  animation-delay: 0.08s;
+}
+
+.wbinfo__chip {
+  padding: 0.4em 0.9em;
+  border: 1px solid var(--wb-rail);
+  border-radius: 999px;
+  font-size: 0.9375em;
+  letter-spacing: -0.01em;
+  color: var(--wb-item);
+}
+
+.wbinfo__body {
+  max-width: 46em;
+  margin: 1.5em 0 0;
+  font-size: 1.143em;
+  line-height: 1.7;
+  letter-spacing: -0.01em;
+  color: var(--wb-item);
+}
+
+.wbinfo__credit {
+  max-width: 46em;
+  margin: 2.4em 0 0;
+  padding-top: 1.6em;
+  border-top: 1px solid var(--wb-rail);
+  font-size: 1.0625em;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+  color: var(--wb-item);
+  animation-delay: 0.3s;
+}
+
+.wbinfo__link {
+  color: var(--wb-pin);
+  text-decoration: underline;
+  text-underline-offset: 0.22em;
+  text-decoration-thickness: 1px;
+}
+
+@media (hover: hover) {
+  .wbinfo__link:hover {
+    text-decoration-thickness: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wbinfo > * {
+    animation: none;
+  }
+}
+
+/* --- the one-line install -------------------------------------------------- */
+
+/*
+ * The same surface and token set as the code panel below it, so the two read
+ * as one object rather than two boxes that happen to be stacked.
+ */
+.install {
+  border: 1px solid var(--code-edge);
+  border-radius: 0.9em;
+  background: var(--code-bg);
+  overflow: hidden;
+  transition:
+    background-color var(--pin-theme-fade) var(--pin-theme-ease),
+    border-color var(--pin-theme-fade) var(--pin-theme-ease);
+}
+
+.install__bar {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 1em;
+  border-bottom: 1px solid var(--code-rule);
+}
+
+.install__tabs {
+  display: flex;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.install__tab {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.8em 1em;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 0.9375em;
+  letter-spacing: -0.01em;
+  color: var(--code-dim);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+.install__tab--on {
+  color: var(--code-ink);
+}
+
+.install__icon {
+  display: block;
+  width: 1.05em;
+  height: 1.05em;
+}
+
+.install__icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.install__rule {
+  position: absolute;
+  inset-inline: 0.6em;
+  bottom: 0;
+  height: 2px;
+  background: var(--wb-pin);
+}
+
+.install__copy {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0 1.1em;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 0.875em;
+  color: var(--code-dim);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.install__copy:hover {
+  color: var(--code-ink);
+}
+
+.install__copyFace {
+  display: inline-flex;
+  align-items: center;
+}
+
+.install__copyFace svg {
+  display: block;
+  width: 1.15em;
+  height: 1.15em;
+}
+
+.install__hint {
+  white-space: nowrap;
+}
+
+/*
+ * The command wraps rather than scrolling sideways: it is one line you are
+ * meant to read and copy, and a horizontal scrollbar hides half of it.
+ */
+.install__line {
+  padding: 1.1em 1.3em;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.8125em;
+  line-height: 1.7;
+  color: var(--code-ink);
+  overflow-wrap: anywhere;
+}
+
+.install__line code:focus-visible {
+  outline: 2px solid var(--wb-pin);
+  outline-offset: 2px;
+  border-radius: 0.2em;
+}
+
+.install__run {
+  color: var(--tok-keyword);
+}
+
+.install__url {
+  color: var(--tok-string);
+}
+
+/* --- the column under the stage ------------------------------------------- */
+
+.wbdoc {
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: 52em;
+  margin: 0 auto;
+  padding-bottom: 4em;
+}
+
+/* --- the source section ---------------------------------------------------- */
+
+.wbsrc {
+  padding-top: 3.4em;
+  color: var(--wb-title);
+}
+
+/* the write-up above it already ends in a rule, so this one takes a divider */
+.wbinfo + .wbsrc {
+  margin-top: 3.4em;
+  border-top: 1px solid var(--wb-rail);
+}
+
+.wbsrc > * {
+  animation: wbrise 0.55s cubic-bezier(0.22, 0.68, 0.16, 1) backwards;
+}
+
+.wbsrc__name {
+  margin: 0 0 0.5em;
+  font-size: 2.286em;
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--wb-title);
+}
+
+.wbsrc__h3 {
+  margin: 2.4em 0 0.7em;
+  font-size: 1.5em;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--wb-title);
+}
+
+.wbsrc__body {
+  max-width: 46em;
+  margin: 0 0 1.4em;
+  font-size: 1.0625em;
+  line-height: 1.65;
+  letter-spacing: -0.01em;
+  color: var(--wb-item);
+}
+
+.wbsrc__link {
+  color: var(--wb-pin);
+  text-decoration: underline;
+  text-underline-offset: 0.22em;
+  text-decoration-thickness: 1px;
+}
+
+.wbsrc__tableWrap {
+  overflow-x: auto;
+  border: 1px solid var(--code-edge);
+  border-radius: 0.9em;
+}
+
+.wbsrc__table {
+  width: 100%;
+  min-width: 38em;
+  border-collapse: collapse;
+  font-size: 0.9375em;
+  letter-spacing: -0.01em;
+}
+
+.wbsrc__table th,
+.wbsrc__table td {
+  padding: 0.8em 1.1em;
+  text-align: left;
+  vertical-align: top;
+}
+
+.wbsrc__table th {
+  font-weight: 500;
+  color: var(--wb-pin);
+  border-bottom: 1px solid var(--code-edge);
+}
+
+.wbsrc__table tbody tr + tr td {
+  border-top: 1px solid var(--code-rule);
+}
+
+.wbsrc__table td:last-child {
+  color: var(--wb-item);
+}
+
+.wbsrc__mono {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.95em;
+  color: var(--wb-title);
+  white-space: nowrap;
+}
+
+.wbsrc__mono--dim {
+  color: var(--wb-item);
+}
+
+@media (hover: hover) {
+  .wbsrc__link:hover {
+    text-decoration-thickness: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wbsrc > * {
+    animation: none;
+  }
+}
+
+/* --- collapsed, and narrow ------------------------------------------------- */
+
+/*
+ * The panel closes by width, and its contents slide out ahead of it rather than
+ * being squashed against the edge on the way — which is what the bare width
+ * change looked like. The stage follows on the same curve, so the two read as
+ * one movement instead of a jump.
+ */
+.wbnav,
+.wbstage {
+  transition:
+    width 0.46s cubic-bezier(0.22, 0.68, 0.16, 1),
+    padding 0.46s cubic-bezier(0.22, 0.68, 0.16, 1);
+}
+
+.wbnav__head,
+.wbnav__title,
+.wbnav__list {
+  transition:
+    opacity 0.3s ease,
+    transform 0.46s cubic-bezier(0.22, 0.68, 0.16, 1);
+}
+
+.site--wb[data-collapsed="true"] .wbnav {
+  width: 0;
+  padding-left: 0;
+  pointer-events: none;
+}
+
+.site--wb[data-collapsed="true"] .wbnav__head,
+.site--wb[data-collapsed="true"] .wbnav__title,
+.site--wb[data-collapsed="true"] .wbnav__list {
+  opacity: 0;
+  transform: translateX(-1.4em);
+}
+
+.site--wb[data-collapsed="true"] .wbstage {
+  padding-left: 1.286em;
+}
+
+/* the control that brings it back fades in once the panel has gone */
+.wbstage__expand {
+  animation: wbrise 0.4s cubic-bezier(0.22, 0.68, 0.16, 1) 0.12s backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wbnav,
+  .wbstage,
+  .wbnav__head,
+  .wbnav__title,
+  .wbnav__list,
+  .wbstage__expand {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* the control has to stay reachable once the panel it lives in has gone */
+.wbstage__expand {
+  position: absolute;
+  left: 2.286em;
+  top: 2.286em;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 2.286em;
+  height: 2.286em;
+  border-radius: 0.6em;
+  background: var(--wb-bar);
+  color: var(--wb-bar-ink);
+  box-shadow:
+    0 0 0 1px var(--wb-bar-edge),
+    0 0.25em 0.7em rgb(0 0 0 / 0.12);
+}
+
+.wbstage__expand svg {
+  display: block;
+  width: 1.429em;
+  height: 1.429em;
+  /* the same control, mirrored: it now opens rather than closes */
+  transform: scaleX(-1);
+}
+
+/*
+ * Under about 900px the sidebar and the stage stop fitting side by side, so the
+ * list becomes a scrolling strip above the stage rather than being squeezed.
+ */
+@media (max-width: 900px) {
+  .site.site--wb {
+    flex-direction: column;
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  .wbnav {
+    width: 100%;
+    padding: 2em 1.286em 0;
+  }
+
+  .wbnav__head {
+    padding-right: 0;
+  }
+
+  /*
+   * Matched to `.wbnav__head .wbnav__collapse` above, which is where the
+   * button gets its `display: grid`. A bare `.wbnav__collapse` here loses on
+   * specificity no matter how far down the file it sits, so the control that
+   * collapses a sidebar stayed on screen on phones — where there is no
+   * sidebar to collapse, and pressing it took the list away with no way back.
+   */
+  .wbnav__head .wbnav__collapse {
+    display: none;
+  }
+
+  .wbnav__title {
+    margin-top: 1.4em;
+  }
+
+  .wbnav__list {
+    display: flex;
+    gap: 1.4em;
+    overflow-x: auto;
+    margin-top: 1em;
+    padding-bottom: 0.6em;
+  }
+
+  .wbnav__item + .wbnav__item {
+    margin-top: 0;
+  }
+
+  .wbnav__link {
+    white-space: nowrap;
+  }
+
+  .wbnav__rail,
+  .wbnav__pin {
+    display: none;
+  }
+
+  /*
+   * `flex: 0 0 auto` matters: stretched by `flex: 1` the stage's height is
+   * resolved by the layout rather than declared, which makes it indefinite —
+   * and the frame's `height: 100%` then silently collapses to its content.
+   */
+  .wbstage {
+    flex: 0 0 auto;
+    height: 78dvh;
+    padding: 1.286em;
+  }
+
+  .wbdoc {
+    padding-inline: 0;
+  }
+}

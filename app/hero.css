@@ -1,0 +1,653 @@
+/* ===========================================================================
+   Demo landing hero — Figma 299:19
+   ---------------------------------------------------------------------------
+   Kept out of `globals.css` on purpose: this is a separate landing page with
+   its own fixed composition, and scoping the styles to the route keeps them
+   off the waitlist bundle.
+
+   Drawn at 1280 wide. Every size below is quoted in `em` against the 16px root
+   the design implies, and `.hero` sets that root with a single clamp — so the
+   whole hero scales as one object and needs no per-element breakpoints. `36px`
+   type is `2.25em`, a `384px` card is `24em`, and so on.
+
+   Clicking the pin inverts the page. That runs off `data-pin-theme` on <html>,
+   the same switch the waitlist uses, so the choice persists and follows you
+   between the two pages — and the layout's no-flash script has already written
+   it before first paint, so the hero never shows the wrong side of itself.
+
+   Every colour below is a token, and only the tokens change between the two
+   states; nothing else in the stylesheet knows a theme exists.
+=========================================================================== */
+
+.site {
+  /*
+   * The margin around the frame is white in both states — the composition sits
+   * on a white page and the frame is what changes, not the sheet it is printed
+   * on. `--hero-paper` below is the *contrast* colour (what the ink is knocked
+   * out of), which is why it inverts and this does not.
+   */
+  --hero-page: #ffffff;
+  /* what fills the frame: nothing in the light state, red in the inverted one */
+  --hero-field: transparent;
+
+  /* the field the page is printed on, and the ink it is printed in */
+  --hero-paper: #ffffff;
+  --hero-red: #e60024;
+  --hero-ink: #0a0a0a;
+
+  /* the frame, the stamp and the Pinterest mark follow the same inversion */
+  --hero-rule-colour: var(--hero-red);
+  --hero-stamp-shape: var(--hero-red);
+  --hero-stamp-label: var(--hero-paper);
+  --hero-pinterest: #ee1b22;
+
+  /*
+   * The stamp, at the larger size from Figma 299:30 in both states. The file
+   * draws a smaller one in the light frame, but a button that resizes when the
+   * theme flips reads as a bug, and the larger one carries its line of type
+   * better at every width.
+   */
+  --hero-stamp-art: url("/hero/stamp-large.svg");
+  --hero-stamp-w: 18.144em; /* 290.304 */
+  --hero-stamp-h: 4.9896em; /* 79.834 */
+  --hero-stamp-type: 1.701em; /* 27.216 */
+
+  /* the shared mark component reads these two */
+  --pin-mark: var(--hero-red);
+  --pin-mark-star: var(--hero-paper);
+
+  /* how far the band's edges blur into the frame */
+  --hero-fade: 3.5em; /* 49 at the reference root */
+
+  --hero-inset: clamp(10px, 1.48vw, 26px);
+  --hero-rule: clamp(2px, 0.22vw, 3px);
+  /*
+   * The design quotes the masthead and the foot from the frame's outer
+   * edge, but they are positioned inside its border, so the rule comes off
+   * the number. One value for both bands means the logo and the claim share
+   * a left guide, and the GitHub mark and the stamp share a right one.
+   */
+  --hero-gutter: calc(1.1625em - var(--hero-rule));
+
+  /*
+   * The one dial the rest of the hero is measured against — change this number
+   * and the whole composition resizes together.
+   *
+   * It holds at 14px from roughly 1000px upward, so the masthead, the cards,
+   * the claim and the stamp are the same size on a laptop and on a 4K display.
+   * What changes with the screen is how many cards fit and how much air the
+   * composition gets, not the composition itself. 1000 is where the claim and
+   * the *larger* stamp stop fitting side by side at that size, so below it the
+   * whole hero scales down together rather than colliding.
+   */
+  font-size: clamp(8px, 1.4vw, 14px);
+
+  position: relative;
+  background: var(--hero-page);
+  color: var(--hero-ink);
+  box-sizing: border-box;
+}
+
+/* the hero is exactly one screen; everything after it scrolls up under it */
+.hero {
+  position: relative;
+  width: 100%;
+  height: 100dvh;
+  min-height: 100dvh;
+  padding: var(--hero-inset);
+  overflow: hidden;
+}
+
+/*
+ * The inverted state: the paper turns red and everything printed on it turns
+ * white. Only the demo cards keep their own colour — they are artwork, not
+ * chrome.
+ */
+:root[data-pin-theme="crimson"] .site {
+  --hero-paper: #e60024;
+  --hero-red: #ffffff;
+  --hero-ink: #ffffff;
+  /*
+   * No rule in this state. The frame exists in the light composition because
+   * there is a white field for it to sit against; once the field is the same
+   * red, drawing it in white would add a box the design does not have. Matching
+   * it to the paper lets the red run edge to edge.
+   */
+  --hero-field: #e60024;
+  /*
+   * No rule in this state — the frame is a solid red field instead of an
+   * outline. Transparent rather than removed so the box keeps its width, and
+   * the fill paints under it, which keeps the red running to the frame's edge.
+   */
+  --hero-rule-colour: transparent;
+  --hero-pinterest: #ffffff;
+  --hero-stamp-shape: #ffffff;
+  --hero-stamp-label: #e60024;
+  --pin-mark: #ffffff;
+  --pin-mark-star: #e60024;
+}
+
+/* every themed surface crosses over together, rather than cutting */
+.hero__frame,
+.hero__wordmark,
+.hero__navLink,
+.hero__claim,
+.hero__stampLabel {
+  transition:
+    color var(--pin-theme-fade) var(--pin-theme-ease),
+    background-color var(--pin-theme-fade) var(--pin-theme-ease),
+    border-color var(--pin-theme-fade) var(--pin-theme-ease);
+}
+
+.hero__mark path,
+.hero__stampShape,
+.hero__pinterest {
+  transition:
+    fill var(--pin-theme-fade) var(--pin-theme-ease),
+    background-color var(--pin-theme-fade) var(--pin-theme-ease);
+}
+
+.hero__githubMark {
+  transition: opacity var(--pin-theme-fade) var(--pin-theme-ease);
+}
+
+.site *,
+.site *::before,
+.site *::after {
+  box-sizing: border-box;
+}
+
+.hero__frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--hero-field);
+  border: var(--hero-rule) solid var(--hero-rule-colour);
+  overflow: hidden;
+}
+
+/* --- masthead ------------------------------------------------------------ */
+
+.hero__masthead {
+  position: absolute;
+  top: var(--hero-gutter);
+  left: var(--hero-gutter);
+  right: var(--hero-gutter);
+  display: flex;
+  align-items: center;
+  gap: 1.25em;
+  z-index: 3;
+}
+
+.hero__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625em; /* 10 */
+  text-decoration: none;
+  color: var(--hero-red);
+  /* the lockup owns the left edge; the nav and mark sit at the right */
+  margin-right: auto;
+}
+
+/* the switch. Only the mark is inside it — the wordmark sits outside on purpose */
+.hero__markButton {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  line-height: 0;
+  color: inherit;
+  /*
+   * A button does not inherit type by default — it takes the browser's own
+   * ~13.3px. Everything inside the hero is sized in `em`, so without this the
+   * mark resolved against that instead of the hero's root and came out a pixel
+   * and a half short of the rest of the lockup.
+   */
+  font: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hero__markButton:focus-visible {
+  outline: 0.14em solid var(--hero-red);
+  outline-offset: 0.3em;
+}
+
+/* the flip needs depth, or the mark just squashes and reopens */
+.hero__mark {
+  display: block;
+  width: 2.375em; /* 38 */
+  height: 2.8125em; /* 45 */
+}
+
+.hero__wordmark {
+  font-size: 2.25em; /* 36 */
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.hero__nav {
+  display: flex;
+  align-items: center;
+  gap: 1.25em; /* 20 */
+}
+
+.hero__navLink {
+  position: relative;
+  font-size: 1.125em; /* 18 */
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--hero-red);
+  text-decoration: none;
+  padding-bottom: 0.25em;
+  white-space: nowrap;
+}
+
+/* a rule that wipes in from the left rather than appearing all at once */
+.hero__navLink::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 0.1em;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.36s cubic-bezier(0.22, 0.68, 0.16, 1);
+}
+
+@media (hover: hover) {
+  .hero__navLink:hover::after {
+    transform: scaleX(1);
+  }
+}
+
+.hero__navLink:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.hero__github {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: 2.5em; /* 40 */
+  height: 2.5em;
+  color: var(--hero-red);
+}
+
+.hero__githubMark {
+  display: block;
+  width: 2.5em; /* 40 */
+  height: 2.5em;
+}
+
+/* the second colourway sits exactly on the first and fades across it */
+.hero__githubMark--alt {
+  position: absolute;
+  inset: 0;
+}
+
+/* --- the component band -------------------------------------------------- */
+
+.hero__band {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+.heroRail {
+  position: relative;
+  overflow: hidden;
+}
+
+.heroRail__track {
+  display: flex;
+  gap: 1.25em; /* 20 */
+  width: max-content;
+  padding-left: 1.25em;
+  will-change: transform;
+}
+
+.heroRail__pass {
+  display: flex;
+  gap: 1.25em;
+  flex: 0 0 auto;
+}
+
+.heroRail__card {
+  position: relative;
+  flex: 0 0 auto;
+  width: 24em; /* 384 */
+  height: 14.175em; /* 226.8 */
+  border-radius: 1.5em; /* 24 */
+  overflow: hidden;
+  /* the recording's own field, so a frame that has not decoded yet shows the
+     colour the component sits on rather than a black hole in the band */
+  background: #000000;
+}
+
+/*
+ * The preview is the recording itself, parked on a chosen frame rather than
+ * backed by a separate still — so nothing swaps when playback starts. Each
+ * clip framed its component at a different size, so the zoom that corrects for
+ * that is a per-card token.
+ */
+.heroRail__video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  pointer-events: none;
+  transform: scale(var(--rail-zoom, 1));
+}
+
+/*
+ * The band blurs out toward the frame rather than being cut by it.
+ *
+ * Six stacked backdrop layers, each masked to start further out and blurring
+ * harder than the last, so the blur ramps smoothly instead of stepping. No
+ * colour of any kind is laid over them — an earlier version washed white into
+ * the outer edge, which greyed the cards out instead of blurring them.
+ *
+ * Only the standard properties are written here. Pairing them with hand-written
+ * `-webkit-` forms made the build collapse each one to the prefixed version
+ * alone, and this browser implements only the unprefixed `backdrop-filter` — so
+ * the blur silently did nothing and the white wash was all that showed.
+ */
+.heroRail__fade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  /*
+   * Narrow on purpose. The design's 100px band reached a third of the way into
+   * the outermost card and smeared its content rather than easing the edge; the
+   * job here is to soften where the band meets the rule, not to obscure a
+   * preview. One value, so both themes ramp identically — there is no colour in
+   * any of this, only blur.
+   */
+  width: var(--hero-fade);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.heroRail__fade--left {
+  left: 0;
+}
+
+.heroRail__fade--right {
+  right: 0;
+  transform: scaleX(-1);
+}
+
+.heroRail__fade span {
+  position: absolute;
+  inset: 0;
+}
+
+.heroRail__fade span:nth-child(1) {
+  backdrop-filter: blur(0.5px);
+  mask-image: linear-gradient(to left, transparent 0%, #000 18%);
+}
+
+.heroRail__fade span:nth-child(2) {
+  backdrop-filter: blur(1.25px);
+  mask-image: linear-gradient(to left, transparent 15%, #000 34%);
+}
+
+.heroRail__fade span:nth-child(3) {
+  backdrop-filter: blur(2.5px);
+  mask-image: linear-gradient(to left, transparent 31%, #000 50%);
+}
+
+.heroRail__fade span:nth-child(4) {
+  backdrop-filter: blur(4.5px);
+  mask-image: linear-gradient(to left, transparent 47%, #000 66%);
+}
+
+.heroRail__fade span:nth-child(5) {
+  backdrop-filter: blur(7.5px);
+  mask-image: linear-gradient(to left, transparent 63%, #000 82%);
+}
+
+.heroRail__fade span:nth-child(6) {
+  backdrop-filter: blur(12px);
+  mask-image: linear-gradient(to left, transparent 79%, #000 100%);
+}
+
+/* --- the claim and its stamp --------------------------------------------- */
+
+.hero__foot {
+  position: absolute;
+  left: var(--hero-gutter);
+  right: var(--hero-gutter);
+  bottom: var(--hero-gutter);
+  display: flex;
+  /*
+   * Centred, not bottom-aligned. The claim's vertical centre is the seam
+   * between its two lines, which is exactly where the design puts the stamp —
+   * and unlike a hand-tuned bottom offset, it stays right if the claim ever
+   * reflows to another line.
+   */
+  align-items: center;
+  justify-content: space-between;
+  gap: 2.5em;
+  z-index: 3;
+}
+
+.hero__claim {
+  margin: 0;
+  font-size: 4.1625em; /* 66.6 */
+  font-weight: 500;
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  color: var(--hero-ink);
+}
+
+/* each line is its own clipping window, so the inner span can rise out of it */
+.hero__line {
+  display: block;
+  overflow: hidden;
+  /* the descenders in "designs" and "components" would otherwise be clipped */
+  padding-bottom: 0.06em;
+  margin-bottom: -0.06em;
+}
+
+.hero__lineInner {
+  display: block;
+  white-space: nowrap;
+}
+
+/*
+ * The Pinterest mark, painted through its own artwork rather than shown as a
+ * picture of it. The glyph is a hole in the disc, so masking means the page
+ * colour reads through the "P" — red disc on white in one state, white disc on
+ * red in the other, from a single asset and with no second file.
+ */
+.hero__pinterest {
+  display: inline-block;
+  width: 0.961em; /* 64 against the 66.6 claim */
+  height: 0.961em;
+  background-color: var(--hero-pinterest);
+  mask-image: url("/hero/pinterest.svg");
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  /* sits on the type rather than the baseline, the way the design sets it */
+  vertical-align: -0.16em;
+  margin: 0 0.16em;
+}
+
+.hero__stamp {
+  position: relative;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--hero-stamp-w);
+  height: var(--hero-stamp-h);
+  text-decoration: none;
+}
+
+/* the torn-edge shape, masked so it takes the theme's colour */
+.hero__stampShape {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background-color: var(--hero-stamp-shape);
+  mask-image: var(--hero-stamp-art);
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+}
+
+.hero__stampLabel {
+  position: relative;
+  font-size: var(--hero-stamp-type);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--hero-stamp-label);
+  white-space: nowrap;
+}
+
+/*
+ * Below roughly a tablet the claim can no longer sit beside the stamp without
+ * one of them shrinking past reading size, so the foot stacks.
+ */
+@media (max-width: 880px) {
+  .hero__foot {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.4em;
+  }
+
+  .hero__claim {
+    font-size: 3.5em;
+  }
+}
+
+/*
+ * On a phone the hero stops being a poster and becomes a column.
+ *
+ * The desktop composition pins the masthead to the top of the frame, the claim
+ * to the bottom and floats the band across the middle, which is right on a
+ * landscape screen: the three bands divide a wide rectangle. Hold that same
+ * arrangement inside a 375 x 812 window and the middle band has nothing to do
+ * with the other two — you get a logo, six hundred pixels of nothing, the
+ * components, more nothing, and a claim pressed against the bottom edge with
+ * its button half off it.
+ *
+ * So the three parts stop being placed and start being stacked, in the order
+ * they read, with the frame growing to fit them. The band still runs edge to
+ * edge — the negative margin is what takes it back out through the frame's
+ * padding — because a band that stops short of the sides stops reading as
+ * something passing through.
+ */
+@media (max-width: 700px) {
+  /*
+   * A phone gets its own dial.
+   *
+   * The wide scale is 1.4vw, which on a 375px screen works out at 5px and is
+   * held up only by its own 8px floor — so every phone rendered the site at
+   * the bottom of a scale built for a 14px root, and the whole thing came out
+   * a little over half size. 3.1vw is the same idea measured against a phone
+   * instead: 11.6px at 375, 13 by the time the screen is a large handset, and
+   * never below 10.5 on the narrowest ones still in use.
+   */
+  .site {
+    font-size: clamp(10.5px, 3.1vw, 13px);
+  }
+
+  .hero {
+    height: auto;
+    min-height: 0;
+  }
+
+  .hero__frame {
+    height: auto;
+    /* poster enough to own the screen, short enough that the shelf shows */
+    min-height: 76dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 2.6em;
+    padding: var(--hero-gutter) var(--hero-gutter) 2.8em;
+  }
+
+  .hero__masthead,
+  .hero__band,
+  .hero__foot {
+    position: static;
+    transform: none;
+  }
+
+  .hero__band {
+    margin-inline: calc(-1 * var(--hero-gutter));
+  }
+
+  .hero__masthead {
+    gap: 0.9em;
+  }
+
+  /* the wordmark is the one piece drawn for a wide frame and set too large */
+  .hero__wordmark {
+    font-size: 1.875em; /* 30 */
+  }
+
+  .hero__mark {
+    width: 2em;
+    height: 2.368em;
+  }
+
+  .hero__foot {
+    gap: 1.6em;
+  }
+
+  /*
+   * The claim wraps here rather than holding its two drawn lines.
+   *
+   * Those lines are `nowrap` so the composition keeps the shape it was drawn
+   * with, which on a phone means the longer of them decides the type size for
+   * the whole hero — and it lands around 26px, too small to be the thing the
+   * page opens with. Letting it break gives it back the size it deserves and
+   * costs only the exact line endings, which nobody but the designer knows.
+   */
+  .hero__lineInner {
+    white-space: normal;
+  }
+
+  /*
+   * Sized off the viewport, not only off the root, so that each of the two
+   * drawn lines still lands on one line of its own.
+   *
+   * At a flat `em` the claim was large enough to wrap, and the wrap fell after
+   * "static" — leaving "designs" alone on a line of its own, which reads as a
+   * mistake rather than as a line break. 7.4vw is measured, not guessed: it is
+   * where the longer of the two lines — "into reusable components" — still
+   * fits between the frame's gutters with a few per cent to spare on every
+   * phone from 320 up, so the composition holds without being nailed to a
+   * particular handset. Wrapping stays legal underneath it, so a face with
+   * wider metrics breaks a line rather than running off the screen.
+   */
+  .hero__claim {
+    font-size: min(3.1em, 7.4vw);
+    line-height: 1.06;
+  }
+}
+
+/* narrower still: the nav and the lockup can no longer share a line */
+@media (max-width: 420px) {
+  .hero__masthead {
+    flex-wrap: wrap;
+    row-gap: 0.7em;
+  }
+
+  .hero__brand {
+    margin-right: auto;
+  }
+}

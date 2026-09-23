@@ -7,6 +7,11 @@ import {
   FAVICONS,
   THEME_STORAGE_KEY,
 } from "@/lib/theme-constants";
+import {
+  organizationJsonLd,
+  webSiteJsonLd,
+  safeJsonLd,
+} from "@/lib/jsonld";
 import "./globals.css";
 
 /* What a link preview says. The tab says less — see `title` below. */
@@ -134,6 +139,16 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 
         <script dangerouslySetInnerHTML={{ __html: noFlash }} />
+
+        {/* Site-wide structured data — Organization + WebSite */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: safeJsonLd(organizationJsonLd()) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: safeJsonLd(webSiteJsonLd()) }}
+        />
       </head>
       <body>
         <FaviconSync />

@@ -1,0 +1,261 @@
+/* ===========================================================================
+   Privacy and Terms
+   ---------------------------------------------------------------------------
+   Sized in the same `em` off `.site` as the hero, the shelf and the component
+   pages, so these read as pages of the site rather than as a document appended
+   to it. A measure of about 38em is what keeps a long page of prose readable;
+   everything else here follows from that.
+=========================================================================== */
+
+.site {
+  --legal-ink: #0a0a0a;
+  --legal-dim: #5c5c5c;
+  --legal-note: #e60024;
+  --legal-edge: rgb(10 10 10 / 0.12);
+  /* the sheet is white in both states — only the ink on it inverts */
+  --legal-paper: #ffffff;
+}
+
+:root[data-pin-theme="crimson"] .site {
+  --legal-ink: #e60024;
+  --legal-dim: #7a7a7a;
+  --legal-note: #0a0a0a;
+  --legal-edge: rgb(230 0 36 / 0.22);
+}
+
+.legal,
+.legal__title,
+.legal__body h2,
+.legal__card {
+  transition:
+    color var(--pin-theme-fade) var(--pin-theme-ease),
+    border-color var(--pin-theme-fade) var(--pin-theme-ease);
+}
+
+.legal {
+  max-width: 46em;
+  margin: 0 auto;
+  /* the sticky band above the title owns the space at the top */
+  padding: 0 var(--hero-inset) 2em;
+  color: var(--legal-ink);
+}
+
+.legal__nav {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  padding: 1.9em 0 1.4em;
+  background: var(--legal-paper);
+}
+
+/*
+ * The way back.
+ *
+ * A hairline box with square corners, like the rest of the site's chrome, that
+ * states its edge in the page's own dim ink and takes full colour on hover
+ * rather than lifting on a shadow. The arrow slides the width of its own
+ * counter — far enough to read as a direction, short enough not to detach
+ * itself from the words.
+ */
+.legal__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  /* the band above owns the spacing now, so the box itself carries none */
+  padding: 0.6em 1em 0.6em 0.75em;
+  border: 1px solid var(--legal-edge);
+  border-radius: 0;
+  font-size: 0.9375em; /* 13, the size the date under the title is set at */
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--legal-dim);
+  text-decoration: none;
+  transition:
+    color var(--pin-theme-fade) var(--pin-theme-ease),
+    border-color 0.32s cubic-bezier(0.22, 0.68, 0.16, 1);
+}
+
+.legal__backArrow {
+  display: block;
+  width: 1.0667em; /* 16 */
+  height: 1.0667em;
+}
+
+.legal__backArrow svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.32s cubic-bezier(0.22, 0.68, 0.16, 1);
+}
+
+@media (hover: hover) {
+  .legal__back:hover {
+    color: var(--legal-ink);
+    border-color: currentColor;
+  }
+
+  .legal__back:hover .legal__backArrow svg {
+    transform: translateX(-0.2em);
+  }
+}
+
+/*
+ * Everything on this site is sized off one clamped root, so at phone widths
+ * the root is 8px and this box lands 19px tall — correct within the system
+ * and far too small to hit with a thumb. The floor is in absolute pixels on
+ * purpose: a tap target is a physical measurement, not a typographic one.
+ */
+@media (pointer: coarse) {
+  .legal__back {
+    min-height: 44px;
+    padding-right: 14px;
+    padding-left: 10px;
+  }
+}
+
+.legal__back:focus-visible {
+  outline: 2px solid var(--legal-note);
+  outline-offset: 3px;
+}
+
+.legal__title {
+  margin: 0;
+  font-size: 3.4em;
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: var(--legal-ink);
+}
+
+.legal__summary {
+  max-width: 34em;
+  margin: 0.5em 0 0;
+  font-size: 1.25em;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  color: var(--legal-dim);
+}
+
+.legal__updated {
+  margin: 1.2em 0 0;
+  font-size: 0.9375em;
+  letter-spacing: -0.01em;
+  color: var(--legal-note);
+}
+
+/*
+ * The prose rules are scoped to the body rather than to `.legal`, so that the
+ * title block above it keeps its own sizes. A bare `.legal p` outranks
+ * `.legal__summary` on specificity and would quietly shrink the standfirst to
+ * body size and drain the colour out of the date.
+ */
+.legal__body {
+  margin-top: 2.6em;
+}
+
+.legal__body h2 {
+  margin: 2.4em 0 0.5em;
+  font-size: 1.625em;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--legal-ink);
+}
+
+.legal__body h2:first-child {
+  margin-top: 0;
+}
+
+.legal__body p {
+  margin: 0 0 1em;
+  max-width: 38em;
+  font-size: 1.0625em;
+  line-height: 1.65;
+  letter-spacing: -0.01em;
+  color: var(--legal-dim);
+}
+
+.legal__body ul {
+  margin: 0 0 1.2em;
+  padding: 0;
+  max-width: 38em;
+  list-style: none;
+}
+
+.legal__body li {
+  position: relative;
+  padding-left: 1.3em;
+  margin-bottom: 0.55em;
+  font-size: 1.0625em;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+  color: var(--legal-dim);
+}
+
+/* a red rule rather than a bullet — the same mark the rest of the site uses */
+.legal__body li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.72em;
+  width: 0.65em;
+  height: var(--hero-rule);
+  background: var(--legal-note);
+}
+
+.legal__body strong {
+  font-weight: 500;
+  color: var(--legal-ink);
+}
+
+.legal__body a {
+  color: var(--legal-note);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* the one thing on the page worth boxing: what is actually stored */
+.legal__card {
+  margin: 0 0 1.6em;
+  padding: 1.2em 1.4em;
+  border: var(--hero-rule) solid var(--legal-edge);
+  border-radius: 0.9em;
+}
+
+.legal__card p:last-child,
+.legal__card ul:last-child,
+.legal__card li:last-child {
+  margin-bottom: 0;
+}
+
+.legal__contact {
+  margin-top: 3em;
+  padding-top: 1.6em;
+  border-top: var(--hero-rule) solid var(--legal-edge);
+}
+
+@media (hover: hover) {
+  .legal__body a:hover {
+    text-decoration-thickness: 2px;
+  }
+}
+
+@media (max-width: 700px) {
+  .legal__title {
+    font-size: 2.6em;
+  }
+}
+
+/*
+ * Phone gutters, matching the sections on the landing page.
+ *
+ * `--hero-inset` is the width of the margin the hero draws its rule inside —
+ * 10px on a phone, which is right for a rule at the edge of the screen and far
+ * too tight for a column of prose set against it.
+ */
+@media (max-width: 700px) {
+  .legal {
+    padding-inline: 1.6em;
+  }
+}

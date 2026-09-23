@@ -1,0 +1,327 @@
+/* ===========================================================================
+   Selection List — a session broken into blocks
+   ---------------------------------------------------------------------------
+   Everything fluid is sized in `cqw` off the card itself rather than off the
+   viewport, so the card keeps its proportions wherever it is placed — in a
+   preview stage, a grid cell or a whole page — instead of only at the width it
+   was drawn for.
+=========================================================================== */
+
+.psess {
+  --psess-card: #151515;
+  --psess-muted: #8a8a8f;
+  --psess-accent: #0a84ff;
+  --psess-accent-deep: #0064d8;
+  --psess-track: #0e2742;
+  --psess-cell: #173a5e;
+  --psess-cell-soft: #12314f;
+
+  width: 100%;
+  max-width: 312px;
+  container-type: inline-size;
+  font-family: Inter, "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+  color: #ffffff;
+  text-align: left;
+}
+
+.psess *,
+.psess *::before,
+.psess *::after {
+  box-sizing: border-box;
+}
+
+/*
+ * `:where()` carries no specificity, so this reset sits *below* the component's
+ * own class rules instead of above them. Written as a bare `.psess button` it
+ * would outrank every single-class rule in this file and quietly strip the type
+ * off the controls that set their own.
+ */
+.psess :where(button) {
+  margin: 0;
+  border: 0;
+  padding: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.psess__card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  aspect-ratio: 1;
+  width: 100%;
+  padding: clamp(20px, 8.3cqw, 26px);
+  overflow: hidden;
+  background: var(--psess-card);
+  box-shadow: 0 20px 45px -24px rgb(0 0 0 / 0.75);
+  outline: none;
+  user-select: none;
+}
+
+.psess__card:focus-visible {
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.25),
+    0 20px 45px -24px rgb(0 0 0 / 0.75);
+}
+
+/* --- header --------------------------------------------------------------- */
+
+.psess__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.psess__clock {
+  display: flex;
+  align-items: baseline;
+  font-size: clamp(46px, 18.6cqw, 58px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.045em;
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+}
+
+.psess__colon {
+  padding: 0 1px;
+}
+
+/*
+ * A digit is a two-face roller: the glyph that is leaving slides up and out
+ * while the one arriving takes its place. The resting position always shows
+ * the current value, so the clock reads correctly even if no frame ever runs.
+ */
+.psess__digit {
+  position: relative;
+  display: inline-block;
+  width: 0.6em;
+  height: 1em;
+  overflow: hidden;
+  vertical-align: baseline;
+}
+
+.psess__roll {
+  display: block;
+  will-change: transform;
+}
+
+.psess__face {
+  display: block;
+  height: 1em;
+  line-height: 1em;
+}
+
+.psess__caption {
+  margin: clamp(6px, 2.9cqw, 9px) 0 0;
+  font-size: clamp(13px, 4.8cqw, 15px);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--psess-muted);
+}
+
+.psess__check {
+  position: relative;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: clamp(34px, 12.2cqw, 38px);
+  height: clamp(34px, 12.2cqw, 38px);
+  margin-top: 3px;
+  border-radius: 999px;
+  background: var(--psess-accent);
+  color: #ffffff;
+}
+
+.psess__check:focus-visible {
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.6);
+}
+
+.psess__check svg {
+  grid-column: 1;
+  grid-row: 1;
+  width: clamp(16px, 5.8cqw, 18px);
+  height: clamp(16px, 5.8cqw, 18px);
+}
+
+.psess__replay {
+  opacity: 0;
+}
+
+/* --- the track ------------------------------------------------------------ */
+
+.psess__lower {
+  position: relative;
+}
+
+.psess__tipLayer {
+  position: absolute;
+  bottom: calc(100% + 11px);
+  left: 0;
+  right: 0;
+  height: 34px;
+  pointer-events: none;
+}
+
+.psess__tip {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 32px;
+  padding: 0 11px 0 6px;
+  border-radius: 10px;
+  background: var(--psess-accent);
+}
+
+.psess__tipIndex {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 19px;
+  height: 19px;
+  border-radius: 999px;
+  background: var(--psess-accent-deep);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  color: #ffffff;
+}
+
+.psess__tipLabel {
+  white-space: nowrap;
+  font-size: clamp(13px, 4.65cqw, 14.5px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+}
+
+.psess__tipTime {
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgb(255 255 255 / 0.7);
+  font-variant-numeric: tabular-nums;
+}
+
+.psess__tipTime[hidden] {
+  display: none;
+}
+
+.psess__tipArrow {
+  position: absolute;
+  bottom: -4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--psess-accent);
+  transform: rotate(45deg);
+}
+
+.psess__track {
+  position: relative;
+  display: flex;
+  gap: 3px;
+  padding: 4px;
+  border-radius: 14px;
+  background: var(--psess-track);
+}
+
+.psess__cell {
+  position: relative;
+  height: clamp(56px, 21.8cqw, 68px);
+  min-width: 34px;
+  overflow: hidden;
+  background: var(--psess-cell-soft);
+}
+
+.psess__cell:focus-visible {
+  box-shadow: 0 0 0 2px rgb(255 255 255 / 0.6);
+}
+
+.psess__fill,
+.psess__hatch,
+.psess__ring,
+.psess__done {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.psess__fill {
+  background: var(--psess-cell);
+}
+
+/* the live block is hatched, and the hatch scrolls while the session runs */
+.psess__hatch {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgb(45 140 255 / 0.55) 0 2px,
+    rgb(45 140 255 / 0) 2px 7px
+  );
+  background-size: 9.9px 9.9px;
+}
+
+.psess__ring {
+  box-shadow: inset 0 0 0 2px var(--psess-accent);
+  pointer-events: none;
+}
+
+.psess__done {
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.psess__done svg {
+  display: block;
+  width: 15px;
+  height: 15px;
+  color: rgb(255 255 255 / 0.5);
+}
+
+/* where the session is, inside the live block */
+.psess__head-line {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 0;
+  width: 2px;
+  border-radius: 999px;
+  background: #ffffff;
+  pointer-events: none;
+}
+
+/* --- the speed control ---------------------------------------------------- */
+
+.psess__speeds {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.psess__speed {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.14);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  color: #ffffff;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.psess__speed--on {
+  background: #ffffff;
+  color: #0b1b2b;
+}
