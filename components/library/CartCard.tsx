@@ -128,7 +128,8 @@ export default function CartCard({
   onConfirm,
 }: CartCardProps) {
   const reduced = useReducedMotion();
-  const sfx = useSfx(sound && !reduced);
+  /* reduced motion is not a reason to mute — sound is not motion */
+  const sfx = useSfx(sound);
   const gooId = useId().replace(/:/g, "");
 
   const [open, setOpen] = useState(false);

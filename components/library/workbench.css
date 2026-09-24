@@ -274,7 +274,16 @@
   flex: 1;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  /*
+   * Top-aligned in both states, never centred. At full height the two look
+   * identical, which hid the difference: closing the write-up switched this
+   * back to `center` at once while the frame was still animating from 75% to
+   * 100% — so for the whole of the close the short frame sat centred and grew
+   * from both ends, its top edge dropping 104px and climbing back. Anchored to
+   * the top, the frame only ever grows or shrinks at the bottom, the same
+   * movement in both directions.
+   */
+  justify-content: flex-start;
   min-width: 0;
   padding: 1.286em 1.286em 1.286em 0;
   /* a themed gutter rather than the platform's grey slab */
@@ -284,11 +293,9 @@
 
 /*
  * Shrunk, the frame gives up the bottom of the window and the write-up takes
- * that room; the column scrolls, and the frame stops being centred so the
- * reading starts where the stage ends rather than a screen below it.
+ * that room, and the column scrolls.
  */
 .wbstage--compact {
-  justify-content: flex-start;
   overflow-y: auto;
 }
 
@@ -663,7 +670,7 @@
 }
 
 .wbinfo__credit {
-  max-width: 46em;
+  max-width: none;
   margin: 2.4em 0 0;
   padding-top: 1.6em;
   border-top: 1px solid var(--wb-rail);
@@ -829,6 +836,7 @@
 
 /* --- the column under the stage ------------------------------------------- */
 
+/* centred under the stage, at one reading measure */
 .wbdoc {
   flex: 0 0 auto;
   width: 100%;

@@ -130,30 +130,33 @@ export default function WorkbenchStage({
             </svg>
           </button>
 
-          <button
-            type="button"
-            className="wbbar__button"
-            aria-pressed={sound}
-            aria-label={sound ? "Turn the sound off" : "Turn the sound on"}
-            title={sound ? "Turn the sound off" : "Turn the sound on"}
-            onClick={() => setSound((on) => !on)}
-          >
-            {/* lucide: volume-2 / volume-x */}
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M9.16667 4.16667 5.41667 7.5H2.5v5h2.91667l3.75 3.33333V4.16667z" />
-              {sound ? (
-                <>
-                  <path d="M12.9167 7.08333a3.75 3.75 0 0 1 0 5.83334" />
-                  <path d="M15.25 5a7.5 7.5 0 0 1 0 10" />
-                </>
-              ) : (
-                <>
-                  <path d="m13.3333 7.91667 3.75 4.16666" />
-                  <path d="m17.0833 7.91667-3.75 4.16666" />
-                </>
-              )}
-            </svg>
-          </button>
+          {/* only a component that makes sound gets a speaker */}
+          {entry.sound && (
+            <button
+              type="button"
+              className="wbbar__button"
+              aria-pressed={sound}
+              aria-label={sound ? "Turn the sound off" : "Turn the sound on"}
+              title={sound ? "Turn the sound off" : "Turn the sound on"}
+              onClick={() => setSound((on) => !on)}
+            >
+              {/* lucide: volume-2 / volume-x */}
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M9.16667 4.16667 5.41667 7.5H2.5v5h2.91667l3.75 3.33333V4.16667z" />
+                {sound ? (
+                  <>
+                    <path d="M12.9167 7.08333a3.75 3.75 0 0 1 0 5.83334" />
+                    <path d="M15.25 5a7.5 7.5 0 0 1 0 10" />
+                  </>
+                ) : (
+                  <>
+                    <path d="m13.3333 7.91667 3.75 4.16666" />
+                    <path d="m17.0833 7.91667-3.75 4.16666" />
+                  </>
+                )}
+              </svg>
+            </button>
+          )}
         </div>
       </div>
 

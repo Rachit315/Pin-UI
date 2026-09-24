@@ -51,6 +51,12 @@ export type Entry = {
   /** The loop's first frame as a still, so a card is never blank while it loads. */
   poster: string;
   /**
+   * Whether the component makes any sound. The workbench only offers its
+   * speaker control for the ones that do — a mute button on a silent
+   * component is a control that does nothing.
+   */
+  sound: boolean;
+  /**
    * How much to zoom the clip inside the card frame. The three were recorded at
    * 1920×1080 with the component centred at different sizes; this brings them
    * all to about the same presence on the shelf.
@@ -89,6 +95,7 @@ export const LIBRARY: Entry[] = [
     highlights: ["Real time by default", "Blocks scaled to length", "Keyboard driven", "Survives a background tab"],
     clip: "/clips/loop/session-list.mp4",
     poster: "/clips/loop/session-list.jpg",
+    sound: false,
     zoom: 1.3,
     stage: "#2d8cff",
     usage: `import SessionList from "@/components/library/SessionList";
@@ -123,6 +130,7 @@ export const LIBRARY: Entry[] = [
     highlights: ["Gooey selection list", "Counter that never skips", "Synthesised cues", "Pointer-tracked glow"],
     clip: "/clips/loop/balance-card.mp4",
     poster: "/clips/loop/balance-card.jpg",
+    sound: true,
     zoom: 1.25,
     stage: "#232323",
     usage: `import BalanceCard from "@/components/library/BalanceCard";
@@ -158,6 +166,7 @@ export const LIBRARY: Entry[] = [
     highlights: ["Measured, not hard-coded", "Drag, or arrow keys", "Gooey heart burst", "A cue for every beat"],
     clip: "/clips/loop/cart-card.mp4",
     poster: "/clips/loop/cart-card.jpg",
+    sound: true,
     zoom: 1,
     stage: "#ececec",
     usage: `import CartCard from "@/components/library/CartCard";

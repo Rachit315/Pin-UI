@@ -131,9 +131,18 @@ export default function BalanceCard({
   onSettle,
 }: BalanceCardProps) {
   const reduced = useReducedMotion();
-  /* the speaker in the credit line turns the cues off without unmounting them */
-  const [audible, setAudible] = useState(sound);
-  const sfx = useSfx(sound && audible && !reduced);
+  /*
+   * The speaker in the credit line is a mute of its own, and starts open.
+   * `sound` is the host's switch and is read live. This used to seed the
+   * state from `sound` — which a host that starts muted and turns sound on
+   * later (the workbench toolbar does exactly that) could never undo, because
+   * state only reads its initial value once. The card stayed silent for good.
+   *
+   * Reduced motion is deliberately not a reason to mute: sound is not motion,
+   * and a switch that says "on" while nothing plays is a broken switch.
+   */
+  const [audible, setAudible] = useState(true);
+  const sfx = useSfx(sound && audible);
   const gooId = useId().replace(/:/g, "");
 
   const [currency, setCurrency] = useState<Currency>(initialCurrency);
