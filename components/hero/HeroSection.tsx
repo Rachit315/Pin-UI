@@ -3,10 +3,9 @@
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import HeroMarquee from "./HeroMarquee";
 import PinterestPeek from "./PinterestPeek";
+import GitHubStars from "./GitHubStars";
 import ThemeMark from "../ThemeMark";
-import { LINKS } from "@/lib/links";
 import { softSpring, spring } from "@/lib/motion";
-import { usePinTheme } from "@/lib/theme";
 import { useRailed } from "./useRailed";
 
 /**
@@ -32,11 +31,7 @@ import { useRailed } from "./useRailed";
  */
 export default function HeroSection() {
   const reduced = useReducedMotion();
-  const { theme } = usePinTheme();
   const { railed, instant } = useRailed();
-
-  /* the mark owns the switch itself; this is only for the two GitHub faces */
-  const inverted = theme === "crimson";
 
   /** Everything in the hero enters on the same curve, just at its own time. */
   const rise = (delay: number) =>
@@ -86,39 +81,8 @@ export default function HeroSection() {
                 </a>
               </motion.nav>
 
-              <motion.a
-                className="hero__github"
-                href={LINKS.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Pin UI on GitHub"
-                whileHover={reduced ? undefined : { y: -2, scale: 1.06 }}
-                whileTap={reduced ? undefined : { scale: 0.95 }}
-                {...rise(0.18)}
-              >
-            {/*
-              Two colourways stacked and cross-faded. The octocat is a solid
-              shape over a solid field rather than a knockout, so it cannot be
-              recoloured with a single mask the way the stamp and the Pinterest
-              mark can.
-            */}
-                <img
-                  src="/hero/github.svg"
-                  alt=""
-                  width={40}
-                  height={40}
-                  className="hero__githubMark"
-                  style={{ opacity: inverted ? 0 : 1 }}
-                />
-                <img
-                  src="/hero/github-crimson.svg"
-                  alt=""
-                  width={40}
-                  height={40}
-                  className="hero__githubMark hero__githubMark--alt"
-                  style={{ opacity: inverted ? 1 : 0 }}
-                />
-              </motion.a>
+              {/* the octocat lifts away on hover and the star count rises into its place */}
+              <GitHubStars {...rise(0.18)} />
             </motion.header>
           )}
         </AnimatePresence>
