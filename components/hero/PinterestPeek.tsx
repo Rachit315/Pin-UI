@@ -191,6 +191,7 @@ export default function PinterestPeek({
                       <video
                         className="peek__video"
                         src={entry.clip}
+                        poster={entry.poster}
                         /*
                          * A shade tighter than the shelf uses. These tiles are
                          * a third the height of a card on the shelf, so the
@@ -206,11 +207,6 @@ export default function PinterestPeek({
                         preload="auto"
                         tabIndex={-1}
                         aria-hidden="true"
-                        onLoadedMetadata={(event) => {
-                          /* open on the frame the pin itself shows */
-                          const video = event.currentTarget;
-                          if (video.currentTime < 0.05) video.currentTime = entry.posterTime;
-                        }}
                         /*
                          * `autoPlay` is spent by the time a clip that was not
                          * already buffered is ready, and the card is only up

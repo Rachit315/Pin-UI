@@ -10,9 +10,9 @@ import type { Entry } from "./registry";
 /**
  * A card on the shelf.
  *
- * The preview is the recording itself, parked on a chosen frame rather than
- * backed by a separate poster image — so the still and the moving picture are
- * the same pixels and hovering cannot make the card jump. Nothing is fetched
+ * The preview is a short loop whose poster is its own first frame — so the
+ * still and the moving picture are the same pixels and hovering cannot make
+ * the card jump. The still shows from the first paint; the clip is not fetched
  * until the card is near the viewport, and hovering is what starts playback:
  * three clips playing at once behind a landing page is a lot of work for a
  * browser to do for something nobody has looked at yet.
@@ -44,16 +44,16 @@ export default function ComponentCard({ entry, index }: { entry: Entry; index: n
     return () => observer.disconnect();
   }, []);
 
-  /* park it on the frame the card is meant to rest on */
+  /* back to the first frame, which is exactly the poster, so leaving never jumps */
   const park = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
     try {
-      video.currentTime = entry.posterTime;
+      video.currentTime = 0;
     } catch {
-      /* metadata has not arrived yet; the loadedmetadata handler will do it */
+      /* nothing has loaded yet, and the poster is already showing */
     }
-  }, [entry.posterTime]);
+  }, []);
 
   function enter() {
     if (reduced) return;
@@ -93,13 +93,14 @@ export default function ComponentCard({ entry, index }: { entry: Entry; index: n
             src={near ? entry.clip : undefined}
             /* the zoom is a token so the hover lift can compose with it */
             style={{ "--card-zoom": entry.zoom } as React.CSSProperties}
+            /* the still is there from the first paint, before the clip is even requested */
+            poster={entry.poster}
             muted
             playsInline
             loop
             preload={near ? "metadata" : "none"}
             tabIndex={-1}
             aria-hidden="true"
-            onLoadedMetadata={park}
           />
         </span>
 

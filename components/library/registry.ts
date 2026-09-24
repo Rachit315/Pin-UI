@@ -40,13 +40,16 @@ export type Entry = {
   blurb: string;
   /** Short claims, shown as a row of chips. */
   highlights: string[];
-  /** The screen recording, played on hover. */
-  clip: string;
   /**
-   * Where in the clip the card sits still and looks its best. The preview rests
-   * on this frame and returns to it, so hovering never starts from black.
+   * The preview loop: a few seconds of the recording, cut to start on its most
+   * alive moment, at 960px and 30fps with no audio — about 80KB. The full
+   * 1080p60 recordings are 1–2MB each and used to be seeked 9–15 seconds in
+   * before a card could show anything, which is what made the hero band sit
+   * empty for seconds after every reload.
    */
-  posterTime: number;
+  clip: string;
+  /** The loop's first frame as a still, so a card is never blank while it loads. */
+  poster: string;
   /**
    * How much to zoom the clip inside the card frame. The three were recorded at
    * 1920×1080 with the component centred at different sizes; this brings them
@@ -84,8 +87,8 @@ export const LIBRARY: Entry[] = [
     blurb:
       "One number drives the whole card. The live block, the time left on it, the playhead and every block's state are read back out of the seconds elapsed, so they cannot disagree — the clock lands on 00:00 on the same tick the playhead reaches the end of its block, and that is what hands over to the next one.",
     highlights: ["Real time by default", "Blocks scaled to length", "Keyboard driven", "Survives a background tab"],
-    clip: "/clips/session-list.mp4",
-    posterTime: 13.5,
+    clip: "/clips/loop/session-list.mp4",
+    poster: "/clips/loop/session-list.jpg",
     zoom: 1.3,
     stage: "#2d8cff",
     usage: `import SessionList from "@/components/library/SessionList";
@@ -118,8 +121,8 @@ export const LIBRARY: Entry[] = [
     blurb:
       "The balance is held once, in USD. The figure on screen, the preset amounts and the toast are all derived from it through the current rate, so a currency swap can never leave two numbers disagreeing about what the account holds. The selector's blobs are two pills blurred into one by an SVG filter: the head snaps to the row and the tail trails after it.",
     highlights: ["Gooey selection list", "Counter that never skips", "Synthesised cues", "Pointer-tracked glow"],
-    clip: "/clips/balance-card.mp4",
-    posterTime: 15,
+    clip: "/clips/loop/balance-card.mp4",
+    poster: "/clips/loop/balance-card.jpg",
     zoom: 1.25,
     stage: "#232323",
     usage: `import BalanceCard from "@/components/library/BalanceCard";
@@ -153,8 +156,8 @@ export const LIBRARY: Entry[] = [
     blurb:
       "Both growing regions are measured at their natural height and then sprung to it, so neither can be outgrown by its own content. The knob's transform is owned by the drag rather than by a spring, so the pointer is tracked exactly and nothing ever fights over the same property.",
     highlights: ["Measured, not hard-coded", "Drag, or arrow keys", "Gooey heart burst", "A cue for every beat"],
-    clip: "/clips/cart-card.mp4",
-    posterTime: 8.7,
+    clip: "/clips/loop/cart-card.mp4",
+    poster: "/clips/loop/cart-card.jpg",
     zoom: 1,
     stage: "#ececec",
     usage: `import CartCard from "@/components/library/CartCard";

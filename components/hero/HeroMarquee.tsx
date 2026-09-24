@@ -2,6 +2,7 @@
 
 import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { preload } from "react-dom";
 import {
   motion,
   useAnimationFrame,
@@ -31,8 +32,9 @@ import { LIBRARY } from "../library/registry";
  * What rides on the track is the recordings themselves, not stills of them.
  * They run continuously, looping, whether or not anybody is pointing at the
  * band — a card that only comes alive under the pointer looks broken on the
- * way past. Each one starts from a chosen frame rather than from frame zero,
- * which for these recordings is an empty field. Hovering does one thing and
+ * way past. Each is a short loop cut to open on its component already in
+ * motion, with that first frame as a poster — so a card has a picture from
+ * the first paint and never has to seek anywhere before it can play. Hovering does one thing and
  * one thing only: it eases the track down to a crawl so a clip can be watched
  * without chasing it across the frame.
  */
@@ -46,7 +48,16 @@ const SPEED = 34;
 /** What it eases down to while the pointer is over the band. */
 const HOVER_SPEED = 7;
 
+/*
+ * The posters are the band's first paint, so the browser is told about them in
+ * the document head rather than finding them when it lays out the video tags.
+ */
+function preloadPosters() {
+  for (const entry of CARDS) preload(entry.poster, { as: "image", fetchPriority: "high" });
+}
+
 export default function HeroMarquee() {
+  preloadPosters();
   const reduced = useReducedMotion();
   const railRef = useRef<HTMLDivElement>(null);
   const passRef = useRef<HTMLDivElement>(null);
@@ -113,23 +124,6 @@ export default function HeroMarquee() {
     railRef.current?.querySelectorAll("video").forEach(run);
   }, []);
 
-  /**
-   * Start a clip from the frame its card is meant to open on.
-   *
-   * Only ever moves a clip that is still sitting at the very beginning: once
-   * it is running, this must not drag it back, and it is called again every
-   * time the pass count settles.
-   */
-  const park = useCallback((video: HTMLVideoElement) => {
-    const at = Number(video.dataset.poster);
-    if (!Number.isFinite(at) || video.currentTime > 0.05) return;
-    try {
-      video.currentTime = at;
-    } catch {
-      /* metadata has not arrived yet; the loadedmetadata handler will do it */
-    }
-  }, []);
-
   /*
    * Start them, and keep them started.
    *
@@ -144,12 +138,11 @@ export default function HeroMarquee() {
         video.pause();
         return;
       }
-      park(video);
       void video.play().catch(() => {
         /* a browser that refuses to play silently is no reason to break the band */
       });
     },
-    [park, reduced],
+    [reduced],
   );
 
   useEffect(() => {
@@ -212,7 +205,8 @@ export default function HeroMarquee() {
                   src={entry.clip}
                   /* each recording framed its component at its own size */
                   style={{ "--rail-zoom": entry.zoom } as React.CSSProperties}
-                  data-poster={entry.posterTime}
+                  /* on screen from the first paint, long before the loop has loaded */
+                  poster={entry.poster}
                   muted
                   playsInline
                   loop
@@ -220,7 +214,6 @@ export default function HeroMarquee() {
                   preload="auto"
                   tabIndex={-1}
                   aria-hidden="true"
-                  onLoadedMetadata={(event) => park(event.currentTarget)}
                   /*
                    * A pass added after the first measurement mounts with
                    * `autoPlay` already spent, and calling play() on it from
