@@ -694,20 +694,30 @@ html[data-pin-scroll="smooth"] {
   opacity: 0.7;
 }
 
+/*
+ * The pill is a track and the white puck is a slider on it: drag it right, or
+ * click, or press Enter, and it runs to the far end to send. The puck's
+ * position is driven by script, so nothing here transitions its transform —
+ * a CSS transition on it would fight the drag frame by frame.
+ */
 .upd__go {
+  position: relative;
+  isolation: isolate;
   flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
   gap: 0.5em;
   height: 2.64em;
   margin: 0;
-  padding: 0 1em 0 0.34em;
+  padding: 0 1.15em 0 0.34em;
   border: 0;
   border-radius: 999px;
   background: var(--foot-ink);
   color: #ffffff;
   font: inherit;
   cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
   transition:
     background-color 0.25s ease,
@@ -719,16 +729,32 @@ html[data-pin-scroll="smooth"] {
   outline-offset: 0.18em;
 }
 
-.upd__go:active:not(:disabled) {
+.upd__go:active:not([aria-disabled="true"]):not([data-dragging="true"]) {
   transform: scale(0.97);
 }
 
-.upd__go:disabled {
+.upd__go[aria-disabled="true"] {
   cursor: default;
 }
 
+/* the lit track behind the puck, as long as the distance it has come */
+.upd__trail {
+  position: absolute;
+  left: 0.34em;
+  top: 50%;
+  z-index: -1;
+  height: 1.95em;
+  margin-top: -0.975em;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.16);
+  pointer-events: none;
+}
+
 .upd__puck {
+  position: relative;
+  z-index: 1;
   display: grid;
+  flex: 0 0 auto;
   place-items: center;
   width: 1.95em;
   height: 1.95em;
@@ -736,7 +762,19 @@ html[data-pin-scroll="smooth"] {
   background: #ffffff;
   color: var(--foot-red);
   overflow: hidden;
-  transition: transform 0.4s var(--foot-ease);
+  cursor: grab;
+  /* the finger owns horizontal movement on the puck; the page keeps vertical */
+  touch-action: pan-y;
+  box-shadow: 0 0.1em 0.35em rgb(0 0 0 / 0.25);
+}
+
+.upd__go[data-dragging="true"],
+.upd__go[data-dragging="true"] .upd__puck {
+  cursor: grabbing;
+}
+
+.upd__go[aria-disabled="true"] .upd__puck {
+  cursor: default;
 }
 
 .upd__chev {
@@ -762,14 +800,19 @@ html[data-pin-scroll="smooth"] {
   line-height: 1;
 }
 
-@media (hover: hover) {
-  .upd__go:not(:disabled):hover {
-    background: #1f1f1f;
-  }
+/* once sent, the puck sits at the right end and the word takes the left */
+.upd__word--done {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0.9em;
+  display: flex;
+  align-items: center;
+}
 
-  /* the puck leans toward where the email is going */
-  .upd__go:not(:disabled):hover .upd__puck {
-    transform: translateX(0.2em);
+@media (hover: hover) {
+  .upd__go:not([aria-disabled="true"]):hover {
+    background: #1f1f1f;
   }
 }
 
