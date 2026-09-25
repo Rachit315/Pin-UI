@@ -57,9 +57,11 @@
   padding: 15px;
   border-radius: 34px;
   background: var(--pcart-ink);
-  box-shadow:
-    0 22px 44px -22px rgb(0 0 0 / 0.45),
-    0 6px 14px -8px rgb(0 0 0 / 0.22);
+  /*
+   * No drop shadow. The card is shown inside frames that clip their contents,
+   * and a shadow this soft ran past the frame's edge and was cut off in a hard
+   * line under the card. The black body carries enough contrast on its own.
+   */
   will-change: transform;
 }
 

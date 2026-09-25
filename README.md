@@ -40,7 +40,7 @@ Three components today. Three new ones every week.
 
 | Component | What it does | Install |
 | :-- | :-- | :-- |
-| **Selection List** | A session broken into blocks, counting down in real time. The track is a clock, not a progress bar. | `npx shadcn@latest add "https://pinui.xyz/r/session-list.json"` |
+| **Count down** | A session broken into blocks, counting down in real time. The track is a clock, not a progress bar. | `npx shadcn@latest add "https://pinui.xyz/r/session-list.json"` |
 | **Balance Card** | A counting balance, a liquid currency selector and a drawer that settles. | `npx shadcn@latest add "https://pinui.xyz/r/balance-card.json"` |
 | **Add To Cart** | A product card that is only a photo until you open it. | `npx shadcn@latest add "https://pinui.xyz/r/cart-card.json"` |
 

@@ -20,6 +20,8 @@ export const LINKS = {
    * to the exact thing is worth more than a link to where it lives.
    */
   pinterest: "https://in.pinterest.com/rachitrampage23/pin-ui/",
+  /** Where support mail goes: the footer's mail icon and its small print. */
+  email: "pinui.official@gmail.com",
 
   /** All external profiles, used by Organization schema `sameAs`. */
   profiles: [

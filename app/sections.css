@@ -418,12 +418,6 @@ html[data-pin-scroll="smooth"] {
   .shelf__lead {
     max-width: 26em;
   }
-
-  /* the rail now sits at the top, so the footer no longer needs extra bottom
-     padding to dodge it — a normal bottom margin is enough */
-  .foot {
-    padding: 2.6em 1.6em 1.6em;
-  }
 }
 
 /* the tightest phones: the pill spans the width it is given */
@@ -438,63 +432,119 @@ html[data-pin-scroll="smooth"] {
   }
 }
 
-/* --- the footer ---------------------------------------------------------- */
+/* --- the footer — Figma 377:871 ------------------------------------------
+   Three bands on the page's own measure: the lockup, links and a line for
+   anyone stuck; the board of pins with the updates field pinned into it; and
+   the small print. The frame's pixels are not followed — the lockup and links
+   are the masthead's own sizes, so the page closes the way it opened.
+
+   The footer sits on the white sheet in both themes, so it keeps its red in
+   both rather than following the hero's inversion.
+=========================================================================== */
 
 .foot {
-  padding: 3em var(--hero-inset) 1.6em;
+  --foot-red: #e60024;
+  --foot-ink: #0a0a0a;
+  --foot-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  padding: 5em var(--hero-inset) 1.8em;
+  color: var(--foot-red);
 }
 
-.foot__lockup {
-  display: flex;
+.foot__top {
+  /* the links sit on the page's centre, whatever either side weighs */
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: center;
-  gap: 0.1em;
-  /* room for the mark to lean without the row reflowing around it */
-  padding: 2em 0 1em;
+  gap: 1.25em;
+}
+
+.foot__brand {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625em;
+  color: inherit;
+  text-decoration: none;
 }
 
 .foot__mark {
-  flex: 0 0 auto;
-  will-change: transform;
-}
-
-.foot__markArt {
   display: block;
-  width: 17em;
-  height: 20.13em; /* 38:45, the mark's own ratio */
-  --pin-mark: #e60024;
+  width: 2.375em;
+  height: 2.8125em;
+  --pin-mark: var(--foot-red);
   --pin-mark-star: #ffffff;
 }
 
 .foot__word {
-  font-size: 20em;
+  font-size: 2.25em;
   font-weight: 500;
-  line-height: 0.82;
-  letter-spacing: -0.03em;
-  color: #e60024;
+  letter-spacing: -0.02em;
+  line-height: 1;
   white-space: nowrap;
 }
 
-.foot__dm {
+.foot__nav {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 0.55em;
-  margin-top: 1em;
-  color: #e60024;
+  gap: 1.25em;
+}
+
+.foot__navLink {
+  position: relative;
+  padding-bottom: 0.25em;
+  font-size: 1.125em;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* the masthead's rule, wiping in from the left */
+.foot__navLink::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 0.1em;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.36s cubic-bezier(0.22, 0.68, 0.16, 1);
+}
+
+@media (hover: hover) {
+  .foot__navLink:hover::after {
+    transform: scaleX(1);
+  }
+}
+
+.foot__navLink:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.foot__dm {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
 }
 
 .foot__dmLabel {
-  font-size: 1em;
-  letter-spacing: -0.01em;
+  font-size: 1.125em;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .foot__social {
   display: block;
-  width: 1.4em;
-  height: 1.4em;
+  width: 1.6em;
+  height: 1.6em;
   color: inherit;
-  transition: transform 0.3s cubic-bezier(0.22, 0.68, 0.16, 1);
+  transition: transform 0.3s var(--foot-ease);
 }
 
 .foot__social svg {
@@ -509,28 +559,286 @@ html[data-pin-scroll="smooth"] {
   }
 }
 
+.foot a:focus-visible {
+  outline: 0.14em solid var(--foot-red);
+  outline-offset: 0.3em;
+}
+
+/* --- the board ------------------------------------------------------------ */
+
+/*
+ * Five rows of pins at the page's size. The component lays out however many
+ * columns fit and leaves out the ones under the form, so this box only has to
+ * say how tall the board is.
+ */
+.pinf {
+  position: relative;
+  height: 41.5em;
+  margin-top: 2.6em;
+  border: 1px solid rgb(230 0 36 / 0.5);
+  overflow: hidden;
+  /* the pins follow a finger too, but the page keeps its own scroll */
+  touch-action: pan-y;
+}
+
+.pinf__pins {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/*
+ * The slot carries the entrance, the pin inside it carries the aim — two
+ * transforms on two elements, so neither ever overwrites the other.
+ */
+.pinf__slot {
+  position: absolute;
+  display: block;
+  opacity: 0;
+  transform: translateY(-1em) scale(1.14);
+  transition:
+    opacity 0.45s ease var(--pinf-delay, 0ms),
+    transform 0.7s cubic-bezier(0.34, 1.45, 0.64, 1) var(--pinf-delay, 0ms);
+}
+
+.pinf[data-arrived="true"] .pinf__slot {
+  opacity: 1;
+  transform: none;
+}
+
+.pinf__pin {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: url("/footer-pin.webp") center / contain no-repeat;
+  /* it turns about its centre of mass, so the point sweeps and the head stays put */
+  transform-origin: 50% 40%;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pinf__slot {
+    transition: none;
+  }
+}
+
+/* --- the updates field ---------------------------------------------------- */
+
+.pinf__form {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(32em, calc(100% - 2em));
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+.upd {
+  position: relative;
+}
+
+.upd__bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  height: 3.43em;
+  padding: 0 0.4em 0 1.15em;
+  background: var(--foot-red);
+  color: #ffffff;
+  transition: box-shadow 0.25s ease;
+}
+
+.upd__bar:focus-within {
+  box-shadow: 0 0 0 0.22em rgb(230 0 36 / 0.22);
+}
+
+.upd__bar[data-invalid="true"] {
+  box-shadow: 0 0 0 0.14em var(--foot-ink);
+}
+
+.upd__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.upd__input,
+.upd__done {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 1.07em;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: inherit;
+  outline: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.upd__input::placeholder {
+  color: rgb(255 255 255 / 0.88);
+  opacity: 1;
+}
+
+.upd__input:disabled {
+  opacity: 0.7;
+}
+
+.upd__go {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  height: 2.64em;
+  margin: 0;
+  padding: 0 1em 0 0.34em;
+  border: 0;
+  border-radius: 999px;
+  background: var(--foot-ink);
+  color: #ffffff;
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 0.25s ease,
+    transform 0.2s var(--foot-ease);
+}
+
+.upd__go:focus-visible {
+  outline: 0.14em solid #ffffff;
+  outline-offset: 0.18em;
+}
+
+.upd__go:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.upd__go:disabled {
+  cursor: default;
+}
+
+.upd__puck {
+  display: grid;
+  place-items: center;
+  width: 1.95em;
+  height: 1.95em;
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--foot-red);
+  overflow: hidden;
+  transition: transform 0.4s var(--foot-ease);
+}
+
+.upd__chev {
+  display: block;
+  line-height: 0;
+}
+
+.upd__chevArt {
+  display: block;
+  width: 1.35em;
+  height: 0.9em;
+}
+
+.upd__tick {
+  display: block;
+  width: 1.2em;
+  height: 1.2em;
+}
+
+.upd__word {
+  font-size: 1.14em;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+@media (hover: hover) {
+  .upd__go:not(:disabled):hover {
+    background: #1f1f1f;
+  }
+
+  /* the puck leans toward where the email is going */
+  .upd__go:not(:disabled):hover .upd__puck {
+    transform: translateX(0.2em);
+  }
+}
+
+/* while it sends, the chevrons run on the spot */
+.upd__bar[data-state="pending"] .upd__chevArt {
+  animation: updRun 0.8s var(--foot-ease) infinite;
+}
+
+@keyframes updRun {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+/*
+ * Out of the flow, so the bar alone is what is centred on the board and what
+ * opens the gap in it; the line sits in the air under the bar, above the next
+ * row of pins.
+ */
+.upd__status {
+  position: absolute;
+  top: calc(100% + 0.55em);
+  left: 0;
+  right: 0;
+  margin: 0;
+  font-size: 0.93em;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+  text-align: center;
+  color: var(--foot-ink);
+}
+
+.upd__status[data-tone="error"] {
+  color: var(--foot-red);
+}
+
+.upd__status span {
+  display: inline-block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .upd__bar[data-state="pending"] .upd__chevArt {
+    animation: none;
+  }
+}
+
+/* --- the small print ------------------------------------------------------ */
+
 .foot__bar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 0.8em 2em;
-  margin-top: 2.2em;
+  margin-top: 1.8em;
 }
 
 .foot__small {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.65em;
+  gap: 0.5em 2em;
   margin: 0;
   font-size: 1em;
   letter-spacing: -0.01em;
-  color: #e60024;
-}
-
-.foot__dot {
-  opacity: 0.6;
+  color: var(--foot-ink);
 }
 
 .foot__link {
@@ -540,32 +848,69 @@ html[data-pin-scroll="smooth"] {
 
 @media (hover: hover) {
   .foot__link:hover {
-    text-decoration: underline;
-    text-underline-offset: 0.25em;
+    color: var(--foot-red);
   }
 }
 
 /*
- * The lockup is the one thing that cannot just scale down — at the hero's small
- * end the wordmark would run past the page. It stacks rather than shrinking
- * past reading size.
+ * Phones: the lockup and the line for help share the top row, the links drop
+ * under them, and the small print stacks.
  */
-@media (max-width: 900px) {
-  .foot__lockup {
-    flex-direction: column;
-    gap: 0.3em;
+@media (max-width: 700px) {
+  .foot {
+    padding: 3.6em 1.6em 1.6em;
+  }
+
+  .foot__top {
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "brand dm"
+      "nav nav";
+    row-gap: 1.4em;
+  }
+
+  .foot__brand {
+    grid-area: brand;
+  }
+
+  .foot__dm {
+    grid-area: dm;
+  }
+
+  .foot__nav {
+    grid-area: nav;
+  }
+
+  .foot__mark {
+    width: 2em;
+    height: 2.368em;
   }
 
   .foot__word {
-    font-size: min(13em, 28vw);
+    font-size: 1.875em;
   }
 
-  .foot__markArt {
-    width: 11em;
-    height: 13.03em;
+  .foot__dmLabel {
+    font-size: 1em;
+  }
+
+  .pinf {
+    margin-top: 2em;
   }
 
   .foot__bar {
-    justify-content: flex-start;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .foot__small {
+    gap: 0.5em 1.4em;
+  }
+}
+
+/* the narrowest phones: the help line gives way to its icons */
+@media (max-width: 420px) {
+  .foot__dmLabel {
+    display: none;
   }
 }

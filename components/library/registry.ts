@@ -88,7 +88,7 @@ export type Entry = {
 export const LIBRARY: Entry[] = [
   {
     slug: "session-list",
-    name: "Selection List",
+    name: "Count down",
     tagline: "A session broken into blocks, counting down in real time.",
     blurb:
       "One number drives the whole card. The live block, the time left on it, the playhead and every block's state are read back out of the seconds elapsed, so they cannot disagree — the clock lands on 00:00 on the same tick the playhead reaches the end of its block, and that is what hands over to the next one.",

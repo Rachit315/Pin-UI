@@ -9,6 +9,7 @@ import { softSpring } from "@/lib/motion";
 import { usePinTheme } from "@/lib/theme";
 import { useRailed } from "./useRailed";
 import { useCompactRail } from "./useCompactRail";
+import { useFooterInView } from "./useFooterInView";
 
 /**
  * The masthead's second life.
@@ -26,6 +27,8 @@ export default function SiteRail() {
   const reduced = useReducedMotion();
   const { railed, instant } = useRailed();
   const compact = useCompactRail();
+  /* the footer has its own lockup and links; the rail steps aside for it */
+  const footerUp = useFooterInView();
   /* the mark owns the switch itself; this is only for the two GitHub faces */
   const { theme } = usePinTheme();
   const pathname = usePathname();
@@ -40,7 +43,7 @@ export default function SiteRail() {
 
   return (
     <AnimatePresence>
-      {railed && (
+      {railed && !footerUp && (
         <motion.nav
           className="rail"
           aria-label="Site"

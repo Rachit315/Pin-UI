@@ -155,15 +155,14 @@
 
 .wbnav__title {
   /*
-   * 44px of air below the lockup, in *this* element's em, which is 32px. The
-   * file quotes 60, but it drew three rows of placeholder text; with real names
-   * under it that much dead space reads as a gap rather than as grouping.
+   * A heading for the list, not a headline: 16px at the reference root, a
+   * step above the 14px rows, with 36px of air between it and the lockup.
    */
-  margin: 1.375em 0 0;
-  font-size: 2.286em;
+  margin: 2.25em 0 0;
+  font-size: 1.143em;
   font-weight: 500;
-  line-height: 1;
-  letter-spacing: -0.02em;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
   color: var(--wb-title);
 }
 
@@ -171,8 +170,9 @@
 
 .wbnav__list {
   position: relative;
-  margin: 1.857em 0 0; /* 26px: the rows carry padding of their own on top */
-  padding: 0;
+  /* 10px under the heading (the first row's padding adds 7 more), rows set in 20px */
+  margin: 0.714em 0 0;
+  padding: 0 0 0 1.429em;
   list-style: none;
 }
 
@@ -185,10 +185,11 @@
  */
 .wbnav__link {
   display: block;
-  padding: 0.4em 0;
-  font-size: 1.357em;
-  line-height: 1.15;
-  letter-spacing: -0.015em;
+  /* 14px type on a 34px row: 20px of line and 7px either side */
+  padding: 0.5em 0;
+  font-size: 1em;
+  line-height: 1.429;
+  letter-spacing: -0.005em;
   color: var(--wb-item);
   text-decoration: none;
   /*
@@ -205,7 +206,7 @@
 }
 
 .wbnav__item + .wbnav__item {
-  margin-top: 0.643em; /* 46px between rows, of which 37 is the row */
+  margin-top: 0; /* the row's own padding is the rhythm: 34px, row to row */
 }
 
 .wbnav__link[aria-current="page"] {
@@ -1076,8 +1077,9 @@
     display: flex;
     gap: 1.4em;
     overflow-x: auto;
-    margin-top: 1em;
-    padding-bottom: 0.6em;
+    margin-top: 0.4em;
+    /* a strip across the top has no column to indent into */
+    padding: 0 0 0.6em;
   }
 
   .wbnav__item + .wbnav__item {
