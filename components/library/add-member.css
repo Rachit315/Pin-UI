@@ -1,0 +1,652 @@
+/* ===========================================================================
+   Add Member — pick people for a project.
+
+   A white card on a blue shell: the header springs the list open, each row's
+   toggle fills with a gooey drop, and chosen faces fly into the stack above
+   "Add to Project". Two themes; the blue shell is the component's identity
+   and stays blue in both, while the card, the type and the controls invert.
+=========================================================================== */
+
+.pmem {
+  --r: 20px;
+  --panel: #4fc1f5;
+  --card: #ffffff;
+  --name: #0b0b0d;
+  --role: #8b8f96;
+  --line: #e9eaec;
+  --hover: rgb(11 11 13 / 0.04);
+  --fill: #0b0b0d;
+  --sign: #9aa0a6;
+  --sign-on: #ffffff;
+  --foot: #0d6db5;
+  --ring-accent: #2563eb;
+  --placeholder: #e7e9ec;
+  --offline: #b3b8c0;
+  --pmem-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --pmem-theme: 0.4s var(--pmem-ease);
+
+  width: 352px;
+  max-width: 100%;
+  font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.pmem[data-theme="dark"] {
+  --card: #0f0f11;
+  --name: #ffffff;
+  --role: #9aa0a6;
+  --line: #26262c;
+  --hover: rgb(255 255 255 / 0.05);
+  --fill: #ffffff;
+  --sign: #8b8f96;
+  --sign-on: #0b0b0d;
+  --foot: #ffffff;
+  --ring-accent: #3b82f6;
+  --placeholder: #1e1e23;
+  --offline: #6b7280;
+}
+
+.pmem *,
+.pmem *::before,
+.pmem *::after {
+  box-sizing: border-box;
+}
+
+/* the component's own controls only — never anybody else's */
+.pmem :where(button) {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pmem :where(button):focus-visible {
+  outline: 2px solid var(--ring-accent);
+  outline-offset: 2px;
+}
+
+.pmem__defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+/* ---- shell -------------------------------------------------------------- */
+
+.pmem__shell {
+  position: relative;
+  overflow: hidden;
+  padding: 10px 10px 0;
+  border-radius: calc(var(--r) + 12px);
+  background: var(--panel);
+  box-shadow:
+    0 18px 36px -24px rgb(31 141 214 / 0.55),
+    0 2px 6px rgb(15 23 42 / 0.05);
+  /* the entrance brings it in */
+  opacity: 0;
+  transition: box-shadow var(--pmem-theme);
+}
+
+/* dark mode: no blue halo, just a quiet drop */
+.pmem[data-theme="dark"] .pmem__shell {
+  box-shadow: 0 16px 30px -26px rgb(0 0 0 / 0.9);
+}
+
+.pmem__card {
+  padding: 14px 20px;
+  border-radius: var(--r);
+  background: var(--card);
+  transition: background-color var(--pmem-theme);
+}
+
+/* ---- head --------------------------------------------------------------- */
+
+.pmem__head {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  text-align: left;
+}
+
+.pmem__title {
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--name);
+  transition: color var(--pmem-theme);
+}
+
+.pmem__chevron {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  color: var(--name);
+  transition: color var(--pmem-theme);
+}
+
+.pmem__chevron svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* ---- body --------------------------------------------------------------- */
+
+/* the clip box is pushed 8px past the content on each side, so avatar rings
+   and the toggle never touch the edge while the height animates */
+.pmem__body {
+  margin: 0 -8px;
+  padding: 0 8px;
+  overflow: hidden;
+}
+
+/* ---- search ------------------------------------------------------------- */
+
+.pmem__search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.pmem__searchIcon {
+  position: absolute;
+  left: 12px;
+  width: 16px;
+  height: 16px;
+  color: var(--role);
+  pointer-events: none;
+  transition: color var(--pmem-theme);
+}
+
+.pmem__searchInput {
+  width: 100%;
+  height: 38px;
+  margin: 0;
+  padding: 0 36px 0 36px;
+  border: 1.5px solid transparent;
+  border-radius: calc(var(--r) * 0.6);
+  outline: none;
+  background: var(--placeholder);
+  color: var(--name);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  /* the card is not selectable; the one thing you type into has to be */
+  user-select: text;
+  -webkit-user-select: text;
+  -webkit-appearance: none;
+  appearance: none;
+  transition:
+    background-color var(--pmem-theme),
+    color var(--pmem-theme),
+    border-color 0.2s var(--pmem-ease),
+    box-shadow 0.2s var(--pmem-ease);
+}
+
+.pmem__searchInput::placeholder {
+  color: var(--role);
+  font-weight: 500;
+  opacity: 1;
+}
+
+/* the browser's own clear control; this field draws its own */
+.pmem__searchInput::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.pmem__searchInput:focus-visible {
+  border-color: var(--ring-accent);
+  box-shadow: 0 0 0 3px rgb(59 130 246 / 0.18);
+}
+
+.pmem__searchClear {
+  position: absolute;
+  right: 7px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 9999px;
+  color: var(--role);
+  animation: pmemPop 0.24s var(--pmem-ease);
+}
+
+.pmem__searchClear svg {
+  width: 13px;
+  height: 13px;
+}
+
+@media (hover: hover) {
+  .pmem__searchClear:hover {
+    background: var(--hover);
+    color: var(--name);
+  }
+}
+
+@keyframes pmemPop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+/* the letters that matched */
+.pmem__mark {
+  border-radius: 3px;
+  background: rgb(79 193 245 / 0.32);
+  color: inherit;
+}
+
+.pmem__empty {
+  padding: 18px 4px 10px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--role);
+  text-align: center;
+  animation: pmemPop 0.3s var(--pmem-ease);
+}
+
+.pmem__empty strong {
+  font-weight: 700;
+  color: var(--name);
+}
+
+.pmem__list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 8px 0 0;
+  list-style: none;
+}
+
+.pmem__row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 -8px;
+  padding: 10px 8px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: background-color 0.25s var(--pmem-ease);
+}
+
+/* hover stays inside the row box: a soft wash, nothing moves */
+@media (hover: hover) {
+  .pmem__row:hover {
+    background: var(--hover);
+  }
+}
+
+/* ---- avatar ------------------------------------------------------------- */
+
+.pmem__avatar {
+  position: relative;
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  border-radius: 9999px;
+  background: var(--placeholder);
+  transition:
+    background-color var(--pmem-theme),
+    box-shadow var(--pmem-theme);
+}
+
+.pmem__avatar.is-ringed {
+  box-shadow:
+    0 0 0 2px var(--card),
+    0 0 0 4px var(--ring-accent);
+}
+
+.pmem__photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  object-fit: cover;
+  object-position: 50% 22%;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+.pmem__photo[data-state="ready"] {
+  opacity: 1;
+}
+
+.pmem__photo[data-state="broken"] {
+  visibility: hidden;
+}
+
+.pmem__dot {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  display: grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  border: 2.5px solid var(--card);
+  border-radius: 9999px;
+  transition: border-color var(--pmem-theme);
+}
+
+.pmem__dot.is-online {
+  background: #22c55e;
+}
+
+.pmem__dot.is-idle {
+  background: #f59e0b;
+}
+
+.pmem__dot.is-dnd {
+  background: #ef4444;
+}
+
+.pmem__dot.is-dnd::after {
+  content: "";
+  display: block;
+  width: 6px;
+  height: 2px;
+  border-radius: 9999px;
+  background: #ffffff;
+}
+
+.pmem__dot.is-offline {
+  background: var(--offline);
+}
+
+/* ---- meta --------------------------------------------------------------- */
+
+.pmem__meta {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.pmem__name,
+.pmem__role {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.25;
+  transition: color var(--pmem-theme);
+}
+
+.pmem__name {
+  font-size: 15.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--name);
+}
+
+.pmem__role {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--role);
+}
+
+/* ---- toggle (goo) ------------------------------------------------------- */
+
+.pmem__toggle {
+  position: relative;
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+}
+
+.pmem__goo {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.pmem__fill {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  background: var(--fill);
+  opacity: 0;
+  transform: scale(0);
+  transition: background-color var(--pmem-theme);
+}
+
+.pmem__blob {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: var(--fill);
+  opacity: 0;
+  transform: scale(0);
+}
+
+.pmem__ring {
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid var(--line);
+  border-radius: 9999px;
+  pointer-events: none;
+  transition: border-color var(--pmem-theme);
+}
+
+.pmem__sign {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  fill: var(--sign);
+  transition: fill 0.2s;
+}
+
+.pmem__bar {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.pmem__toggle.is-on .pmem__sign {
+  fill: var(--sign-on);
+}
+
+/* ---- selected / add to project ------------------------------------------ */
+
+.pmem__action {
+  overflow: hidden;
+}
+
+.pmem__actionIn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  transition: border-color var(--pmem-theme);
+}
+
+.pmem__stack {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.pmem__chip {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  margin-left: -10px;
+  overflow: hidden;
+  border: 2px solid var(--card);
+  border-radius: 9999px;
+  background: var(--placeholder);
+  transition:
+    border-color var(--pmem-theme),
+    background-color var(--pmem-theme);
+}
+
+.pmem__chip:first-child {
+  margin-left: 0;
+}
+
+.pmem__chip img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 22%;
+}
+
+.pmem__more {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--name);
+}
+
+.pmem__count {
+  margin-right: auto;
+  padding-left: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--role);
+}
+
+.pmem__cta {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 14px;
+  border-radius: 9999px;
+  background: var(--fill);
+  color: var(--sign-on);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  transition:
+    background-color 0.3s var(--pmem-ease),
+    color 0.3s var(--pmem-ease);
+}
+
+.pmem__cta.is-done {
+  background: #16a34a;
+  color: #ffffff;
+  cursor: default;
+}
+
+.pmem__ctaCheck {
+  display: grid;
+  place-items: center;
+  width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition:
+    width 0.3s var(--pmem-ease),
+    opacity 0.25s var(--pmem-ease);
+}
+
+.pmem__cta.is-done .pmem__ctaCheck {
+  width: 15px;
+  opacity: 1;
+}
+
+.pmem__ctaCheck svg {
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+}
+
+/* the face that flies from its row into the stack */
+.pmem__fly {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.pmem__ghost {
+  position: absolute;
+  overflow: hidden;
+  border-radius: 9999px;
+  box-shadow: 0 10px 22px -8px rgb(7 20 35 / 0.45);
+}
+
+.pmem__ghost img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 22%;
+}
+
+/* ---- foot --------------------------------------------------------------- */
+
+.pmem__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+  padding: 0 8px 0 12px;
+}
+
+.pmem__all {
+  flex-shrink: 0;
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--foot);
+  transition: color var(--pmem-theme);
+}
+
+.pmem__nav {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 2px;
+}
+
+.pmem__nav button {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  color: var(--foot);
+  transition: color var(--pmem-theme);
+}
+
+/* nothing to turn to while the search leaves one page */
+.pmem__nav button[aria-disabled="true"] {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.pmem__nav svg {
+  width: 19px;
+  height: 19px;
+}

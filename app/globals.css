@@ -23,6 +23,40 @@
   src: url("/fonts/inter-tight-var-latin.woff2") format("woff2");
 }
 
+/* Chips is drawn in Poppins, at the three weights it uses. */
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/poppins-600-latin.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/poppins-700-latin.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("/fonts/poppins-800-latin.woff2") format("woff2");
+}
+
+/* Add Member is drawn in Plus Jakarta Sans. */
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url("/fonts/plus-jakarta-sans-var-latin.woff2") format("woff2");
+}
+
 /* ---------------------------------------------------------------------------
    Pin UI — global tokens & base styles
 
@@ -1058,4 +1092,228 @@ a {
   .strip__blur {
     transition: none;
   }
+}
+
+
+/* ---------------------------------------------------------------------------
+   The maker's mark — a dot after a component's name that cycles through the
+   seven colours of the rainbow, flickering as it goes, with a tooltip that
+   says who made it. Used in the sidebar and on the shelf, so it lives here.
+--------------------------------------------------------------------------- */
+
+.cdot {
+  --cdot-size: 0.5em;
+  position: relative;
+  display: inline-block;
+  width: var(--cdot-size);
+  height: var(--cdot-size);
+  margin-left: 0.42em;
+  border-radius: 50%;
+  color: #ff3b30;
+  background: currentColor;
+  /* the glow is the dot's own colour, so it changes with it */
+  box-shadow:
+    0 0 0 0.09em rgb(255 255 255 / 0.18) inset,
+    0 0 0.45em 0.05em currentColor;
+  cursor: pointer;
+  vertical-align: middle;
+  animation:
+    cdotSpectrum 3.5s linear infinite,
+    cdotFlicker 2.3s steps(1, end) infinite;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* a bigger target than the dot itself, so it is easy to find with a pointer */
+.cdot::before {
+  content: "";
+  position: absolute;
+  inset: -0.45em;
+  border-radius: 50%;
+}
+
+@media (hover: hover) {
+  .cdot:hover {
+    transform: scale(1.3);
+  }
+}
+
+.cdot {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* red, orange, yellow, green, blue, indigo, violet — and round again */
+@keyframes cdotSpectrum {
+  0% {
+    color: #ff3b30;
+  }
+  14.28% {
+    color: #ff9500;
+  }
+  28.57% {
+    color: #ffd60a;
+  }
+  42.85% {
+    color: #30d158;
+  }
+  57.14% {
+    color: #0a84ff;
+  }
+  71.42% {
+    color: #5e5ce6;
+  }
+  85.71% {
+    color: #bf5af2;
+  }
+  100% {
+    color: #ff3b30;
+  }
+}
+
+/* an uneven flicker, like a lamp that has just been switched on */
+@keyframes cdotFlicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  31% {
+    opacity: 0.55;
+  }
+  34% {
+    opacity: 1;
+  }
+  62% {
+    opacity: 0.7;
+  }
+  64% {
+    opacity: 1;
+  }
+  66% {
+    opacity: 0.45;
+  }
+  69% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* the colours still turn, slowly; the flicker stops */
+  .cdot {
+    animation: cdotSpectrum 9s linear infinite;
+    transition: none;
+  }
+}
+
+/* the tooltip: square like the rest of the site's own chrome */
+.cdot-tip {
+  --tip-bg: #0f0f0f;
+  --tip-ink: #ffffff;
+  --tip-muted: rgb(255 255 255 / 0.62);
+  --tip-edge: rgb(255 255 255 / 0.08);
+
+  position: fixed;
+  z-index: 1000;
+  transform: translate(-50%, -100%);
+  pointer-events: auto;
+}
+
+.cdot-tip[data-below="true"] {
+  transform: translate(-50%, 0);
+}
+
+:root[data-pin-theme="crimson"] .cdot-tip {
+  --tip-bg: #ffffff;
+  --tip-ink: #0f0f0f;
+  --tip-muted: rgb(15 15 15 / 0.58);
+  --tip-edge: rgb(15 15 15 / 0.1);
+}
+
+.cdot-tip__body {
+  position: relative;
+  transform-origin: 50% 100%;
+}
+
+.cdot-tip[data-below="true"] .cdot-tip__body {
+  transform-origin: 50% 0;
+}
+
+.cdot-tip__link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px 8px 10px;
+  background: var(--tip-bg);
+  color: var(--tip-ink);
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 12.5px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  text-decoration: none;
+  box-shadow:
+    0 0 0 1px var(--tip-edge),
+    0 10px 24px -8px rgb(0 0 0 / 0.35);
+  -webkit-font-smoothing: antialiased;
+}
+
+.cdot-tip__link:focus-visible {
+  outline: 2px solid #e60024;
+  outline-offset: 2px;
+}
+
+.cdot-tip__x {
+  display: block;
+  flex: none;
+  width: 13px;
+  height: 13px;
+  padding-right: 8px;
+  box-sizing: content-box;
+  border-right: 1px solid var(--tip-edge);
+}
+
+.cdot-tip__text {
+  color: var(--tip-muted);
+}
+
+.cdot-tip__handle {
+  font-weight: 600;
+  color: var(--tip-ink);
+}
+
+@media (hover: hover) {
+  .cdot-tip__link:hover .cdot-tip__handle {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}
+
+/* a square arrow, turned, pointing back at the dot */
+.cdot-tip__arrow {
+  position: absolute;
+  left: 50%;
+  bottom: -4px;
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  background: var(--tip-bg);
+  transform: rotate(45deg);
+  box-shadow: 1px 1px 0 0 var(--tip-edge);
+}
+
+.cdot-tip[data-below="true"] .cdot-tip__arrow {
+  top: -4px;
+  bottom: auto;
+  box-shadow: -1px -1px 0 0 var(--tip-edge);
+}
+
+/* sized and lifted to sit level with the "New" tag it follows */
+.wbnav__link .cdot {
+  --cdot-size: 0.46em;
+  margin-left: 0.5em;
+  top: -0.42em;
+}
+
+.card__title .cdot {
+  --cdot-size: 0.26em;
+  margin-left: 0.38em;
+  top: -0.12em;
 }

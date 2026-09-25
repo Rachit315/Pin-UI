@@ -1,0 +1,191 @@
+/* ===========================================================================
+   Chips — a selection list of 3D chips with a real press.
+
+   Each chip is extruded: the lip is a hard shadow `--lift` px deep, and the
+   press drives the chip down by exactly that much while the lip shrinks to
+   match. The component sizes itself off its own width (a container query), so
+   it is the same component in a sidebar, a stage or a phone.
+
+   Two themes: light chips on paper, and graphite chips on near-black. The
+   selected chip is the inverse of the rest in both.
+=========================================================================== */
+
+.pchips {
+  --corner: 20px;
+  --cast: 0.33;
+  --shade: 1;
+
+  --pchips-face-top: #ffffff;
+  --pchips-face-bottom: #f4f2ee;
+  --pchips-ink: #111111;
+  --pchips-lip: #d8d4cc;
+  --pchips-sheen: rgb(255 255 255 / 0.9);
+  --pchips-edge-line: rgb(0 0 0 / 0.04);
+  --pchips-cast-rgb: 40 36 28;
+  --pchips-on-top: #35332f;
+  --pchips-on-bottom: #191817;
+  --pchips-on-ink: #ffffff;
+  --pchips-on-lip: #0c0c0b;
+  --pchips-focus: #1b1b1b;
+
+  container-type: inline-size;
+  width: min(100%, 60rem);
+  font-family: Poppins, system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.pchips[data-theme="dark"] {
+  --pchips-face-top: #34332f;
+  --pchips-face-bottom: #242320;
+  --pchips-ink: #f4f2ee;
+  --pchips-lip: #0d0d0c;
+  --pchips-sheen: rgb(255 255 255 / 0.09);
+  --pchips-edge-line: rgb(0 0 0 / 0.35);
+  --pchips-cast-rgb: 0 0 0;
+  --pchips-on-top: #ffffff;
+  --pchips-on-bottom: #e9e6e0;
+  --pchips-on-ink: #111111;
+  --pchips-on-lip: #a9a49a;
+  --pchips-focus: #f4f2ee;
+}
+
+.pchips__list {
+  /* the press travel; the component reads it back, so the two cannot disagree */
+  --pchips-edge: 7px;
+
+  /* the block sits centred in whatever holds it; the rows stay left-aligned */
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 26px;
+}
+
+.pchips__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 26px;
+}
+
+/* ---- the 3D chip -------------------------------------------------------- */
+
+.pchips__chip {
+  --lift: 7px;
+  --lip-color: var(--pchips-lip);
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 13px;
+  margin: 0;
+  padding: 15px 26px 15px 20px;
+  border: 0;
+  border-radius: var(--corner);
+  background: linear-gradient(180deg, var(--pchips-face-top) 0%, var(--pchips-face-bottom) 100%);
+  color: var(--pchips-ink);
+  font-family: inherit;
+  font-size: 27px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  will-change: transform;
+  box-shadow:
+    inset 0 1px 0 var(--pchips-sheen),
+    0 var(--lift) 0 0 var(--lip-color),
+    0 calc(var(--lift) + 2px) 0 0 var(--pchips-edge-line),
+    0 calc(var(--lift) + 9px * var(--shade)) calc(18px * var(--shade)) -7px
+      rgb(var(--pchips-cast-rgb) / var(--cast));
+  transition:
+    box-shadow 0.16s ease,
+    background 0.28s ease,
+    color 0.28s ease;
+}
+
+/* pixel pointing-hand cursor */
+@media (hover: hover) {
+  .pchips__chip {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 16 16' shape-rendering='crispEdges'><path fill='%23fff' d='M5 2h2v5H5zM8 6h4v7H8zM7 6h1v7H7zM4 8h1v3H4zM5 7h2v6H5z'/><path fill='%23000' d='M5 1h2v1H5zM4 2h1v5H4zM7 2h1v4H7zM8 5h2v1H8zM10 6h2v1h-2zM3 7h1v4H3zM12 7h1v6h-1zM4 11h1v2H4zM5 13h7v1H5z'/></svg>") 6 2, pointer;
+  }
+}
+
+.pchips__chip:focus-visible {
+  outline: 3px solid var(--pchips-focus);
+  outline-offset: 5px;
+}
+
+.pchips__chip[data-selected="true"] {
+  --lip-color: var(--pchips-on-lip);
+  background: linear-gradient(180deg, var(--pchips-on-top) 0%, var(--pchips-on-bottom) 100%);
+  color: var(--pchips-on-ink);
+}
+
+.pchips__icon {
+  display: block;
+  flex: none;
+  width: 30px;
+  height: 30px;
+}
+
+/* soft ground shadow, squashed while the chip is held down */
+.pchips__ground {
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  bottom: -13px;
+  z-index: -1;
+  height: 16px;
+  border-radius: 50%;
+  background: rgb(var(--pchips-cast-rgb) / calc(0.2 * var(--shade)));
+  filter: blur(9px);
+  pointer-events: none;
+}
+
+.pchips__label {
+  display: block;
+}
+
+/* ---- narrow: the same chips, a size down -------------------------------- */
+
+@container (max-width: 760px) {
+  .pchips__list {
+    --pchips-edge: 5px;
+    gap: 18px;
+  }
+
+  .pchips__row {
+    gap: 14px;
+  }
+
+  .pchips__chip {
+    --lift: 5px;
+    gap: 9px;
+    padding: 11px 17px 11px 13px;
+    font-size: 19px;
+  }
+
+  .pchips__icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .pchips__ground {
+    bottom: -9px;
+    height: 12px;
+    filter: blur(7px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pchips__chip {
+    transition: none;
+  }
+}

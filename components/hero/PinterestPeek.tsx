@@ -41,7 +41,7 @@ import "./peek.css";
  * card has to know its own size before it is drawn in order to decide which
  * side of the pointer to open on, and a guess leaves dead space at the bottom.
  */
-const CARD = { w: 272, h: 200 };
+const CARD = { w: 272, h: 219 };
 /** How far it sits from the pointer, and how close it may come to the edge. */
 const OFFSET = { x: 18, y: 18 };
 const MARGIN = 12;
@@ -183,7 +183,7 @@ export default function PinterestPeek({
                     <motion.span
                       className="peek__tile"
                       key={entry.slug}
-                      style={{ background: entry.stage }}
+                      style={{ background: entry.clipStage ?? entry.stage }}
                       initial={reduced ? false : { opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ ...softSpring, delay: 0.04 + i * 0.05 }}
@@ -199,7 +199,7 @@ export default function PinterestPeek({
                          * push is what keeps it from reading as a speck on a
                          * field of background.
                          */
-                        style={{ "--peek-zoom": entry.zoom * 1.18 } as React.CSSProperties}
+                        style={{ "--peek-zoom": entry.zoom * 1.1 } as React.CSSProperties}
                         muted
                         loop
                         autoPlay

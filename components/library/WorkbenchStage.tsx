@@ -6,8 +6,13 @@ import InstallBlock from "./InstallBlock";
 import BalanceCard from "./BalanceCard";
 import CartCard from "./CartCard";
 import SessionList from "./SessionList";
+import Chips from "./Chips";
+import ChipsEditor, { type ChipsSettings } from "./ChipsEditor";
+import OtpInput from "./OtpInput";
+import AddMember from "./AddMember";
 import type { Entry } from "./registry";
 import { LINKS } from "@/lib/links";
+import { usePinTheme } from "@/lib/theme";
 
 /**
  * The stage — Figma 345:21.
@@ -32,8 +37,24 @@ export default function WorkbenchStage({
 }) {
   const [about, setAbout] = useState(false);
   const [showCode, setShowCode] = useState(false);
-  /* off until asked for: a page that starts making noise is a hostile page */
-  const [sound, setSound] = useState(false);
+  /*
+   * On from the start, so a first visit hears the components as they were
+   * made. Nothing plays on arrival: every cue is synthesised in response to a
+   * press, and the audio engine is only built on that first gesture, so a
+   * page that has not been touched stays silent.
+   */
+  const [sound, setSound] = useState(true);
+  /* the Chips' layout and corner, edited live from the panel above them */
+  const [chips, setChips] = useState<ChipsSettings>({ corner: 20, shadow: 50, rows: 2 });
+
+  /*
+   * The site's switch drives the components that have two themes: the light
+   * page shows them light, the crimson state shows them dark, on their own
+   * darker field. The rest keep the one field they were designed on.
+   */
+  const { theme: siteTheme } = usePinTheme();
+  const theme = siteTheme === "crimson" ? "dark" : "light";
+  const field = theme === "dark" && entry.stageDark ? entry.stageDark : entry.stage;
 
   /* either panel shortens the stage; the column below it is what scrolls */
   const opened = about || showCode;
@@ -49,15 +70,32 @@ export default function WorkbenchStage({
         nothing while nobody is touching them.
       */}
       <div className={`wbstage__frame${opened ? " wbstage__frame--compact" : ""}`}>
-        <div className="wbstage__field" style={{ background: entry.stage }} aria-hidden="true" />
+        <div className="wbstage__field" style={{ background: field }} aria-hidden="true" />
 
-        <div className="wbstage__hold">
+        <div
+          className={`wbstage__hold${entry.wide ? " wbstage__hold--wide" : ""}${
+            entry.spill ? " wbstage__hold--spill" : ""
+          }`}
+        >
           {/* the wall shot draws it at a 32px corner, not the block's own 40 */}
           {entry.slug === "session-list" && <SessionList corner={32} />}
           {/* the bar owns the sound here, so the card's own credit row stands down */}
           {entry.slug === "balance-card" && <BalanceCard sound={sound} credit={false} />}
           {entry.slug === "cart-card" && <CartCard sound={sound} />}
+          {entry.slug === "chips" && (
+            <Chips
+              theme={theme}
+              sound={sound}
+              corner={chips.corner}
+              shadow={chips.shadow}
+              rows={chips.rows}
+            />
+          )}
+          {entry.slug === "otp-input" && <OtpInput theme={theme} autoFocus />}
+          {entry.slug === "add-member" && <AddMember theme={theme} />}
         </div>
+
+        {entry.slug === "chips" && <ChipsEditor value={chips} onChange={setChips} />}
 
         <div className="wbbar" role="toolbar" aria-label="Stage">
           <button
@@ -192,18 +230,24 @@ export default function WorkbenchStage({
                 in otherwise. The apology this line used to carry — that it
                 only went to Pinterest itself — is gone with it.
               */}
-              <p className="wbinfo__credit">
-                Inspired from Pinterest —{" "}
-                <a
-                  className="wbinfo__link"
-                  href={entry.info.pin ?? LINKS.pinterest}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  find it here
-                </a>
-                .
-              </p>
+              {/*
+                An original has no pin to credit: its maker is credited by the
+                dot beside its name instead, so the Pinterest line is left out.
+              */}
+              {!entry.creator && (
+                <p className="wbinfo__credit">
+                  Inspired from Pinterest —{" "}
+                  <a
+                    className="wbinfo__link"
+                    href={entry.info.pin ?? LINKS.pinterest}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    find it here
+                  </a>
+                  .
+                </p>
+              )}
             </section>
           )}
 

@@ -44,16 +44,46 @@ export type RegistryItem = {
  * never loads falls back silently to the system sans. Saying so at install time
  * is cheaper than letting somebody find out by looking at it.
  */
+/** The face each component is drawn in; the OTP field uses the system's own. */
+const FACES: Record<string, string | null> = {
+  "balance-card": "Inter Tight",
+  chips: "Poppins (600, 700 and 800)",
+  "otp-input": null,
+  "add-member": "Plus Jakarta Sans",
+};
+
 function docsFor(entry: Entry): string {
+  const face = entry.slug in FACES ? FACES[entry.slug] : "Inter";
   const lines = [
     `${entry.name} — ${entry.tagline}`,
     "",
     `The stylesheet sits next to the component and is imported by it, so keep the two together in ${INSTALL_DIR}/.`,
     "",
-    "It is drawn in Inter" +
-      (entry.slug === "balance-card" ? " Tight" : "") +
-      ". If your project does not already load that face the card will fall back to your system sans and look noticeably different.",
+    face
+      ? `It is drawn in ${face}. If your project does not already load that face it will fall back to your system sans and look noticeably different.`
+      : "It is set in the system's own UI face, so there is no font to load.",
   ];
+
+  if (entry.stageDark) {
+    lines.push(
+      "",
+      'It comes in two themes: pass theme="dark" for the dark one, or wire the prop to your own theme switch.',
+    );
+  }
+
+  if (entry.slug === "otp-input") {
+    lines.push(
+      "",
+      "On a wrong code the eggs break and fall: the pieces travel about 130px to either side of the row and 110px below it. Give it that room, or it will spill into whatever sits around it — and inside a scrolling box, it will briefly make that box scroll.",
+    );
+  }
+
+  if (entry.slug === "add-member") {
+    lines.push(
+      "",
+      "The default people use portraits from randomuser.me. Pass your own `members` — name, role, portrait URL and status — before shipping it.",
+    );
+  }
 
   if (entry.slug === "cart-card") {
     lines.push(

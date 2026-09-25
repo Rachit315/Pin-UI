@@ -118,13 +118,16 @@
 /*
  * The pins keep their corners. Everything that frames a component on this site
  * is rounded — the shelf cards, the band — because the components are artwork
- * rather than chrome, and these are the same three components.
+ * rather than chrome, and these are the same components.
+ *
+ * Landscape, so the whole board fits in two rows of three: the recordings
+ * are landscape too, so less of each one is cropped away.
  */
 .peek__tile {
   display: block;
   overflow: hidden;
   border-radius: 7px;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 4 / 3;
 }
 
 .peek__video {

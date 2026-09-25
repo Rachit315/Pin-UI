@@ -136,8 +136,12 @@ html[data-pin-scroll="smooth"] {
 
 .shelf__grid {
   display: grid;
-  /* three across while they fit, then two, then one — no breakpoints needed */
-  grid-template-columns: repeat(auto-fit, minmax(20em, 1fr));
+  /*
+   * Three across at most, then two, then one — no breakpoints needed. The
+   * floor of a column is whichever is wider: 20em, or a third of the row, so
+   * a wide screen can never fit a fourth and leave the last row ragged.
+   */
+  grid-template-columns: repeat(auto-fit, minmax(max(20em, calc((100% - 3em) / 3)), 1fr));
   gap: 1.5em;
   margin: 0;
   padding: 0;
@@ -197,6 +201,28 @@ html[data-pin-scroll="smooth"] {
   font-weight: 500;
   line-height: 1.1;
   letter-spacing: -0.02em;
+}
+
+/*
+ * The tag on a component that has just been added. Square, like everything
+ * else the site draws for itself, and the card's colours the other way round:
+ * white on the red card, red on the white one.
+ */
+.card__new {
+  display: inline-block;
+  margin-left: 0.5em;
+  padding: 0.28em 0.5em 0.24em;
+  background: var(--card-ink);
+  color: var(--card-fill);
+  font-size: 0.4em;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  vertical-align: 0.42em;
+  transition:
+    background-color var(--pin-theme-fade) var(--pin-theme-ease),
+    color var(--pin-theme-fade) var(--pin-theme-ease);
 }
 
 .card__arrow {

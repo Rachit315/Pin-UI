@@ -98,7 +98,7 @@ export function homepageJsonLd() {
       codeRepository: LINKS.github,
       programmingLanguage: ["TypeScript", "React", "CSS"],
       description:
-        "A free, open-source React component library that turns Pinterest-inspired designs into production-ready, copy-paste components. Includes Balance Card, Session List, Add To Cart, and more.",
+        "A free, open-source React component library that turns Pinterest-inspired designs into production-ready, copy-paste components. Includes Count down, Balance Card, Add To Cart, Chips, Egg OTP, Add Member and more.",
     },
   ];
 }

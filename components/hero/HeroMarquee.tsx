@@ -191,7 +191,7 @@ export default function HeroMarquee() {
               <motion.div
                 key={entry.slug}
                 className="heroRail__card"
-                style={{ background: entry.stage }}
+                style={{ background: entry.clipStage ?? entry.stage }}
                 initial={reduced ? false : { y: 40, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{

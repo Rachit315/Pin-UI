@@ -65,7 +65,7 @@
  * single-class rule here — which is exactly how the expand control lost its
  * fill and its icon colour and became a floating shadow.
  */
-:where(.wbnav button, .wbbar button, .wbstage__expand) {
+:where(.wbnav button, .wbbar button, .wbedit button, .wbstage__expand) {
   margin: 0;
   border: 0;
   padding: 0;
@@ -198,11 +198,48 @@
    * moment reads the wrapped layout.
    */
   white-space: nowrap;
-  opacity: 0.55;
   transition:
-    opacity 0.25s ease,
     color 0.25s ease,
     transform 0.35s cubic-bezier(0.22, 0.68, 0.16, 1);
+}
+
+/*
+ * The name carries the dimming, not the link — so a "New" tag beside it stays
+ * at full strength on every row, not only on the one you are looking at.
+ */
+.wbnav__text {
+  opacity: 0.55;
+  transition: opacity 0.25s ease;
+}
+
+.wbnav__link[aria-current="page"] .wbnav__text {
+  opacity: 1;
+}
+
+/*
+ * The tag on a component that has just been added. It rides high, like a
+ * superscript: its top clears the name's capitals and its foot sits halfway
+ * up them, so it reads as a note on the name rather than a second word.
+ */
+.wbnav__new {
+  display: inline-block;
+  margin-left: 0.45em;
+  padding: 0.16em 0.4em 0.14em;
+  background: var(--wb-pin);
+  color: #ffffff;
+  font-size: 0.6em;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  /*
+   * Lifted by an offset rather than by vertical-align: an offset moves the
+   * tag without touching the line box, so the rows keep their 34px rhythm and
+   * the pin still lands on each one's centre.
+   */
+  position: relative;
+  top: -0.62em;
+  vertical-align: 0.2em;
 }
 
 .wbnav__item + .wbnav__item {
@@ -210,7 +247,6 @@
 }
 
 .wbnav__link[aria-current="page"] {
-  opacity: 1;
   font-weight: 500;
   color: var(--wb-title);
 }
@@ -322,6 +358,22 @@
 .wbstage__field {
   position: absolute;
   inset: 0;
+  /* a two-theme component's field crosses over with the rest of the page */
+  transition: background-color var(--pin-theme-fade, 0.5s) var(--pin-theme-ease, ease);
+}
+
+/*
+ * A short component whose animation runs past its own box. The hold would
+ * turn that into scrollbars for the length of the animation; instead it lets
+ * the spill show, and the frame still clips it at the stage's edge.
+ */
+.wbstage__hold.wbstage__hold--spill {
+  overflow: visible;
+}
+
+/* the chips are laid out as a wide list, not a card */
+.wbstage__hold.wbstage__hold--wide {
+  max-width: 64em;
 }
 
 /*
@@ -380,6 +432,205 @@
 }
 
 /*
+ * The prop editor — a component's own props, live on the stage.
+ *
+ * The bar's twin: the same surface, hairline and ink, so it reads as part of
+ * the workbench rather than as part of the component, and it follows the
+ * theme with the rest of it. It sits at the top of the stage, as the bar sits
+ * at the bottom, so the component between them is never covered.
+ */
+.wbedit {
+  position: absolute;
+  left: 50%;
+  top: 0.8em;
+  z-index: 3;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.9em;
+  height: 2.857em;
+  padding: 0 0.6em 0 1em;
+  border-radius: 999px;
+  background: var(--wb-bar);
+  color: var(--wb-bar-ink);
+  box-shadow:
+    0 0 0 1px var(--wb-bar-edge),
+    0 0.35em 0.9em rgb(0 0 0 / 0.14);
+  white-space: nowrap;
+  animation: wbrise 0.45s cubic-bezier(0.22, 0.68, 0.16, 1) 0.1s backwards;
+  transition:
+    background-color var(--pin-theme-fade, 0.5s) var(--pin-theme-ease, ease),
+    color var(--pin-theme-fade, 0.5s) var(--pin-theme-ease, ease);
+}
+
+.wbedit__field {
+  display: flex;
+  align-items: center;
+  gap: 0.55em;
+  cursor: pointer;
+}
+
+.wbedit__label {
+  font-size: 0.786em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.wbedit__value {
+  min-width: 1.6em;
+  font-size: 0.857em;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.wbedit__rule {
+  width: 1px;
+  height: 1.3em;
+  background: currentColor;
+  opacity: 0.14;
+}
+
+/* a range drawn in the bar's own ink: a hairline track, filled up to the value */
+.wbedit__range {
+  --fill: 50%;
+  width: 6.4em;
+  height: 1.6em;
+  margin: 0;
+  background: transparent;
+  /* a form control does not inherit colour, and the track and thumb are drawn in it */
+  color: inherit;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.wbedit__range::-webkit-slider-runnable-track {
+  height: 0.214em;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    currentColor 0 var(--fill),
+    color-mix(in srgb, currentColor 18%, transparent) var(--fill) 100%
+  );
+}
+
+.wbedit__range::-moz-range-track {
+  height: 0.214em;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 18%, transparent);
+}
+
+.wbedit__range::-moz-range-progress {
+  height: 0.214em;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.wbedit__range::-webkit-slider-thumb {
+  width: 1em;
+  height: 1em;
+  margin-top: -0.393em;
+  border: 0;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 0.214em var(--wb-bar);
+  -webkit-appearance: none;
+  appearance: none;
+  transition: transform 0.18s cubic-bezier(0.22, 0.68, 0.16, 1);
+}
+
+.wbedit__range::-moz-range-thumb {
+  width: 1em;
+  height: 1em;
+  border: 0;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 0.214em var(--wb-bar);
+}
+
+.wbedit__range:active::-webkit-slider-thumb {
+  transform: scale(1.2);
+}
+
+.wbedit__range:focus-visible {
+  outline: 2px solid var(--wb-pin);
+  outline-offset: 3px;
+  border-radius: 999px;
+}
+
+/* the layout switch: three segments and one lit thumb that slides between them */
+.wbedit__seg {
+  --seg-w: 2.2em;
+  position: relative;
+  /* one unit for the buttons and the thumb, so the thumb lands on each exactly */
+  font-size: 0.857em;
+  display: flex;
+  padding: 0.2em;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.wbedit__segButton {
+  position: relative;
+  z-index: 1;
+  width: var(--seg-w);
+  height: 1.9em;
+  border-radius: 999px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.6;
+  transition:
+    color 0.25s ease,
+    opacity 0.25s ease;
+}
+
+.wbedit__segButton[aria-checked="true"] {
+  color: var(--wb-bar);
+  opacity: 1;
+}
+
+.wbedit__segThumb {
+  position: absolute;
+  left: 0.2em;
+  top: 0.2em;
+  width: var(--seg-w);
+  height: calc(100% - 0.4em);
+  border-radius: 999px;
+  background: currentColor;
+  transform: translateX(calc(var(--seg) * 100%));
+  transition: transform 0.38s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wbedit,
+  .wbedit__segThumb {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* phones: the controls wrap onto two lines rather than running off the edge */
+@media (max-width: 700px) {
+  .wbedit {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5em 0.9em;
+    width: max-content;
+    max-width: calc(100% - 1.6em);
+    height: auto;
+    padding: 0.55em 0.9em;
+    border-radius: 1.2em;
+  }
+
+  .wbedit__rule {
+    display: none;
+  }
+}
+
+/*
  * The hit area is the whole rounded square, not just the 20px glyph — the icon
  * keeps the size the design draws while the target stays a comfortable 34px,
  * and that square is what carries the hover.
@@ -421,7 +672,7 @@
     transform: translateY(-0.1em);
   }
 
-  .wbnav__link:hover {
+  .wbnav__link:hover .wbnav__text {
     opacity: 1;
   }
 }

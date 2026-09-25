@@ -68,6 +68,37 @@ export type Entry = {
    * seen rather than dropping it onto the page's own paper.
    */
   stage: string;
+  /**
+   * Set only for components drawn in both a light and a dark theme. The stage
+   * shows the dark one, on this field, whenever the site is switched to its
+   * crimson state; the others keep the one field they were designed on.
+   */
+  stageDark?: string;
+  /**
+   * Wider than a card. The stage normally holds a component to a card's width;
+   * these get the room they were laid out in.
+   */
+  wide?: boolean;
+  /**
+   * Its animation runs past its own box — the Egg OTP's eggs break and fall. The
+   * stage lets that spill show instead of scrolling to it; the frame around
+   * the stage still clips it. Only for components too short to ever need to
+   * scroll inside the stage.
+   */
+  spill?: boolean;
+  /**
+   * The field behind the shelf and carousel loop, when the loop was recorded
+   * on a different field from the stage's light one — the Egg OTP loop is
+   * recorded in its dark theme.
+   */
+  clipStage?: string;
+  /** Recently added: flagged with a "New" tag in the sidebar and on the shelf. */
+  isNew?: boolean;
+  /**
+   * Who made it, shown as a small colour-cycling dot after the name — in the
+   * sidebar and on the shelf — with a tooltip that links to their X profile.
+   */
+  creator?: { handle: string; url: string };
   /** The import used on the page and in the copy button. */
   usage: string;
   props: PropSpec[];
@@ -86,6 +117,124 @@ export type Entry = {
 };
 
 export const LIBRARY: Entry[] = [
+  {
+    slug: "chips",
+    name: "Chips",
+    isNew: true,
+    tagline: "A selection list of 3D chips that press into the surface.",
+    blurb:
+      "Every chip is extruded: its lip is a hard shadow as deep as the chip travels, and a press drives it down by exactly that much while the lip shrinks to match, so it lands on its own edge instead of just shrinking. The selected chip stays pressed in, inverted, a pixel proud of the surface.",
+    highlights: ["A real press, not a scale", "Light and dark", "Synthesised clicks", "Arrow-key navigation"],
+    clip: "/clips/loop/chips.mp4",
+    poster: "/clips/loop/chips.jpg",
+    sound: true,
+    zoom: 0.94,
+    stage: "#edeae4",
+    stageDark: "#121211",
+    wide: true,
+    usage: `import Chips from "@/components/library/Chips";
+
+<Chips corner={20} shadow={50} rows={2} theme="light" />`,
+    props: [
+      { name: "corner", type: "number", fallback: "20", note: "Chip radius, clamped to 0–40px." },
+      { name: "shadow", type: "number", fallback: "50", note: "How far the cast shadow is thrown, 0–100." },
+      { name: "rows", type: "2 | 3 | 4", fallback: "2", note: "Rows of four chips. Changing it drops the new set in." },
+      { name: "theme", type: "\"light\" | \"dark\"", fallback: "\"light\"", note: "Paper chips, or graphite. The selected chip is the inverse in both." },
+      { name: "sound", type: "boolean", fallback: "true", note: "Press, release, select and hover clicks, synthesised at play time." },
+      { name: "defaultValue", type: "string | null", fallback: "\"start\"", note: "The chip selected on first render." },
+      { name: "onChange", type: "(value) => void", note: "Fired with the selected chip's id, or null once it is deselected." },
+    ],
+    files: [
+      { name: "Chips.tsx", lang: "tsx" },
+      { name: "chips.css", lang: "css" },
+    ],
+    info: {
+      paragraphs: [
+        "Each chip is a little block with depth. Its lip is a hard shadow exactly as deep as the chip can travel, so pressing it drives the chip down onto its own edge while the lip shrinks to match — the soft ground shadow squashes with it. Hover lifts the chip a few pixels and tips its icon; letting go springs it back up with a pop.",
+        "Selecting a chip leaves it pressed in and inverted; selecting it again lets it back up. Every click is synthesised — a noise transient through a bandpass for the plastic, and a pitched body that drops fast for the travel — so there is nothing to download, and no two clicks are quite the same. The component sizes itself off its own width, so the same chips work on a stage, in a sidebar or on a phone.",
+      ],
+    },
+    origin: { label: "Chips" },
+  },
+  {
+    slug: "otp-input",
+    name: "Egg OTP",
+    isNew: true,
+    creator: { handle: "RachitThakur146", url: "https://x.com/RachitThakur146" },
+    tagline: "A one-time-code field made of eggs that crack on a wrong code.",
+    blurb:
+      "Each egg is two clipped copies of one shape, split along a single jagged line that is also the crack's stroke, so an egg always breaks exactly where it cracked. A right code makes the row hop; a wrong one is refused with a shake, the crack draws itself down every shell, and the halves hinge open and tumble away before coming back together, empty.",
+    highlights: ["Crack, hinge and tumble", "Light and dark", "One-time-code autofill", "Your own verify"],
+    clip: "/clips/loop/otp-input-dark.mp4",
+    poster: "/clips/loop/otp-input-dark.jpg",
+    sound: false,
+    zoom: 1.65,
+    stage: "#ffffff",
+    stageDark: "#0b0b0b",
+    clipStage: "#0b0b0b",
+    spill: true,
+    usage: `import OtpInput from "@/components/library/OtpInput";
+
+<OtpInput length={6} verify={(code) => check(code)} theme="light" />`,
+    props: [
+      { name: "length", type: "number", fallback: "6", note: "How many digits. A dash splits the row in half." },
+      { name: "code", type: "string", fallback: "\"123456\"", note: "The code that passes, for demos. Ignored when verify is given." },
+      { name: "verify", type: "(value) => boolean | Promise<boolean>", note: "Your own check, e.g. a request to your server." },
+      { name: "theme", type: "\"light\" | \"dark\"", fallback: "\"light\"", note: "Pale eggs on white, or charcoal eggs on black." },
+      { name: "hint", type: "ReactNode | false", fallback: "\"Enter 123456 to pass.\"", note: "The line under the row; false hides it." },
+      { name: "autoFocus", type: "boolean", fallback: "false", note: "Take the keyboard as soon as it mounts." },
+      { name: "caret", type: "boolean", fallback: "true", note: "A softly blinking caret in the egg the next digit goes into." },
+      { name: "onSuccess", type: "(value) => void", note: "Fired once a full code has passed." },
+    ],
+    files: [
+      { name: "OtpInput.tsx", lang: "tsx" },
+      { name: "otp-input.css", lang: "css" },
+    ],
+    info: {
+      paragraphs: [
+        "Digits rise into the even eggs and drop into the odd ones, blurring in as they land, and the egg you are on is outlined. One invisible input owns the keyboard, so paste, backspace and the phone's one-time-code autofill all just work; the eggs only draw what it holds.",
+        "A right code turns the row green and makes it hop, egg by egg. A wrong one is refused with a heavy shake. Then the crack draws itself down each shell, the shells quiver as it widens, hinge open along it, and break away along crossing diagonals before gravity takes them — and the row comes back together, empty, ready for another try. Pass verify to check the code against your own server.",
+      ],
+    },
+    origin: { label: "Egg OTP" },
+  },
+  {
+    slug: "add-member",
+    name: "Add Member",
+    isNew: true,
+    tagline: "Pick people for a project, and watch their faces fly into the stack.",
+    blurb:
+      "The header springs the list open. Each row's toggle fills with a gooey drop that turns its plus into a minus, and the face flies from the row into the stack above Add to Project. Every sequence writes its end state down once it has had its time, so a background tab can never leave the card half-open.",
+    highlights: ["Gooey plus-to-minus", "Faces fly to the stack", "Paged list", "Light and dark"],
+    clip: "/clips/loop/add-member.mp4",
+    poster: "/clips/loop/add-member.jpg",
+    sound: false,
+    zoom: 1.2,
+    stage: "#f1f1f1",
+    stageDark: "#08080a",
+    usage: `import AddMember from "@/components/library/AddMember";
+
+<AddMember corner={20} rows={4} theme="light" onAdd={(names) => invite(names)} />`,
+    props: [
+      { name: "corner", type: "number", fallback: "20", note: "Card radius, clamped to 0–40px. The blue shell adds 12 to it." },
+      { name: "rows", type: "2 | 3 | 4", fallback: "4", note: "People per page. The pager turns the rest." },
+      { name: "theme", type: "\"light\" | \"dark\"", fallback: "\"light\"", note: "The card and its type invert; the blue shell stays blue." },
+      { name: "open", type: "boolean", fallback: "false", note: "Start expanded rather than as a single header." },
+      { name: "members", type: "Member[]", fallback: "eight people", note: "Name, role, portrait, status and an optional ring." },
+      { name: "onAdd", type: "(names) => void", note: "Fired with the chosen names when Add to Project is pressed." },
+    ],
+    files: [
+      { name: "AddMember.tsx", lang: "tsx" },
+      { name: "add-member.css", lang: "css" },
+    ],
+    info: {
+      paragraphs: [
+        "Shut, the card is a single header. Press it and the list springs open, its rows sliding in one after another. The toggle on each row is drawn through an SVG goo filter: choosing someone floods it with a drop that splits and merges back as the plus folds into a minus, and their face lifts off the row and arcs into the stack of chosen people.",
+        "Add to Project confirms the lot — the stack hops, the button turns green with a tick and the count of people added — and then every row springs back to a plus and the bar folds away. The arrows and View All Members turn the list a page at a time, from the side you turned toward.",
+      ],
+    },
+    origin: { label: "Add member" },
+  },
   {
     slug: "session-list",
     name: "Count down",
@@ -193,5 +342,6 @@ export const LIBRARY: Entry[] = [
     origin: { label: "Cart" },
   },
 ];
+
 
 export const bySlug = (slug: string) => LIBRARY.find((entry) => entry.slug === slug);

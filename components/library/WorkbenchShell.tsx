@@ -8,6 +8,7 @@ import { motion, useReducedMotion } from "motion/react";
 import ThemeMark from "../ThemeMark";
 import { softSpring } from "@/lib/motion";
 import { LIBRARY } from "./registry";
+import CreatorDot from "./CreatorDot";
 import "@/app/hero.css";
 import "./workbench.css";
 
@@ -152,7 +153,9 @@ export default function WorkbenchShell({ children }: { children: ReactNode }) {
                 href={`/components/${entry.slug}`}
                 aria-current={i === activeIndex ? "page" : undefined}
               >
-                {entry.name}
+                <span className="wbnav__text">{entry.name}</span>
+                {entry.isNew && <span className="wbnav__new">New</span>}
+                {entry.creator && <CreatorDot {...entry.creator} />}
               </Link>
             </li>
           ))}

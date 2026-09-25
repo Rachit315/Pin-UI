@@ -1,0 +1,267 @@
+/* ===========================================================================
+   OTP — a one-time-code field made of eggs.
+
+   Every egg is two clipped copies of the same shape, split along one jagged
+   line, so it can crack and come apart there. Two themes: pale eggs on white,
+   and charcoal eggs on black. Success and failure keep their green and red in
+   both, tuned so each still reads on its own ground.
+=========================================================================== */
+
+.potp {
+  --egg-w: 54px;
+  --egg-h: 68px;
+
+  --idle: #e6e6e6;
+  --idle-ink: #2c2c2c;
+  --focus-bd: #b4b4b4;
+  --focus-bg: #dcdcdc;
+  --ok: #00c514;
+  --ok-bg: #edfced;
+  --ok-ink: #0a9418;
+  --err: #ff1414;
+  --err-bg: #fdecec;
+  --err-ink: #d01111;
+  --sep: #a8a8a8;
+  --hint: #a3a3a3;
+  --hint-strong: #525252;
+  --caret: #111111;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.potp[data-theme="dark"] {
+  --idle: #1f1f1f;
+  --idle-ink: #ededed;
+  --focus-bd: #5c5c5c;
+  --focus-bg: #2a2a2a;
+  --ok: #1fd735;
+  --ok-bg: #0d2410;
+  --ok-ink: #45e25a;
+  --err: #ff3b3b;
+  --err-bg: #2a1010;
+  --err-ink: #ff6b6b;
+  --sep: #5a5a5a;
+  --hint: #737373;
+  --hint-strong: #d4d4d4;
+  --caret: #ffffff;
+}
+
+.potp__stage {
+  position: relative;
+}
+
+.potp__row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* the separator and the egg are both items of the row */
+.potp__slot {
+  display: contents;
+}
+
+/* ---- the egg ------------------------------------------------------------ */
+
+.potp__cell {
+  position: relative;
+  flex: none;
+  width: var(--egg-w);
+  height: var(--egg-h);
+  will-change: transform;
+}
+
+.potp__whole,
+.potp__half {
+  position: absolute;
+  inset: 0;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+.potp__egg {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 3px solid transparent;
+  border-radius: 50% 50% 48% 48% / 62% 62% 38% 38%;
+  background: var(--idle);
+  transition:
+    background-color 0.28s ease,
+    border-color 0.28s ease;
+}
+
+.potp__digit {
+  font-size: 26px;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--idle-ink);
+  opacity: 0;
+  user-select: none;
+  will-change: transform, opacity, filter;
+  transition: color 0.28s ease;
+}
+
+.potp__cell[data-state="focus"] .potp__egg {
+  border-color: var(--focus-bd);
+  background: var(--focus-bg);
+}
+
+.potp__cell[data-state="ok"] .potp__egg {
+  border-color: var(--ok);
+  background: var(--ok-bg);
+}
+
+.potp__cell[data-state="ok"] .potp__digit {
+  color: var(--ok-ink);
+}
+
+.potp__cell[data-state="err"] .potp__egg {
+  border-color: var(--err);
+  background: var(--err-bg);
+}
+
+.potp__cell[data-state="err"] .potp__digit {
+  color: var(--err-ink);
+}
+
+/* the crack */
+.potp__crack {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.potp__crack path {
+  fill: none;
+  stroke: var(--err);
+  stroke-width: 1.25;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+/* ---- the caret ---------------------------------------------------------
+   A blinking bar in the empty egg the next digit goes into, so where you are
+   typing is never a guess.
+------------------------------------------------------------------------- */
+
+.potp__caret {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 2px;
+  height: 40%;
+  margin: 0 0 0 -1px;
+  border-radius: 2px;
+  background: var(--caret);
+  opacity: 0;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.potp__cell[data-state="focus"][data-filled="false"] .potp__caret {
+  animation: potpBlink 1.1s ease-in-out infinite;
+}
+
+/* a soft blink: it holds, fades out, holds, fades back — never a hard flash */
+@keyframes potpBlink {
+  0%,
+  40% {
+    opacity: 1;
+  }
+  55%,
+  85% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .potp__cell[data-state="focus"][data-filled="false"] .potp__caret {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+.potp__sep {
+  flex: none;
+  width: 13px;
+  font-size: 19px;
+  line-height: 1;
+  text-align: center;
+  color: var(--sep);
+  user-select: none;
+  transition: color 0.28s ease;
+}
+
+/* the invisible field that actually owns the keyboard */
+.potp__field {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: transparent;
+  caret-color: transparent;
+  font-size: 16px;
+  opacity: 0;
+  cursor: default;
+}
+
+.potp__field:focus {
+  outline: none;
+}
+
+
+.potp__hint {
+  margin: 28px 0 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--hint);
+  transition: color 0.28s ease;
+}
+
+.potp__hintStrong {
+  color: var(--hint-strong);
+  transition: color 0.28s ease;
+}
+
+.potp__hintOk {
+  color: var(--ok-ink);
+}
+
+.potp__hintErr {
+  color: var(--err-ink);
+}
+
+@media (max-width: 680px) {
+  .potp {
+    --egg-w: 44px;
+    --egg-h: 56px;
+  }
+
+  .potp__digit {
+    font-size: 22px;
+  }
+
+  .potp__sep {
+    width: 11px;
+    font-size: 16px;
+  }
+}

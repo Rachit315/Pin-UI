@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { softSpring } from "@/lib/motion";
 import type { Entry } from "./registry";
+import CreatorDot from "./CreatorDot";
 
 /**
  * A card on the shelf.
@@ -86,7 +87,8 @@ export default function ComponentCard({ entry, index }: { entry: Entry; index: n
         onFocus={enter}
         onBlur={leave}
       >
-        <span className="card__frame">
+        {/* the recording's own field shows behind a clip zoomed out below 1 */}
+        <span className="card__frame" style={{ background: entry.clipStage ?? entry.stage }}>
           <video
             className="card__video"
             ref={videoRef}
@@ -105,7 +107,11 @@ export default function ComponentCard({ entry, index }: { entry: Entry; index: n
         </span>
 
         <span className="card__foot">
-          <span className="card__title">{entry.name}</span>
+          <span className="card__title">
+            {entry.name}
+            {entry.isNew && <span className="card__new">New</span>}
+            {entry.creator && <CreatorDot {...entry.creator} />}
+          </span>
           {/* the arrow sits at the design's angle and straightens on hover */}
           <span className="card__arrow" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none">

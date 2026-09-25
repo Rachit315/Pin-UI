@@ -47,7 +47,7 @@ const FAQS = [
   {
     question: "What components does Pin UI have?",
     answer:
-      "Pin UI currently includes three components: Count down (a session timer with real-time countdown and keyboard control), Balance Card (a finance card with a gooey currency selector, counter animation, and synthesised sound cues), and Add To Cart (a product card with drag-to-confirm, quantity picker, and a gooey heart burst). Three new components are added every week.",
+      "Pin UI currently includes six components: Count down (a session timer with real-time countdown and keyboard control), Balance Card (a finance card with a gooey currency selector, counter animation, and synthesised sound cues), Add To Cart (a product card with drag-to-confirm, quantity picker, and a gooey heart burst), Chips (a selection list of 3D chips with a real press and synthesised clicks), Egg OTP (a one-time-code field whose eggs crack on a wrong code) and Add Member (a paged people picker with gooey toggles and faces that fly into a stack). Chips, Egg OTP and Add Member come in light and dark. Three new components are added every week.",
   },
   {
     question: "How is Pin UI different from other UI libraries?",
