@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import { Analytics } from "@vercel/analytics/next";
 import { SITE_URL } from "@/lib/site";
 import FaviconSync from "@/components/FaviconSync";
 import {
@@ -153,7 +152,6 @@ export default function RootLayout({
       <body>
         <FaviconSync />
         {children}
-        <Analytics />
       </body>
     </html>
   );

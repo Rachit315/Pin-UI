@@ -1,0 +1,9 @@
+# Static files are served straight from Cloudflare's asset store, before
+# Next.js runs, so the cache rules in next.config.mjs never reach them.
+# These repeat those rules for the two folders that need them.
+
+/clips/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000
+
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable

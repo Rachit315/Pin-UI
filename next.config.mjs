@@ -18,7 +18,7 @@ const securityHeaders = [
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=(), payment=()",
   },
-  /* Vercel serves this over HTTPS; keep it that way for return visits */
+  /* the site is only served over HTTPS; keep it that way for return visits */
   {
     key: "Strict-Transport-Security",
     value: "max-age=63072000; includeSubDomains",
