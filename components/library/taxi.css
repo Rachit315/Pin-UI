@@ -1,0 +1,390 @@
+/* ===========================================================================
+   Taxi — a taxi-hailing card that runs the whole ride from one tap.
+
+   The card is drawn on a 380-unit grid. --u is one unit, so the whole widget
+   scales together by changing its width alone.
+=========================================================================== */
+
+.ptaxi {
+  /* light: ink on a yellow cab, on a pale page */
+  --card: #ffcc00;
+  --card-ink: #262005;
+  --dim: #d9ad00;
+  --glyph-ink: #262005;
+  --glyph-cab: #ffcc00;
+  --panel: #262005;
+  --on-panel: #ffcc00;
+  --on-panel-soft: rgba(255, 204, 0, 0.55);
+  --on-panel-faint: rgba(255, 204, 0, 0.2);
+  --panel-edge:
+    inset 0 2px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.35),
+    0 0 0 1.5px rgba(38, 32, 5, 0.9);
+  --card-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 24px 48px -24px rgba(120, 90, 0, 0.45);
+  --hint: rgba(0, 0, 0, 0.35);
+  --action-focus: rgba(38, 32, 5, 0.3);
+  --star-focus: rgba(255, 204, 0, 0.6);
+
+  position: relative;
+  display: grid;
+  place-items: center;
+  font-family: -apple-system, "SF Pro Display", "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/*
+ * Dark: the cab at night. The card goes to a warm near-black and the colours
+ * trade places — the glyph and the action panel are lit in cab yellow, and
+ * the panel's type turns to ink. Every shape keeps its tone, so the morphs,
+ * the goo and the track are the same moves in the other palette.
+ */
+.ptaxi[data-theme="dark"] {
+  --card: #1c1a12;
+  --card-ink: #f6f0dc;
+  --dim: #a38b2a;
+  --glyph-ink: #ffcc00;
+  --glyph-cab: #1c1a12;
+  --panel: #ffcc00;
+  --on-panel: #262005;
+  --on-panel-soft: rgba(38, 32, 5, 0.62);
+  --on-panel-faint: rgba(38, 32, 5, 0.2);
+  --panel-edge:
+    inset 0 2px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -3px 0 rgba(128, 92, 0, 0.35),
+    0 0 0 1.5px rgba(0, 0, 0, 0.55);
+  --card-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+    0 24px 48px -24px rgba(0, 0, 0, 0.85);
+  --hint: rgba(255, 255, 255, 0.4);
+  --action-focus: rgba(255, 204, 0, 0.35);
+  --star-focus: rgba(38, 32, 5, 0.5);
+}
+
+.ptaxi *,
+.ptaxi *::before,
+.ptaxi *::after {
+  box-sizing: border-box;
+}
+
+.ptaxi button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.ptaxi__defs {
+  position: absolute;
+}
+
+.ptaxi__hold {
+  position: relative;
+}
+
+
+.ptaxi__pre {
+  opacity: 0;
+}
+
+.ptaxi__card {
+  --w: min(var(--ptaxi-w, 300px), calc(100vw - 32px));
+  --u: calc(var(--w) / 380);
+  position: relative;
+  width: var(--w);
+  aspect-ratio: 380 / 376;
+  border-radius: calc(var(--u) * 72);
+  background: var(--card);
+  box-shadow: var(--card-shadow);
+  user-select: none;
+  transition:
+    background-color 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+/* ── the status and the address ── */
+
+.ptaxi__info {
+  position: absolute;
+  top: 14%;
+  left: 11.5%;
+  width: 56%;
+  color: var(--card-ink);
+}
+
+.ptaxi__statusRow {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--u) * 8);
+  color: var(--dim);
+}
+
+.ptaxi__pin {
+  position: relative;
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: calc(var(--u) * 26);
+  height: calc(var(--u) * 26);
+}
+.ptaxi__pin > svg {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.ptaxi__pinArrow {
+  fill: var(--card);
+  stroke: var(--card);
+}
+.ptaxi__pinRing {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: var(--dim);
+  opacity: 0;
+}
+
+.ptaxi__statusClip {
+  overflow: hidden;
+  padding: 0.15em 0;
+  line-height: 1;
+  white-space: nowrap;
+}
+.ptaxi__status {
+  display: block;
+  font-size: calc(var(--u) * 24);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.ptaxi__letter {
+  display: inline-block;
+}
+
+.ptaxi__address {
+  margin-top: calc(var(--u) * 30);
+  font-size: calc(var(--u) * 22);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+}
+.ptaxi__lineClip {
+  overflow: hidden;
+}
+
+/* ── the glyph ── */
+
+.ptaxi__icon {
+  position: absolute;
+  top: 11%;
+  right: 12%;
+  width: 19.5%;
+  overflow: visible;
+  transform-origin: 50% 100%;
+}
+/* a shape's tone eases across as it morphs; the duration is set per morph */
+.ptaxi__shape {
+  transition: fill 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+}
+.ptaxi__shape[data-tone="ink"] {
+  fill: var(--glyph-ink);
+}
+.ptaxi__shape[data-tone="cab"] {
+  fill: var(--glyph-cab);
+}
+
+/* ── the action panel ── */
+
+.ptaxi__panel {
+  position: absolute;
+  bottom: 2.6%;
+  height: 40.5%;
+  border-radius: calc(var(--u) * 60);
+}
+
+.ptaxi__goo,
+.ptaxi__gooBase,
+.ptaxi__panelEdge {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.ptaxi__gooBase {
+  background: var(--panel);
+}
+.ptaxi__panelEdge {
+  box-shadow: var(--panel-edge);
+}
+
+.ptaxi__blob {
+  position: absolute;
+  top: calc(var(--u) * 18);
+  left: 50%;
+  width: calc(var(--u) * var(--s));
+  height: calc(var(--u) * var(--s));
+  margin-left: calc(var(--u) * var(--s) / -2);
+  border-radius: 999px;
+  background: var(--panel);
+}
+
+.ptaxi__action {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0 2%;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+  outline: none;
+}
+.ptaxi__action:disabled {
+  cursor: default;
+}
+.ptaxi__action:focus-visible {
+  box-shadow: 0 0 0 4px var(--action-focus);
+}
+
+.ptaxi__labelClip {
+  display: block;
+  overflow: hidden;
+  padding: 0.06em 8px;
+}
+.ptaxi__label {
+  display: block;
+  color: var(--on-panel);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.ptaxi__caption {
+  display: block;
+  height: calc(var(--u) * 16);
+  color: var(--on-panel-soft);
+  font-size: calc(var(--u) * 13);
+  font-weight: 500;
+  line-height: calc(var(--u) * 16);
+  white-space: nowrap;
+}
+
+/* ── the rating ── */
+
+.ptaxi__stars {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.ptaxi__starRow {
+  display: flex;
+  align-items: center;
+}
+/* each star is a 44px touch target: five of them fit the panel on a 320px phone */
+.ptaxi__star {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  color: var(--on-panel);
+  background: transparent;
+  cursor: pointer;
+  outline: none;
+}
+.ptaxi__star:focus-visible {
+  box-shadow: 0 0 0 2px var(--star-focus);
+}
+.ptaxi__star svg {
+  display: block;
+  width: calc(var(--u) * 34);
+  height: calc(var(--u) * 34);
+  transition: transform 0.15s ease;
+}
+.ptaxi__star:focus-visible svg {
+  transform: scale(1.12);
+}
+@media (hover: hover) {
+  .ptaxi__star:hover svg {
+    transform: scale(1.12);
+  }
+}
+.ptaxi__starsCaption {
+  display: block;
+  margin-top: calc(var(--u) * 2);
+  color: var(--on-panel-soft);
+  font-size: calc(var(--u) * 13);
+  font-weight: 500;
+  line-height: calc(var(--u) * 16);
+  white-space: nowrap;
+}
+
+/* ── the trip's progress ── */
+
+.ptaxi__track {
+  position: absolute;
+  right: calc(var(--u) * 40);
+  bottom: calc(var(--u) * 20);
+  left: calc(var(--u) * 40);
+  height: calc(var(--u) * 3);
+  border-radius: 999px;
+  background: var(--on-panel-faint);
+  opacity: 0;
+  pointer-events: none;
+}
+.ptaxi__trackFill {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: var(--on-panel);
+  transform-origin: 0 50%;
+}
+.ptaxi__trackEnd {
+  position: absolute;
+  top: calc(var(--u) * -3.5);
+  right: calc(var(--u) * -4);
+  width: calc(var(--u) * 10);
+  height: calc(var(--u) * 10);
+  border: calc(var(--u) * 2) solid var(--on-panel);
+  border-radius: 999px;
+  background: var(--panel);
+}
+.ptaxi__trackCar {
+  position: absolute;
+  top: calc(var(--u) * -6.5);
+  left: 0;
+  width: calc(var(--u) * 16);
+  height: calc(var(--u) * 16);
+  margin-left: calc(var(--u) * -8);
+  border-radius: 999px;
+  background: var(--on-panel);
+  box-shadow: 0 0 0 calc(var(--u) * 3) var(--panel);
+}
+
+/* ── the hint under the card ── */
+
+.ptaxi__hint {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  margin: 24px 0 0;
+  color: var(--hint);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: center;
+  white-space: nowrap;
+}

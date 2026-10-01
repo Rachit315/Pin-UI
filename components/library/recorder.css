@@ -1,0 +1,420 @@
+/* ===========================================================================
+   Recorder — a dark voice-recorder card with a scrolling waveform.
+
+   Authored at 700 × 700 and scaled as one piece, so every position below is
+   in that grid. The card's outline is a radius-200 superellipse, applied as a
+   clip-path from the component, with a rim stroked from the same path.
+=========================================================================== */
+
+.prec {
+  /* dark: graphite, white bars, frosted edges */
+  --prec-bg:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.17) 0%, rgba(0, 0, 0, 0) 45%),
+    linear-gradient(180deg, #262626 0%, #222222 45%, #1f1f1f 100%);
+  --prec-bar: linear-gradient(180deg, #c4bade 0%, #eeebf8 7%, #fbfbfb 22%, #fbfbfb 78%, #eeebf8 93%, #c4bade 100%);
+  --prec-track: #8f8f8f;
+  --prec-tint-l: 29, 29, 29;
+  --prec-tint-r: 35, 35, 35;
+  --prec-sheen: rgba(255, 255, 255, 0.025);
+  --prec-sheen-2: rgba(255, 255, 255, 0.015);
+  --prec-playhead-ring: rgba(0, 0, 0, 0.55);
+  --prec-label: #dedede;
+  --prec-timer: #ececec;
+  --prec-dot-idle: #5b5b5b;
+  --prec-dot-saved: #bdbdbd;
+  --prec-dot-play: #f2f2f2;
+  --prec-side: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.075) 100%);
+  --prec-side-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), inset 0 -1px 0 rgba(0, 0, 0, 0.25);
+  --prec-side-down: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.05) 100%);
+  --prec-side-down-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.35), inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+  --prec-stop: linear-gradient(180deg, #e3dfde 0%, #d6d1d0 100%);
+  --prec-stop-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --prec-clear: #e6e1e0;
+  --prec-focus: rgba(255, 255, 255, 0.35);
+  --prec-rim: #ffffff;
+  --prec-rim-a: 0.32;
+  --prec-rim-b: 0.04;
+
+  display: grid;
+  place-items: center;
+  outline: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+.prec *,
+.prec *::before,
+.prec *::after {
+  box-sizing: border-box;
+}
+
+.prec__fit {
+  position: relative;
+}
+
+.prec__frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 700px;
+  height: 700px;
+  transform-origin: top left;
+}
+
+.prec__card {
+  position: absolute;
+  inset: 0;
+  isolation: isolate;
+  opacity: 0;
+}
+
+.prec__bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--prec-bg);
+}
+
+/*
+ * Light: porcelain. The bars turn graphite and keep their lavender tips, the
+ * glass edges are re-tinted to the paler card so the waveform still dissolves
+ * into it, and the side key becomes a pressed-in well. The red key, the
+ * playhead and the recording dot are the same in both — they are the product.
+ */
+.prec[data-theme="light"] {
+  --prec-bg:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.035) 0%, rgba(0, 0, 0, 0) 45%),
+    linear-gradient(180deg, #fbfbfa 0%, #f5f5f4 45%, #efefee 100%);
+  --prec-bar: linear-gradient(180deg, #8d82b4 0%, #3b3848 7%, #242426 22%, #242426 78%, #3b3848 93%, #8d82b4 100%);
+  --prec-track: #b9b9b9;
+  --prec-tint-l: 238, 238, 237;
+  --prec-tint-r: 246, 246, 245;
+  --prec-sheen: rgba(255, 255, 255, 0.35);
+  --prec-sheen-2: rgba(255, 255, 255, 0.2);
+  --prec-playhead-ring: rgba(255, 255, 255, 0.9);
+  --prec-label: #3d3d3d;
+  --prec-timer: #1d1d1d;
+  --prec-dot-idle: #c4c4c4;
+  --prec-dot-saved: #6f6f6f;
+  --prec-dot-play: #1d1d1d;
+  --prec-side: linear-gradient(180deg, rgba(0, 0, 0, 0.065) 0%, rgba(0, 0, 0, 0.045) 100%);
+  --prec-side-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.06), inset 0 -1px 0 rgba(255, 255, 255, 0.9);
+  --prec-side-down: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.08) 100%);
+  --prec-side-down-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.16), inset 0 -1px 0 rgba(255, 255, 255, 0.7);
+  --prec-stop: linear-gradient(180deg, #3a3a3a 0%, #262626 100%);
+  --prec-stop-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --prec-clear: #2c2c2c;
+  --prec-focus: rgba(0, 0, 0, 0.25);
+  --prec-rim: #000000;
+  --prec-rim-a: 0.1;
+  --prec-rim-b: 0.05;
+}
+
+/* ── the waveform ── */
+
+.prec__wave {
+  position: absolute;
+  top: 60px;
+  right: 0;
+  left: 0;
+  height: 350px;
+  touch-action: none;
+  user-select: none;
+}
+
+.prec__bars {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.prec__dots {
+  position: absolute;
+  inset: 0;
+}
+
+.prec__bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 340px;
+  border-radius: 2px;
+  /* a solid body with faint lavender tips */
+  background: var(--prec-bar);
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+.prec__dot {
+  position: absolute;
+  top: 173px;
+  width: 3px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--prec-track);
+}
+
+/*
+ * Progressive glass edges: six stacked backdrop blurs, each stronger than the
+ * last but masked to a narrower band, so the blur ramps up toward the edge
+ * instead of stepping. A tint on top lets the bars dissolve into it.
+ */
+.prec__edge {
+  --to: to right; /* from the edge inward */
+  --tint: var(--prec-tint-l);
+  position: absolute;
+  top: -30px;
+  bottom: -30px;
+  width: 190px;
+  pointer-events: none;
+}
+.prec__edge--l {
+  left: 0;
+}
+.prec__edge--r {
+  right: 0;
+  --to: to left;
+  --tint: var(--prec-tint-r);
+}
+.prec__edge > i {
+  position: absolute;
+  inset: 0;
+  -webkit-mask-image: linear-gradient(var(--to), #000 var(--a), transparent var(--b));
+  mask-image: linear-gradient(var(--to), #000 var(--a), transparent var(--b));
+}
+.prec__edge > i:nth-child(1) { --a: 45%; --b: 100%; backdrop-filter: blur(1px); }
+.prec__edge > i:nth-child(2) { --a: 32%; --b: 82%; backdrop-filter: blur(2.5px); }
+.prec__edge > i:nth-child(3) { --a: 22%; --b: 64%; backdrop-filter: blur(5px); }
+.prec__edge > i:nth-child(4) { --a: 12%; --b: 46%; backdrop-filter: blur(9px) saturate(120%); }
+.prec__edge > i:nth-child(5) { --a: 5%; --b: 30%; backdrop-filter: blur(16px) saturate(130%); }
+/* the last layer: the frosted tint and a faint sheen */
+.prec__edge > i:nth-child(6) {
+  --a: 0%;
+  --b: 100%;
+  background:
+    linear-gradient(180deg, var(--prec-sheen), rgba(255, 255, 255, 0) 40%, var(--prec-sheen-2)),
+    linear-gradient(var(--to), rgba(var(--tint), 0.6) 0%, rgba(var(--tint), 0.28) 35%, rgba(var(--tint), 0) 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 14%, #000 86%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 14%, #000 86%, transparent 100%);
+}
+@supports not (backdrop-filter: blur(1px)) {
+  .prec__edge > i:nth-child(6) {
+    background: linear-gradient(var(--to), rgba(var(--tint), 0.92), rgba(var(--tint), 0));
+  }
+}
+
+.prec__playhead {
+  position: absolute;
+  top: 46px;
+  left: 378px;
+  width: 4px;
+  height: 258px;
+  border-radius: 999px;
+  pointer-events: none;
+  background: linear-gradient(90deg, #e8412f 0%, #ff8a6e 50%, #e8412f 100%);
+  box-shadow:
+    0 0 0 1.5px var(--prec-playhead-ring),
+    0 0 12px 2px rgba(255, 70, 50, 0.3);
+}
+
+/* ── status and timer ── */
+
+.prec__recDot {
+  position: absolute;
+  top: 505px;
+  left: 64px;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 40% 38%, #f36b5c 0%, #e24a3a 60%, #cf3b2e 100%);
+}
+
+.prec__label {
+  position: absolute;
+  top: 494px;
+  left: 107px;
+  width: 230px;
+  height: 36px;
+  overflow: hidden;
+  color: var(--prec-label);
+  font-family: "Roboto Mono", ui-monospace, "Cascadia Mono", monospace;
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 36px;
+  letter-spacing: 0.15em;
+}
+.prec__labelText {
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+}
+
+.prec__timer {
+  position: absolute;
+  top: 549px;
+  left: 62px;
+  display: flex;
+  color: var(--prec-timer);
+  font-family: "Roboto Mono", ui-monospace, "Cascadia Mono", monospace;
+  font-size: 56px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.prec__slot {
+  position: relative;
+  display: inline-block;
+  width: 0.6em;
+  height: 1.05em;
+  overflow: hidden;
+}
+.prec__slot > span {
+  position: absolute;
+  inset: 0;
+  display: block;
+  text-align: center;
+}
+/* a mono colon is a full cell; pull the neighbours in so it sits centred */
+.prec__colon {
+  display: inline-block;
+  width: 0.6em;
+  height: 1.05em;
+  margin-inline: -0.115em;
+  text-align: center;
+}
+
+/* ── controls ── */
+
+.prec__side,
+.prec__main {
+  position: absolute;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  outline: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.prec__glyphs {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+.prec__glyph {
+  position: absolute;
+}
+
+.prec__side {
+  top: 469px;
+  left: 349px;
+  width: 107px;
+  height: 171px;
+  background: var(--prec-side);
+  box-shadow: var(--prec-side-shadow);
+}
+.prec__side.is-down {
+  background: var(--prec-side-down);
+  box-shadow: var(--prec-side-down-shadow);
+}
+.prec__side:disabled {
+  cursor: default;
+}
+.prec__side:focus-visible {
+  box-shadow: 0 0 0 3px var(--prec-focus);
+}
+
+.prec__hold {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.prec__stop {
+  width: 41px;
+  height: 41px;
+  border-radius: 9px;
+  background: var(--prec-stop);
+  box-shadow: var(--prec-stop-shadow);
+}
+.prec__clear {
+  color: var(--prec-clear);
+}
+
+/* the solid red key: a lit top and a shaded base, no outer shadow */
+.prec__main {
+  top: 472px;
+  left: 472px;
+  width: 163px;
+  height: 163px;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 55%),
+    linear-gradient(180deg, #f5423f 0%, #ee302d 55%, #dd2522 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -2px 4px rgba(110, 0, 0, 0.2);
+}
+.prec__main.is-down {
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 55%),
+    linear-gradient(180deg, #df2c29 0%, #e3302d 100%);
+  box-shadow:
+    inset 0 3px 8px rgba(80, 0, 0, 0.4),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+}
+.prec__main:focus-visible {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 0 0 3px var(--prec-focus);
+}
+
+.prec__recGlyph {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: #f6e2e1;
+}
+.prec__pause {
+  display: flex;
+  gap: 10px;
+}
+.prec__pause > span {
+  display: block;
+  width: 12px;
+  height: 36px;
+  border-radius: 4px;
+  background: #f3dedd;
+}
+
+.prec__rim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+/* the rim catches light from above: bright on the dark card, a soft line on the light one */
+.prec__rimStop {
+  stop-color: var(--prec-rim);
+}
+.prec__rimStop--0 {
+  stop-opacity: var(--prec-rim-a);
+}
+.prec__rimStop--1 {
+  stop-opacity: var(--prec-rim-b);
+}
+.prec__rimStop--2 {
+  stop-opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prec *,
+  .prec *::before,
+  .prec *::after {
+    transition-duration: 0.01ms !important;
+  }
+}

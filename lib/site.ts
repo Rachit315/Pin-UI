@@ -2,20 +2,12 @@
  * The canonical address. Overridable for previews and custom domains, but it
  * must never fall back to a localhost URL, empty string, or malformed URL.
  *
- * Checks in order:
- * 1. process.env.NEXT_PUBLIC_SITE_URL (custom domain or explicitly set site URL)
- * 2. process.env.NEXT_PUBLIC_VERCEL_URL (Vercel public URL)
- * 3. process.env.VERCEL_PROJECT_PRODUCTION_URL (Vercel production URL)
- * 4. process.env.VERCEL_URL (Vercel deployment URL)
- * 5. Fallback to "https://pinui.xyz"
+ * NEXT_PUBLIC_SITE_URL is set in wrangler.jsonc for the Cloudflare worker and
+ * in .env.local for development; anything missing or malformed falls back to
+ * "https://pinui.xyz".
  */
 function resolveSiteUrl(): string {
-  const candidates = [
-    process.env.NEXT_PUBLIC_SITE_URL,
-    process.env.NEXT_PUBLIC_VERCEL_URL,
-    process.env.VERCEL_PROJECT_PRODUCTION_URL,
-    process.env.VERCEL_URL,
-  ];
+  const candidates = [process.env.NEXT_PUBLIC_SITE_URL];
 
   for (const candidate of candidates) {
     if (typeof candidate === "string") {

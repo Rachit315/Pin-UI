@@ -184,7 +184,13 @@
  * a weak signal once every row says something different.
  */
 .wbnav__link {
-  display: block;
+  /*
+   * One line per row: the name, its tag and its maker's dot are laid out on
+   * it together and centred on it, so every tag sits at the same height
+   * against its name whatever the name is.
+   */
+  display: flex;
+  align-items: center;
   /* 14px type on a 34px row: 20px of line and 7px either side */
   padding: 0.5em 0;
   font-size: 1em;
@@ -198,9 +204,7 @@
    * moment reads the wrapped layout.
    */
   white-space: nowrap;
-  transition:
-    color 0.25s ease,
-    transform 0.35s cubic-bezier(0.22, 0.68, 0.16, 1);
+  transition: color 0.25s ease;
 }
 
 /*
@@ -217,29 +221,24 @@
 }
 
 /*
- * The tag on a component that has just been added. It rides high, like a
- * superscript: its top clears the name's capitals and its foot sits halfway
- * up them, so it reads as a note on the name rather than a second word.
+ * The tag on a component that has just been added: a small caps label on the
+ * name's own line, centred on its capitals — a label beside the name rather
+ * than a note floating above it. Its box is shorter than the line, so the
+ * rows keep their 34px rhythm and the pin still lands on each one's centre.
  */
 .wbnav__new {
-  display: inline-block;
-  margin-left: 0.45em;
-  padding: 0.16em 0.4em 0.14em;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  margin-left: 0.6em;
+  padding: 0.3em 0.45em 0.26em;
   background: var(--wb-pin);
   color: #ffffff;
   font-size: 0.6em;
   font-weight: 600;
-  line-height: 1.2;
+  line-height: 1;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  /*
-   * Lifted by an offset rather than by vertical-align: an offset moves the
-   * tag without touching the line box, so the rows keep their 34px rhythm and
-   * the pin still lands on each one's centre.
-   */
-  position: relative;
-  top: -0.62em;
-  vertical-align: 0.2em;
 }
 
 .wbnav__item + .wbnav__item {
@@ -251,11 +250,10 @@
   color: var(--wb-title);
 }
 
-@media (hover: hover) {
-  .wbnav__link:not([aria-current="page"]):hover {
-    transform: translateX(0.15em);
-  }
-}
+/*
+ * Hover brightens a name (below) rather than nudging it: every name starts on
+ * the same line, and a row that slides out of it reads as misaligned.
+ */
 
 /*
  * The rail runs the height of the list and the pin drops onto whichever

@@ -19,6 +19,9 @@ interactive, and ready to paste into your project. Three new ones every week.
 
 | Component | Description | Slug |
 | :-- | :-- | :-- |
+| **Weather** | A weather square that opens out into a five-day forecast. | `weather` |
+| **Recorder** | A voice recorder with a scrolling waveform, playback and scrubbing. | `recorder` |
+| **Taxi** | A taxi-hailing card that runs the whole ride from one tap. | `taxi` |
 | **Chips** | 3D chips that press into the surface. Light and dark. | `chips` |
 | **Egg OTP** | A one-time-code field whose eggs crack on a wrong code. Light and dark. | `otp-input` |
 | **Add Member** | A people picker with search, gooey toggles and a flying stack. Light and dark. | `add-member` |
@@ -51,7 +54,8 @@ Requires Node 20.9+. Built with Next.js 16, React 19, TypeScript and Motion.
 
 Optional environment variables: `NEXT_PUBLIC_SITE_URL`, and `SUPABASE_URL` with
 `SUPABASE_PUBLISHABLE_KEY` for the waitlist and updates signups. Without them the
-site runs as normal and skips the signup writes.
+site runs as normal in development and skips the signup writes; in production the
+forms report an error until they are set.
 
 ## License
 

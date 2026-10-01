@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { SITE_URL } from "@/lib/site";
 import FaviconSync from "@/components/FaviconSync";
+import NoFlashScript from "@/components/NoFlashScript";
 import {
   DEFAULT_THEME,
   FAVICONS,
@@ -103,7 +104,7 @@ export default function RootLayout({
   return (
     /* the theme attribute is written by the script below, before hydration,
        so React must not claim ownership of it */
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         {/*
           Neue Montreal is the design's typeface; Switzer is the closest freely
@@ -137,7 +138,7 @@ export default function RootLayout({
         />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 
-        <script dangerouslySetInnerHTML={{ __html: noFlash }} />
+        <NoFlashScript id="pin-no-flash" code={noFlash} />
 
         {/* Site-wide structured data — Organization + WebSite */}
         <script

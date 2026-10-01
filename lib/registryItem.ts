@@ -50,6 +50,9 @@ const FACES: Record<string, string | null> = {
   chips: "Poppins (600, 700 and 800)",
   "otp-input": null,
   "add-member": "Plus Jakarta Sans",
+  weather: "Inter Tight",
+  recorder: "Roboto Mono (500)",
+  taxi: "Inter (500 and 600) — after SF Pro, where the system has it",
 };
 
 function docsFor(entry: Entry): string {
@@ -82,6 +85,20 @@ function docsFor(entry: Entry): string {
     lines.push(
       "",
       "The default people use portraits from randomuser.me. Pass your own `members` — name, role, portrait URL and status — before shipping it.",
+    );
+  }
+
+  if (entry.slug === "taxi") {
+    lines.push(
+      "",
+      "The ride's twelve sound cues are not part of this package: `soundBase` defaults to /sounds/taxi. Copy them from https://github.com/Rachit315/Pin-UI/tree/main/public/sounds/taxi into your own public folder (their licences and credits are in the same folder), or pass sound={false}. A missing cue just stays silent.",
+    );
+  }
+
+  if (entry.slug === "recorder") {
+    lines.push(
+      "",
+      "There is no microphone: the waveform is a generated, speech-shaped signal and playback is a silent replay of the take. Wire your own MediaRecorder to it if you need real audio. The keyboard shortcuts (Space, S, arrows) listen on the card, so they work once it has focus.",
     );
   }
 

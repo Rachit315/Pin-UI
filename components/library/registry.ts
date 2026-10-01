@@ -46,9 +46,20 @@ export type Entry = {
    * 1080p60 recordings are 1–2MB each and used to be seeked 9–15 seconds in
    * before a card could show anything, which is what made the hero band sit
    * empty for seconds after every reload.
+   *
+   * Left out for a component that has not been recorded yet: its card shows
+   * the poster instead, and it stays out of the hero band until it has a loop.
    */
-  clip: string;
-  /** The loop's first frame as a still, so a card is never blank while it loads. */
+  clip?: string;
+  /**
+   * Set false to keep a recorded component's loop on the shelf only, out of
+   * the hero band and the Pinterest peek.
+   */
+  hero?: boolean;
+  /**
+   * The loop's first frame as a still, so a card is never blank while it
+   * loads — or, for a component without a loop yet, a screenshot of it.
+   */
   poster: string;
   /**
    * Whether the component makes any sound. The workbench only offers its
@@ -117,6 +128,122 @@ export type Entry = {
 };
 
 export const LIBRARY: Entry[] = [
+  {
+    slug: "weather",
+    name: "Weather",
+    isNew: true,
+    tagline: "A weather square that opens out into a five-day forecast.",
+    blurb:
+      "One card, two states. Tap the square and it springs open into a black shell with the forecast sliding out beside it; pick a day and the panel takes its colour while the temperature rolls to the new reading, digit by digit. Every dimension is a custom property, so a tap mid-flight retargets from wherever the card has got to.",
+    highlights: ["Square to forecast", "Rolling odometer", "Recolours by day", "Light and dark"],
+    clip: "/clips/loop/weather.mp4",
+    poster: "/clips/loop/weather.jpg",
+    hero: false,
+    sound: false,
+    zoom: 1.15,
+    stage: "#ebebeb",
+    stageDark: "#0e0e0f",
+    wide: true,
+    usage: `import Weather from "@/components/library/Weather";
+
+<Weather city="Los Angeles" theme="light" onSelect={(day) => console.log(day)} />`,
+    props: [
+      { name: "city", type: "string", fallback: "\"Los Angeles\"", note: "The city on the square, compact card." },
+      { name: "forecastCity", type: "string", fallback: "\"Amsterdam\"", note: "The city once the card has opened into the forecast." },
+      { name: "days", type: "WeatherDay[]", fallback: "Mon–Fri", note: "Day, condition, label, low and high. The first is shown on arrival." },
+      { name: "defaultExpanded", type: "boolean", fallback: "false", note: "Start opened out rather than as the square." },
+      { name: "theme", type: "\"light\" | \"dark\"", fallback: "\"light\"", note: "A black shell for a pale page, or a graphite one with a hairline edge for a dark page." },
+      { name: "onSelect", type: "(day, index) => void", note: "Fired when a day is picked from the forecast." },
+    ],
+    files: [
+      { name: "Weather.tsx", lang: "tsx" },
+      { name: "weather.css", lang: "css" },
+    ],
+    info: {
+      paragraphs: [
+        "Shut, it is a yellow square: the condition, the temperature and the city. Tap it and the card widens into a black shell, the panel shrinks into its left side, and a dark five-day forecast slides out beside it, its rows arriving forty milliseconds apart. On a phone there is no room to go sideways, so the forecast stacks underneath and slides up instead — the same transitions with different numbers.",
+        "Pick a day and the panel takes its colour — yellow for sun, pale blue for cloud, slate for rain — while the condition swaps through a blur and the temperature rolls. Each digit is a strip of 0 to 9 behind a clipping box, so a new reading only slides the strips, and a second pick mid-roll carries on from wherever they are. Everything is a CSS transition on custom properties, so nothing ever snaps back to start.",
+      ],
+    },
+    origin: { label: "Weather-UI", href: "https://github.com/Rachit315/Weather-UI" },
+  },
+  {
+    slug: "recorder",
+    name: "Recorder",
+    isNew: true,
+    tagline: "A voice recorder with a waveform that scrolls under the playhead.",
+    blurb:
+      "Record, pause, save, play back and scrub, on a dark card with a superellipse outline. The waveform is a fixed pool of bars driven by one frame loop, fading into progressive glass at both edges, and every key presses with real travel and a synthesised click. No microphone: the signal is generated, so it works anywhere.",
+    highlights: ["Scrub by drag or scroll", "Hold to clear", "Rolling timer", "Light and dark"],
+    clip: "/clips/loop/recorder.mp4",
+    poster: "/clips/loop/recorder.jpg",
+    hero: false,
+    sound: true,
+    zoom: 1.1,
+    stage: "#e2e2e1",
+    stageDark: "#363636",
+    clipStage: "#363636",
+    usage: `import Recorder from "@/components/library/Recorder";
+
+<Recorder size={360} theme="dark" onSave={(seconds) => console.log(seconds)} />`,
+    props: [
+      { name: "size", type: "number", fallback: "360", note: "How wide the card is drawn. It shrinks further to fit a small screen." },
+      { name: "sound", type: "boolean", fallback: "true", note: "A tactile click on every press and a tick as you scrub, synthesised at play time." },
+      { name: "autoFocus", type: "boolean", fallback: "false", note: "Take the keyboard on mount, so Space and S work straight away." },
+      { name: "theme", type: "\"light\" | \"dark\"", fallback: "\"dark\"", note: "Graphite with white bars, or porcelain with graphite bars. The red key is the same in both." },
+      { name: "onSave", type: "(seconds) => void", note: "Fired when a take is saved, with its length." },
+    ],
+    files: [
+      { name: "Recorder.tsx", lang: "tsx" },
+      { name: "recorder.css", lang: "css" },
+    ],
+    info: {
+      paragraphs: [
+        "The red key records, pauses and resumes; the side key stops and saves the take, which ripples through the waveform as it lands. On a saved take the red key plays it back, the bars ahead of the playhead dimmed, and the side key turns into hold-to-clear: a ring draws itself around it, and letting go early cancels. Drag the waveform, scroll over the card or use the arrow keys to scrub — Space and S work too.",
+        "The waveform is one pool of bars that scroll under a fixed playhead, all drawn from a single frame loop, so nothing is made or thrown away while it runs. Each bar springs up as it is born, and the edges dissolve through six stacked backdrop blurs that grow stronger toward the rim. The timer's digits roll through a blur, the glyphs on the keys morph with a twist, and there is no microphone: the signal is generated speech-shaped noise, so the card works anywhere.",
+      ],
+    },
+    origin: { label: "Recorder" },
+  },
+  {
+    slug: "taxi",
+    name: "Taxi",
+    isNew: true,
+    tagline: "Hail a cab in one tap, and ride the whole trip on one card.",
+    blurb:
+      "One tap runs the ride: hailing, a driver found, the cab at the curb, the trip counting down, and a rating at the end. The corner glyph morphs point for point from a waving person to the cab to a check, gooey blobs burst off the panel at every milestone, and each beat has its own sound — the horn, the door, the engine.",
+    highlights: ["Point-for-point morphs", "Gooey milestones", "A cue for every beat", "Light and dark"],
+    clip: "/clips/loop/taxi.mp4",
+    poster: "/clips/loop/taxi.jpg",
+    hero: false,
+    sound: true,
+    zoom: 1.3,
+    stage: "#f2f2f2",
+    stageDark: "#0f0e0b",
+    spill: true,
+    usage: `import Taxi from "@/components/library/Taxi";
+
+<Taxi width={300} theme="light" onRate={(stars) => console.log(stars)} />`,
+    props: [
+      { name: "width", type: "number", fallback: "300", note: "How wide the card is drawn. Everything on it scales with it." },
+      { name: "sound", type: "boolean", fallback: "true", note: "The ride's cues: tap, horn, door, engine, ticks and the rest." },
+      { name: "theme", type: "\"light\" | \"dark\"", fallback: "\"light\"", note: "The yellow cab by day, or at night: a dark card with the glyph and panel lit in cab yellow." },
+      { name: "soundBase", type: "string", fallback: "\"/sounds/taxi\"", note: "Where the twelve .wav cues are served from." },
+      { name: "onRate", type: "(stars) => void", note: "Fired with the stars given once the ride is rated." },
+    ],
+    files: [
+      { name: "Taxi.tsx", lang: "tsx" },
+      { name: "taxi.css", lang: "css" },
+    ],
+    info: {
+      paragraphs: [
+        "Tap Taxi! and the ride runs itself. The panel pinches in while it hails, liquid bumps travelling along its top edge and the pin pulsing; a driver is found and the person in the corner morphs into the cab, a track fills under the minutes counting down; the cab arrives with a horn and a hop; you get in, the door shuts and the engine starts, and the trip counts down to a check and five stars to rate it.",
+        "The glyph is five shapes that morph pairwise, each sampled into a ring of two hundred points and rotated to line up with the last, so nothing twists on the way. Letters roll out and back in, changing only the ones that differ, and the gooey filter behind the blobs is only switched on while they move — it is the most expensive thing on the card to paint. Every beat has its own cue, from Kenney's interface sounds and Mixkit's horn, door and engine.",
+      ],
+      pin: "https://in.pinterest.com/pin/1056657131344553887/",
+    },
+    origin: { label: "Taxi" },
+  },
   {
     slug: "chips",
     name: "Chips",

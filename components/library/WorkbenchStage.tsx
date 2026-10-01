@@ -10,6 +10,9 @@ import Chips from "./Chips";
 import ChipsEditor, { type ChipsSettings } from "./ChipsEditor";
 import OtpInput from "./OtpInput";
 import AddMember from "./AddMember";
+import Weather from "./Weather";
+import Recorder from "./Recorder";
+import Taxi from "./Taxi";
 import type { Entry } from "./registry";
 import { LINKS } from "@/lib/links";
 import { usePinTheme } from "@/lib/theme";
@@ -93,6 +96,9 @@ export default function WorkbenchStage({
           )}
           {entry.slug === "otp-input" && <OtpInput theme={theme} autoFocus />}
           {entry.slug === "add-member" && <AddMember theme={theme} />}
+          {entry.slug === "weather" && <Weather theme={theme} />}
+          {entry.slug === "recorder" && <Recorder theme={theme} sound={sound} autoFocus />}
+          {entry.slug === "taxi" && <Taxi theme={theme} sound={sound} />}
         </div>
 
         {entry.slug === "chips" && <ChipsEditor value={chips} onChange={setChips} />}

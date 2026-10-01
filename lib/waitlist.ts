@@ -38,6 +38,14 @@ export async function joinWaitlist(
   meta: { ip?: string | null; userAgent?: string | null } = {},
 ): Promise<JoinResult> {
   if (!hasStore || !URL_BASE || !KEY) {
+    /*
+     * Without a store a signup has nowhere to go. In development that is fine
+     * and the form carries on; in production it would tell a visitor they are
+     * signed up when nothing was saved, so it fails loudly instead.
+     */
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("[waitlist] SUPABASE_URL or SUPABASE_PUBLISHABLE_KEY is not set");
+    }
     console.info("[waitlist] no store configured — signup", email, handle);
     return { status: "ok", position: null };
   }

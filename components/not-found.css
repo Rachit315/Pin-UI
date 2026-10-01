@@ -1,0 +1,247 @@
+/* ===========================================================================
+   404 — Figma 415:54 (light) and 415:55 (dark).
+
+   Drawn in the frame's own pixels through one unit, --u: a pixel of the
+   1280 × 832 frame. It is a real pixel on a laptop, and shrinks so the 540px
+   arm always fits the width with a gutter and the frame always fits the
+   height.
+=========================================================================== */
+
+.nf {
+  --u: min(1px, calc((100vw - 48px) / 540), calc(100dvh / 832));
+  --nf-page: #ffffff;
+  --nf-four: #e60024;
+  --nf-link: #0a0a0a;
+  --nf-focus: rgba(10, 10, 10, 0.35);
+
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: var(--nf-page);
+  font-family: var(--pin-font);
+  transition: background-color var(--pin-theme-fade) var(--pin-theme-ease);
+}
+
+/* the dark frame: near-black, with the pin in white and its star in red */
+:root[data-pin-theme="crimson"] .nf {
+  --nf-page: #0b0b0b;
+  --nf-link: #aaaaaa;
+  --nf-focus: rgba(255, 255, 255, 0.4);
+}
+
+.nf__stage {
+  position: absolute;
+  inset: 0;
+}
+
+/* ── the arm: a point at the centre that the two 4s hang off ── */
+
+.nf__arm {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  will-change: transform;
+}
+
+/*
+ * Each 4 keeps the frame's text box: 566 × 1200 units at 300px, so 169.8 ×
+ * 360, the two spread across 540. Only the 4 itself catches the pointer.
+ */
+.nf__four {
+  position: absolute;
+  top: calc(var(--u) * -180);
+  width: calc(var(--u) * 169.8);
+  height: calc(var(--u) * 360);
+  color: var(--nf-four);
+  outline: none;
+  pointer-events: none;
+  touch-action: none;
+}
+.nf__four--left {
+  left: calc(var(--u) * -270);
+}
+.nf__four--right {
+  left: calc(var(--u) * (270 - 169.8));
+}
+
+.nf__in {
+  width: 100%;
+  height: 100%;
+}
+
+/* the entrance owns the wrapper's transform; the hover swell lives on the glyph */
+.nf__glyph {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  transform-origin: 50% 64%;
+  transition: transform 0.35s cubic-bezier(0.22, 0.68, 0.16, 1);
+}
+
+.nf__hit {
+  fill: transparent;
+  pointer-events: all;
+  cursor: grab;
+  touch-action: none;
+}
+
+.nf__four:focus-visible .nf__glyph {
+  filter: drop-shadow(0 0 0.5px var(--nf-focus)) drop-shadow(0 0 6px var(--nf-focus));
+}
+
+/* while a 4 is held, the whole page shows it is held */
+:root.nf-grabbing,
+:root.nf-grabbing * {
+  cursor: grabbing !important;
+  user-select: none;
+}
+
+/* ── the pin: the axis, and the theme switch ── */
+
+.nf__axis {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  width: calc(var(--u) * 124.776);
+  height: calc(var(--u) * 147.761);
+  margin: calc(var(--u) * -73.88) 0 0 calc(var(--u) * -62.388);
+}
+
+.nf__pin {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  outline: none;
+}
+.nf__pin:focus-visible {
+  outline: 2px solid var(--nf-focus);
+  outline-offset: 6px;
+}
+
+/* the mark's outline runs a hair past its 38 × 45 box; at this size a clip would show */
+.nf__mark {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* ── back to home ── */
+
+.nf__foot {
+  position: absolute;
+  right: 0;
+  /* lifted a little off the edge, so the small label has air under it */
+  bottom: max(28px, calc(var(--u) * 40));
+  left: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 3;
+}
+
+/*
+ * The label keeps its colour. Pointing at it draws the underline in from the
+ * left and brings the arrow in beside it; leaving sweeps the line out to the
+ * right. The arrow hangs off the label's right edge, so the words never move
+ * off centre to make room for it.
+ */
+.nf__home {
+  position: relative;
+  display: inline-block;
+  /*
+   * A quiet caption, not a headline: small, tight, and set in the page's own
+   * colour, so the 404 above stays the only loud thing on it. The padding
+   * keeps the tap target generous even though the words are small.
+   */
+  padding: 10px 2px;
+  color: var(--nf-link);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  outline: none;
+  transition: color var(--pin-theme-fade) var(--pin-theme-ease);
+}
+
+.nf__label {
+  position: relative;
+  display: inline-block;
+}
+.nf__label::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -0.14em;
+  left: 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 0.42s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.nf__arrow {
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  display: block;
+  width: 0.8em;
+  height: 0.8em;
+  margin: -0.4em 0 0 0.32em;
+  opacity: 0;
+  transform: translate(-0.35em, 0.3em) rotate(0deg) scale(0.7);
+  transition:
+    opacity 0.2s ease,
+    transform 0.45s cubic-bezier(0.22, 0.68, 0.16, 1);
+}
+.nf__arrow svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.nf__home:focus-visible .nf__label::after,
+.nf__home:active .nf__label::after {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+.nf__home:focus-visible .nf__arrow,
+.nf__home:active .nf__arrow {
+  opacity: 1;
+  transform: translate(0, 0) rotate(45deg) scale(1);
+  transition-delay: 0.08s;
+}
+
+@media (hover: hover) {
+  .nf__home:hover .nf__label::after {
+    transform: scaleX(1);
+    transform-origin: left center;
+  }
+  /* it arrives on the diagonal and straightens to point home */
+  .nf__home:hover .nf__arrow {
+    opacity: 1;
+    transform: translate(0, 0) rotate(45deg) scale(1);
+    transition-delay: 0.08s;
+  }
+  .nf__four:hover .nf__glyph {
+    transform: scale(1.035);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nf__label::after,
+  .nf__arrow,
+  .nf__glyph {
+    transition-duration: 0.01ms;
+  }
+}

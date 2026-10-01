@@ -11,9 +11,6 @@ tsconfig.tsbuildinfo
 # secrets - the Supabase key and site URL live here, never in the repo
 .env*.local
 
-# vercel cli
-.vercel
-
 # cloudflare / opennext build output and local secrets
 .open-next
 .wrangler
@@ -35,3 +32,5 @@ CLAUDE.md
 Add member/
 Chips/
 OTP/
+/Record/
+/Taxi/

@@ -89,21 +89,37 @@ export default function ComponentCard({ entry, index }: { entry: Entry; index: n
       >
         {/* the recording's own field shows behind a clip zoomed out below 1 */}
         <span className="card__frame" style={{ background: entry.clipStage ?? entry.stage }}>
-          <video
-            className="card__video"
-            ref={videoRef}
-            src={near ? entry.clip : undefined}
-            /* the zoom is a token so the hover lift can compose with it */
-            style={{ "--card-zoom": entry.zoom } as React.CSSProperties}
-            /* the still is there from the first paint, before the clip is even requested */
-            poster={entry.poster}
-            muted
-            playsInline
-            loop
-            preload={near ? "metadata" : "none"}
-            tabIndex={-1}
-            aria-hidden="true"
-          />
+          {entry.clip ? (
+            <video
+              className="card__video"
+              ref={videoRef}
+              src={near ? entry.clip : undefined}
+              /* the zoom is a token so the hover lift can compose with it */
+              style={{ "--card-zoom": entry.zoom } as React.CSSProperties}
+              /* the still is there from the first paint, before the clip is even requested */
+              poster={entry.poster}
+              muted
+              playsInline
+              loop
+              preload={near ? "metadata" : "none"}
+              tabIndex={-1}
+              aria-hidden="true"
+            />
+          ) : (
+            /* not recorded yet: a screenshot, which takes the same hover lift */
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              className="card__video"
+              src={entry.poster}
+              style={{ "--card-zoom": entry.zoom } as React.CSSProperties}
+              alt=""
+              width={960}
+              height={540}
+              loading="lazy"
+              decoding="async"
+              aria-hidden="true"
+            />
+          )}
         </span>
 
         <span className="card__foot">

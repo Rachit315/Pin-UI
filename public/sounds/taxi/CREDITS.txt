@@ -1,0 +1,13 @@
+Sound credits for the Taxi component (public/sounds/taxi).
+
+tap, open, cancel, ping, found, tick, done, star, thanks
+  Kenney, Interface Sounds (click_002, maximize_006, minimize_006, glass_002,
+  confirmation_002, tick_002, confirmation_004, pluck_001, bong_001)
+  https://kenney.nl/assets/interface-sounds — CC0 1.0 (see KENNEY-LICENSE.txt)
+
+horn    Mixkit, Car double horn (#719)
+door    Mixkit, Car door slam (#1564)
+engine  Mixkit, Car engine start (#1566)
+  https://mixkit.co — Mixkit Sound Effects Free License
+
+Each clip was trimmed of leading silence, faded and normalised.

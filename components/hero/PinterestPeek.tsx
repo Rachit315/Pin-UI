@@ -42,6 +42,13 @@ import "./peek.css";
  * side of the pointer to open on, and a guess leaves dead space at the bottom.
  */
 const CARD = { w: 272, h: 219 };
+
+/*
+ * The board shows the recorded components, the same set the hero band plays —
+ * one still waiting for its loop would sit frozen among moving tiles, and the
+ * card is measured for two rows.
+ */
+const PINS = LIBRARY.filter((entry) => entry.clip && entry.hero !== false);
 /** How far it sits from the pointer, and how close it may come to the edge. */
 const OFFSET = { x: 18, y: 18 };
 const MARGIN = 12;
@@ -175,11 +182,11 @@ export default function PinterestPeek({
                 <p className="peek__meta">
                   <span className="peek__badge">Public board</span>
                   <span className="peek__dot">·</span>
-                  {LIBRARY.length} Pins
+                  {PINS.length} Pins
                 </p>
 
                 <div className="peek__grid">
-                  {LIBRARY.map((entry, i) => (
+                  {PINS.map((entry, i) => (
                     <motion.span
                       className="peek__tile"
                       key={entry.slug}

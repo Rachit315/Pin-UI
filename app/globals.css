@@ -57,6 +57,15 @@
   src: url("/fonts/plus-jakarta-sans-var-latin.woff2") format("woff2");
 }
 
+/* The Recorder's status and timer are set in Roboto Mono. */
+@font-face {
+  font-family: "Roboto Mono";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/roboto-mono-500-latin.woff2") format("woff2");
+}
+
 /* ---------------------------------------------------------------------------
    Pin UI — global tokens & base styles
 
@@ -1306,10 +1315,12 @@ a {
 }
 
 /* sized and lifted to sit level with the "New" tag it follows */
+/* on the sidebar's row, centred on the line with the name and its tag */
 .wbnav__link .cdot {
   --cdot-size: 0.46em;
-  margin-left: 0.5em;
-  top: -0.42em;
+  flex: none;
+  margin-left: 0.55em;
+  top: 0;
 }
 
 .card__title .cdot {

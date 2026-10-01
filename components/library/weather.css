@@ -1,0 +1,483 @@
+/* ===========================================================================
+   Weather — a square widget that opens out into a five-day forecast.
+
+   Every dimension is a custom property, so compact, expanded and the phone
+   layout (where the forecast stacks underneath instead of beside) are the
+   same transitions with different numbers. State lives in data attributes,
+   so a toggle mid-flight retargets from wherever things are.
+=========================================================================== */
+
+.pwx {
+  /* light: the panel colours, the black shell and the forecast drawn on it */
+  --pwx-clear: #ffe500;
+  --pwx-partly: #9ed0ff;
+  --pwx-rain: #aab7c4;
+  --pwx-shell: #000000;
+  --pwx-shell-edge: transparent;
+  --pwx-panel: #1c1c1e;
+  --pwx-low: #5b5b60;
+  --pwx-high: #8e8e93;
+  --pwx-focus: rgba(0, 0, 0, 0.35);
+  /* strong custom curves: the built-in easings are too weak */
+  --pwx-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --pwx-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  /* a small overshoot, enough to feel alive and not enough to wobble */
+  --pwx-bounce: cubic-bezier(0.34, 1.26, 0.44, 1);
+
+  --card-w: 210px;
+  --card-h: 210px;
+  --card-r: 36px;
+  --main-w: 210px;
+  --main-h: 210px;
+  --main-x: 0px;
+  --main-y: 0px;
+  --main-r: 36px;
+  --content-scale: 0.636;
+  --dark-w: 240px;
+  --dark-h: 224px;
+  --dark-x: 210px; /* parked outside the card */
+  --dark-y: 14px;
+  --dur: 380ms;
+
+  position: relative;
+  display: block;
+  width: var(--card-w);
+  height: var(--card-h);
+  overflow: hidden;
+  border-radius: var(--card-r);
+  /*
+   * Compact, the main panel covers the card exactly — painting the black shell
+   * underneath would leave a dark fringe along the rounded edge, so the shell
+   * is only painted while expanded. It flips at the very end of the collapse,
+   * by which point the panel already covers it.
+   */
+  background: transparent;
+  color: #000;
+  text-align: left;
+  font-family: "Inter Tight", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  contain: layout paint;
+  touch-action: manipulation;
+  user-select: none;
+  transition:
+    width var(--dur) var(--pwx-bounce),
+    height var(--dur) var(--pwx-bounce),
+    border-radius var(--dur) var(--pwx-drawer),
+    background-color 1ms linear var(--dur),
+    box-shadow 1ms linear var(--dur),
+    transform 120ms var(--pwx-out);
+}
+
+.pwx[data-state="expanded"] {
+  --card-w: 540px;
+  --card-h: 252px;
+  --card-r: 36px;
+  --main-w: 260px;
+  --main-h: 224px;
+  --main-x: 14px;
+  --main-y: 14px;
+  --main-r: 26px;
+  --content-scale: 0.678;
+  --dark-x: 286px;
+  --dark-y: 14px;
+  --dur: 460ms;
+  background: var(--pwx-shell);
+  box-shadow: inset 0 0 0 1px var(--pwx-shell-edge);
+  transition:
+    width var(--dur) var(--pwx-bounce),
+    height var(--dur) var(--pwx-bounce),
+    border-radius var(--dur) var(--pwx-drawer),
+    background-color 1ms linear,
+    box-shadow 1ms linear,
+    transform 120ms var(--pwx-out);
+}
+
+/*
+ * Dark: the same card for a dark page. A pure-black shell would vanish into
+ * it, so the shell is graphite with a hairline edge, the forecast is lifted a
+ * step above it, and the panel hues take their dark-mode values — a touch
+ * warmer and deeper, so they glow rather than glare.
+ */
+.pwx[data-theme="dark"] {
+  --pwx-clear: #ffd60a;
+  --pwx-partly: #82c3ff;
+  --pwx-rain: #98a6b5;
+  --pwx-shell: #161618;
+  --pwx-shell-edge: rgba(255, 255, 255, 0.08);
+  --pwx-panel: #242427;
+  --pwx-low: #6e6e74;
+  --pwx-high: #a1a1a7;
+  --pwx-focus: rgba(0, 0, 0, 0.45);
+}
+
+.pwx *,
+.pwx *::before,
+.pwx *::after {
+  box-sizing: border-box;
+}
+
+/* ── the main panel ── */
+
+.pwx__main {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--main-w);
+  height: var(--main-h);
+  border-radius: var(--main-r);
+  background: var(--pwx-clear);
+  transform: translate3d(var(--main-x), var(--main-y), 0);
+  cursor: pointer;
+  outline: none;
+  touch-action: manipulation;
+  /* the colour change takes plain ease; the morph keeps its own curves */
+  transition:
+    background-color 280ms ease,
+    width var(--dur) var(--pwx-bounce),
+    height var(--dur) var(--pwx-bounce),
+    border-radius var(--dur) var(--pwx-drawer),
+    transform var(--dur) var(--pwx-bounce);
+}
+.pwx__main:focus-visible {
+  box-shadow: inset 0 0 0 3px var(--pwx-focus);
+}
+
+/* the content keeps its compact layout and is scaled — no font-size or padding animates */
+.pwx__content {
+  display: flex;
+  width: 330px;
+  height: 330px;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 44px 36px 36px;
+  transform-origin: top left;
+  transform: scale(var(--content-scale));
+  transition: transform var(--dur) var(--pwx-bounce);
+}
+
+.pwx__icon {
+  display: block;
+  width: 26px;
+  height: 26px;
+}
+
+/* ── the temperature odometer ── */
+
+.pwx__temp {
+  display: flex;
+  align-items: flex-start;
+  font-size: 112px;
+  font-weight: 500;
+  line-height: 0.86;
+  letter-spacing: -0.045em;
+  font-variant-numeric: tabular-nums;
+}
+
+.pwx__odometer {
+  display: flex;
+}
+
+.pwx__digit {
+  display: block;
+  height: 0.86em;
+  overflow: hidden;
+  /* tracking lives between the columns: inside a clipping box it would shave each glyph */
+  letter-spacing: normal;
+}
+.pwx__digit + .pwx__digit {
+  margin-left: -0.045em;
+}
+
+.pwx__strip {
+  display: block;
+  transform: translateY(calc(var(--d) * -10%));
+  transition: transform 420ms var(--pwx-bounce) calc(var(--n) * 45ms);
+}
+.pwx__strip > span {
+  display: block;
+  height: 0.86em;
+}
+.pwx__odometer[data-instant="true"] .pwx__strip {
+  transition: none;
+}
+
+/* ── the city ── */
+
+.pwx__city {
+  position: relative;
+  height: 34px;
+}
+.pwx__cityLabel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  font-size: 31px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  white-space: nowrap;
+  /* the outgoing one leaves fast and the incoming one waits: two words never overlap legibly */
+  opacity: 1;
+  filter: blur(0);
+  transition:
+    opacity 120ms var(--pwx-out),
+    filter 120ms var(--pwx-out);
+}
+.pwx__cityLabel[data-city="expanded"],
+.pwx[data-state="expanded"] .pwx__cityLabel[data-city="compact"] {
+  opacity: 0;
+  filter: blur(4px);
+}
+.pwx[data-state="expanded"] .pwx__cityLabel[data-city="expanded"],
+.pwx[data-state="compact"] .pwx__cityLabel[data-city="compact"] {
+  opacity: 1;
+  filter: blur(0);
+  transition:
+    opacity 200ms var(--pwx-out) 150ms,
+    filter 200ms var(--pwx-out) 150ms;
+}
+
+/* ── the forecast ── */
+
+.pwx__forecast {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  width: var(--dark-w);
+  height: var(--dark-h);
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 18px 16px;
+  border-radius: 26px;
+  background: var(--pwx-panel);
+  opacity: 0;
+  transform: translate3d(var(--dark-x), var(--dark-y), 0);
+  transition:
+    opacity 140ms var(--pwx-out),
+    width var(--dur) var(--pwx-bounce),
+    height var(--dur) var(--pwx-bounce),
+    transform var(--dur) var(--pwx-bounce);
+}
+.pwx[data-state="expanded"] .pwx__forecast {
+  opacity: 1;
+  transition:
+    opacity 200ms var(--pwx-out) 120ms,
+    width var(--dur) var(--pwx-bounce),
+    height var(--dur) var(--pwx-bounce),
+    transform var(--dur) var(--pwx-bounce);
+}
+
+.pwx__row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  margin: 0 -6px;
+  padding: 3px 6px;
+  border: 0;
+  border-radius: 10px;
+  color: #fff;
+  background: transparent;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+  touch-action: manipulation;
+  opacity: 0;
+  transform: translate3d(10px, 0, 0);
+  transition:
+    opacity 120ms var(--pwx-out),
+    transform 120ms var(--pwx-out),
+    background-color 160ms ease;
+}
+.pwx__row[aria-pressed="false"] {
+  color: #d1d1d6;
+}
+.pwx__row[aria-pressed="true"] {
+  background: rgba(255, 255, 255, 0.09);
+}
+.pwx__row:focus-visible {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
+}
+@media (hover: hover) and (pointer: fine) {
+  .pwx__row[aria-pressed="false"]:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+}
+
+.pwx__day {
+  width: 52px;
+}
+.pwx__rowIcon {
+  display: flex;
+  width: 36px;
+  justify-content: center;
+}
+.pwx__low {
+  width: 32px;
+  margin-left: auto;
+  color: var(--pwx-low);
+  text-align: right;
+}
+.pwx__high {
+  width: 44px;
+  color: var(--pwx-high);
+  text-align: right;
+}
+
+/* in on expand, 40ms apart; out together on collapse */
+.pwx[data-state="expanded"] .pwx__row {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition:
+    opacity 260ms var(--pwx-out) calc(160ms + var(--i) * 40ms),
+    transform 260ms var(--pwx-bounce) calc(160ms + var(--i) * 40ms),
+    background-color 160ms ease;
+}
+
+/* ── the condition: three stacked icons, one on show ── */
+
+.pwx__condition {
+  position: relative;
+  display: flex;
+  height: 30px;
+  align-items: center;
+  padding-left: 38px;
+}
+.pwx__condIcon {
+  position: absolute;
+  left: 0;
+  display: block;
+  width: 26px;
+  height: 26px;
+  opacity: 0;
+  transform: scale(0.9);
+  filter: blur(3px);
+  transition:
+    opacity 120ms var(--pwx-out),
+    transform 120ms var(--pwx-out),
+    filter 120ms var(--pwx-out);
+}
+.pwx__condText {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  white-space: nowrap;
+  transition:
+    opacity 120ms var(--pwx-out),
+    filter 120ms var(--pwx-out);
+}
+.pwx__condText[data-swapping="true"] {
+  opacity: 0;
+  filter: blur(4px);
+}
+.pwx[data-condition="clear"] .pwx__condIcon[data-cond-icon="clear"],
+.pwx[data-condition="partly"] .pwx__condIcon[data-cond-icon="partly"],
+.pwx[data-condition="rain"] .pwx__condIcon[data-cond-icon="rain"] {
+  opacity: 1;
+  transform: scale(1);
+  filter: blur(0);
+  transition:
+    opacity 200ms var(--pwx-out) 130ms,
+    transform 240ms var(--pwx-drawer) 130ms,
+    filter 200ms var(--pwx-out) 130ms;
+}
+
+/* ── press and hover ── */
+
+/* a deliberate press is slower; the release snaps back at 120ms */
+.pwx[data-pressed="true"] {
+  transform: scale(0.985);
+  transition:
+    width var(--dur) var(--pwx-bounce),
+    height var(--dur) var(--pwx-bounce),
+    border-radius var(--dur) var(--pwx-drawer),
+    transform 180ms var(--pwx-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .pwx:hover {
+    transform: translateY(-2px);
+  }
+  .pwx[data-pressed="true"]:hover {
+    transform: translateY(-2px) scale(0.985);
+  }
+}
+
+/* constant decorative motion is linear */
+.pwx__rays {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pwx-spin 24s linear infinite;
+}
+@keyframes pwx-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── phone: the forecast stacks underneath and slides up instead of out ── */
+
+@media (max-width: 580px) {
+  .pwx {
+    --card-w: 210px;
+    --card-h: 210px;
+    --main-w: 210px;
+    --main-h: 210px;
+    --content-scale: 0.636;
+    --dark-w: 186px;
+    --dark-h: 214px;
+    --dark-x: 12px;
+    --dark-y: 210px; /* parked just under the card */
+  }
+  .pwx[data-state="expanded"] {
+    --card-w: 210px;
+    --card-h: 440px;
+    --main-w: 186px;
+    --main-h: 186px;
+    --main-x: 12px;
+    --main-y: 12px;
+    --main-r: 26px;
+    --content-scale: 0.56;
+    --dark-x: 12px;
+    --dark-y: 210px;
+  }
+  /* a 44px touch target per row */
+  .pwx__row {
+    margin: 0 -8px;
+    padding: 6px 8px;
+  }
+  .pwx__forecast {
+    padding: 14px 16px;
+  }
+}
+
+/* gentler, not still: keep the fades, drop the movement and the morph */
+@media (prefers-reduced-motion: reduce) {
+  .pwx__rays {
+    animation: none;
+  }
+  .pwx,
+  .pwx__main,
+  .pwx__content,
+  .pwx__forecast,
+  .pwx__row,
+  .pwx[data-state="expanded"] .pwx__forecast,
+  .pwx[data-state="expanded"] .pwx__row {
+    transition: opacity 200ms ease;
+  }
+  .pwx:hover,
+  .pwx[data-pressed="true"],
+  .pwx[data-pressed="true"]:hover {
+    transform: translate3d(0, 0, 0);
+  }
+  .pwx__strip {
+    transition: none;
+  }
+}

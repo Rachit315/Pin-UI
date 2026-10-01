@@ -26,6 +26,14 @@ export async function subscribeUpdates(
   meta: { ip?: string | null; userAgent?: string | null } = {},
 ): Promise<SubscribeStatus> {
   if (!URL_BASE || !KEY) {
+    /*
+     * Without a store a signup has nowhere to go. In development that is fine
+     * and the form carries on; in production it would tell a visitor they are
+     * signed up when nothing was saved, so it fails loudly instead.
+     */
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("[updates] SUPABASE_URL or SUPABASE_PUBLISHABLE_KEY is not set");
+    }
     console.info("[updates] no store configured — signup", email);
     return "ok";
   }

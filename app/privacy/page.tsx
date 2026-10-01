@@ -17,7 +17,7 @@ export default function PrivacyPage() {
   return (
     <LegalPage
       title="Privacy Policy"
-      updated="2026-09-22"
+      updated="2026-10-01"
       summary="Pin UI is a waitlist and a component library. It collects the little it needs to run those two things, and nothing else."
     >
       <h2>The short version</h2>
@@ -68,16 +68,16 @@ export default function PrivacyPage() {
       </p>
       <p>
         The site itself is served by{" "}
-        <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer">
-          Vercel
+        <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer">
+          Cloudflare
         </a>
         , who process requests on our behalf and keep their own short-lived operational logs.
       </p>
 
       <h2>Analytics</h2>
       <p>
-        Pin UI uses Vercel Analytics to count page views. It does not set advertising cookies, does
-        not follow you between sites, and reports visits in aggregate rather than as individuals.
+        Pin UI runs no analytics script. Beyond the request logs Cloudflare keeps to operate the
+        site, nothing counts your visits, sets advertising cookies or follows you between sites.
         There is no Google Analytics, no advertising pixel, and no third-party tracker on this site.
       </p>
 

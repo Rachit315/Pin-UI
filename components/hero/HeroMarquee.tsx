@@ -39,8 +39,11 @@ import { LIBRARY } from "../library/registry";
  * without chasing it across the frame.
  */
 
-/** One card per component on the shelf, in shelf order. */
-const CARDS = LIBRARY;
+/**
+ * One card per recorded component, in shelf order. A component that only has a
+ * still so far waits for its loop before it joins the band.
+ */
+const CARDS = LIBRARY.filter((entry) => entry.clip && entry.hero !== false);
 
 /** Drift speed, in CSS pixels per second. */
 const SPEED = 34;
