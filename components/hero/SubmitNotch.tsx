@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { animate, motion, useMotionValue, useReducedMotion } from "motion/react";
 
 /** Where a design is submitted. */
 const SUBMIT_URL = "https://tally.so/r/2EQY9e";
@@ -13,18 +13,57 @@ const SUBMIT_URL = "https://tally.so/r/2EQY9e";
 const NOTCH = { type: "spring", stiffness: 520, damping: 36, mass: 0.85 } as const;
 const CONTENT = { type: "spring", stiffness: 460, damping: 34, mass: 0.7 } as const;
 
+/* the shape, in the notch's own em */
+const SHUT = 2;
+const OPEN = 6.75;
+/** How far each shoulder flares out past the body, and how far down it reaches. */
+const FLARE = 0.7;
+/** The bottom corners: 40px across, as drawn. */
+const CORNER = 2.5;
+/** A cubic Bézier's reach for a quarter circle. */
+const K = 0.5523;
+
+/**
+ * The outline, as one path: the top edge, a concave shoulder at each end that
+ * leaves the edge flat and turns straight down, then a convex corner that
+ * starts exactly where the shoulder ends, at the same angle, and sweeps into
+ * the bottom edge. Shut, the corner takes the whole side — one S-curve from the
+ * top to the bottom; open, the side runs straight between the two.
+ *
+ * `w` is the full width including both shoulders; everything is in pixels.
+ */
+function outline(w: number, h: number, em: number) {
+  const f = FLARE * em;
+  const rx = CORNER * em;
+  const ry = Math.max(0, Math.min(h - f, rx));
+  const k = K;
+  const r = (n: number) => Math.round(n * 100) / 100;
+  return (
+    `path('M0 0H${r(w)}` +
+    /* right shoulder: a quarter circle centred out on the edge, curving down into the side */
+    `C${r(w - k * f)} 0 ${r(w - f)} ${r(f - k * f)} ${r(w - f)} ${r(f)}` +
+    `V${r(h - ry)}` +
+    /* right corner: a quarter ellipse into the bottom edge */
+    `C${r(w - f)} ${r(h - ry + k * ry)} ${r(w - f - rx + k * rx)} ${r(h)} ${r(w - f - rx)} ${r(h)}` +
+    `H${r(f + rx)}` +
+    `C${r(f + rx - k * rx)} ${r(h)} ${r(f)} ${r(h - ry + k * ry)} ${r(f)} ${r(h - ry)}` +
+    `V${r(f)}` +
+    `C${r(f)} ${r(f - k * f)} ${r(k * f)} 0 0 0Z')`
+  );
+}
+
 /**
  * The notch — Figma 439:159 (shut) and 439:239 (open).
  *
  * A black tab hanging from the top edge of the hero, the way a MacBook's notch
- * hangs from its bezel. Shut, it is a 20px strip with one small line; pointed
- * at, it swells to 100px, the line grows to twice its size as it rises into
- * place, and a stamp fades in under it to submit a design.
+ * hangs from its bezel. Shut, it is a strip with one line; pointed at, it
+ * swells, the line grows as it rises into place, and a stamp fades in under it
+ * to submit a design.
  *
- * Only the height and the corners move: the design keeps the width, so the
- * tab grows down out of the edge rather than spreading along it. The line is
- * set at its open size and scaled down when shut, so the open state — the one
- * people read — is always crisp.
+ * The silhouette is drawn as a path from the live height on every frame of the
+ * spring, so the shoulders and corners stay one smooth curve however far open
+ * it is. The line is set at its open size and scaled down when shut, so the
+ * open state — the one people read — is always crisp.
  *
  * A touch screen cannot point first, so a tap opens it and a tap anywhere else
  * shuts it; a keyboard opens it by tabbing onto the stamp.
@@ -33,7 +72,21 @@ export default function SubmitNotch() {
   const reduced = useReducedMotion();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  /* the body's measured width and em, and its height as a live value */
+  const [box, setBox] = useState<{ w: number; em: number } | null>(null);
+  const height = useMotionValue(0);
+  const clipPath = useMotionValue("none");
+
+  /* the outline is redrawn from the live height on every frame, and on any rescale */
+  useEffect(() => {
+    if (!box) return;
+    const draw = (h: number) => clipPath.set(outline(box.w, h, box.em));
+    draw(height.get());
+    return height.on("change", draw);
+  }, [box, height, clipPath]);
 
   const cancelClose = () => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
@@ -47,7 +100,35 @@ export default function SubmitNotch() {
 
   useEffect(() => cancelClose, []);
 
-  /* a tap outside shuts it on touch screens */
+  /* measure before the first paint, and again whenever the hero rescales */
+  useLayoutEffect(() => {
+    const body = bodyRef.current;
+    if (!body) return;
+    const measure = () => {
+      const em = parseFloat(getComputedStyle(body).fontSize) || 16;
+      setBox((prev) => (prev && prev.w === body.offsetWidth && prev.em === em ? prev : { w: body.offsetWidth, em }));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(body);
+    return () => ro.disconnect();
+  }, []);
+
+  /* the height follows the state on the notch's spring; a rescale just lands */
+  const target = box ? (open ? OPEN : SHUT) * box.em : 0;
+  const settled = useRef(false);
+  useEffect(() => {
+    if (!box) return;
+    if (!settled.current) {
+      settled.current = true;
+      height.set(target);
+      return;
+    }
+    const controls = animate(height, target, reduced ? { duration: 0.15 } : NOTCH);
+    return () => controls.stop();
+  }, [target, box, reduced, height]);
+
+  /* a tap outside shuts it on touch screens; Escape shuts it anywhere */
   useEffect(() => {
     if (!open) return;
     const onDown = (event: PointerEvent) => {
@@ -65,7 +146,6 @@ export default function SubmitNotch() {
     };
   }, [open]);
 
-  const move = reduced ? { duration: 0.15 } : NOTCH;
   const ease = reduced ? { duration: 0.15 } : CONTENT;
 
   return (
@@ -92,15 +172,12 @@ export default function SubmitNotch() {
         if (!event.currentTarget.contains(event.relatedTarget as Node)) closeSoon();
       }}
     >
-      {/* the two concave shoulders where the notch meets the edge */}
-      <span className="notch__shoulder notch__shoulder--left" aria-hidden="true" />
-      <span className="notch__shoulder notch__shoulder--right" aria-hidden="true" />
-
       <motion.div
+        ref={bodyRef}
         className="notch__body"
-        initial={false}
-        animate={{ height: open ? "6.75em" : "2em" }}
-        transition={move}
+        data-drawn={box ? "true" : "false"}
+        /* until it has been measured the stylesheet's own shape stands in */
+        style={box ? { height, clipPath } : undefined}
         onClick={(event) => {
           /* a tap on the strip itself opens it; the stamp inside handles its own */
           if ((event.target as HTMLElement).closest(".notch__submit")) return;
@@ -114,7 +191,7 @@ export default function SubmitNotch() {
             Set at its open size and scaled to three quarters when shut, which
             centres it in the strip at 15px — large enough to read at a glance.
           */
-          animate={{ y: open ? 0 : "-0.64em", scale: open ? 1 : 0.75 }}
+          animate={{ y: open ? 0 : "-0.6em", scale: open ? 1 : 0.75 }}
           transition={ease}
         >
           Want to submit a design??
@@ -131,7 +208,6 @@ export default function SubmitNotch() {
           animate={{ opacity: open ? 1 : 0 }}
           transition={open ? { duration: reduced ? 0.15 : 0.22, delay: reduced ? 0 : 0.1, ease: "easeOut" } : { duration: 0.1 }}
           style={{ pointerEvents: open ? "auto" : "none" }}
-          tabIndex={0}
         >
           <span className="notch__stamp" aria-hidden="true" />
           <span className="notch__submitLabel">Submit →</span>

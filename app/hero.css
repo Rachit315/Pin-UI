@@ -171,49 +171,52 @@
  */
 .notch {
   position: absolute;
-  top: 0;
+  /*
+   * It hangs from the frame's outer top edge in both states — over the rule in
+   * the light one, from the top of the red field in the crimson one — so it
+   * reads as cut into the frame rather than hung below it. It is set 2px up
+   * into the page margin and those 2px are painted back in the page's colour
+   * (below), so its top edge never shares an anti-aliased line with the
+   * frame's and no sliver of red can show above the black at any display scale.
+   */
+  top: calc(var(--hero-inset) - 2px);
   left: 50%;
   z-index: 4;
   width: 20em;
   margin-left: -10em;
   font-size: max(1.1em, 14px);
+  /* reaches a little below the strip, so the pointer catches it easily */
+  padding-bottom: 0.75em;
 }
 
-.notch__body {
-  position: relative;
-  height: 2em;
-  overflow: hidden;
-  border-radius: 0 0 2.5em 2.5em;
-  background: #000000;
-  color: #f4f4f4;
-  cursor: default;
-}
-
-/* the hover zone reaches a little below the strip, so it is easy to catch */
-.notch__body::after {
+/* the page margin, repainted across the notch's top 2px (shoulders included) */
+.notch::after {
   content: "";
   position: absolute;
-  inset: 100% 0 auto;
-  height: 0.75em;
-}
-
-/* the concave fillets where a notch meets its bezel */
-.notch__shoulder {
-  position: absolute;
   top: 0;
-  width: 0.75em;
-  height: 0.75em;
+  right: -0.7em;
+  left: -0.7em;
+  z-index: 1;
+  height: 2px;
+  background: var(--hero-page);
   pointer-events: none;
 }
 
-.notch__shoulder--left {
-  right: 100%;
-  background: radial-gradient(circle at 0 100%, transparent 0.74em, #000000 0.75em);
-}
-
-.notch__shoulder--right {
-  left: 100%;
-  background: radial-gradient(circle at 100% 100%, transparent 0.74em, #000000 0.75em);
+/*
+ * The body spans the notch and its two shoulders, and its silhouette is cut by
+ * a path drawn from its live size (see SubmitNotch). Until that is measured —
+ * the first frame, or with scripts off — a rounded inset stands in for it.
+ */
+.notch__body {
+  position: relative;
+  width: calc(100% + 1.4em);
+  height: 2em;
+  margin-left: -0.7em;
+  overflow: hidden;
+  background: #000000;
+  color: #f4f4f4;
+  cursor: default;
+  clip-path: inset(0 0.7em round 0 0 1.25em 1.25em);
 }
 
 /*

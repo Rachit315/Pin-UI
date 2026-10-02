@@ -46,9 +46,14 @@ export default function HeroSection() {
 
   return (
     <main className="hero" id="top">
-      <div className="hero__frame">
-        <SubmitNotch />
+      {/*
+        The notch hangs from the frame's top rule, but sits outside the frame:
+        inside it, the frame's clip and its rule would share one anti-aliased
+        edge and leave a hairline of paper between the two.
+      */}
+      <SubmitNotch />
 
+      <div className="hero__frame">
         {/*
           The masthead stands down once the rail takes over, and the mark is
           handed across by a shared `layoutId` rather than fading out here and
