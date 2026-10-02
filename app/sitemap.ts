@@ -19,6 +19,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 1,
     },
+    {
+      url: `${SITE_URL}/components`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.95,
+    },
     ...LIBRARY.map((entry) => ({
       url: `${SITE_URL}/components/${entry.slug}`,
       lastModified: now,

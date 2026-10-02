@@ -19,6 +19,7 @@ interactive, and ready to paste into your project. Three new ones every week.
 
 | Component | Description | Slug |
 | :-- | :-- | :-- |
+| **Joystick** | A pixel-art arcade stick with a real gate, spring and microswitch clicks. Light and dark. | `joystick` |
 | **Weather** | A weather square that opens out into a five-day forecast. | `weather` |
 | **Recorder** | A voice recorder with a scrolling waveform, playback and scrubbing. | `recorder` |
 | **Taxi** | A taxi-hailing card that runs the whole ride from one tap. | `taxi` |
@@ -56,6 +57,14 @@ Optional environment variables: `NEXT_PUBLIC_SITE_URL`, and `SUPABASE_URL` with
 `SUPABASE_PUBLISHABLE_KEY` for the waitlist and updates signups. Without them the
 site runs as normal in development and skips the signup writes; in production the
 forms report an error until they are set.
+
+## Deploying
+
+The site deploys to [Vercel](https://vercel.com) as a standard Next.js project —
+no `vercel.json` needed. Import the repository, keep the detected framework
+preset (Next.js, `npm run build`), and add the three variables above under
+**Settings → Environment Variables** for Production and Preview. Point the
+domain at the project under **Settings → Domains**.
 
 ## License
 

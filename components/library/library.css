@@ -1,0 +1,374 @@
+/* ===========================================================================
+   The library — /components.
+
+   Sized in the same `em` off `.site` as the landing page, so a card here is
+   the size it is on the shelf there. The page is white paper in both states,
+   like the sections under the hero; what changes with the switch is the ink
+   and the cards, through the tokens `sections.css` already sets on `.site`.
+=========================================================================== */
+
+.site.lib-page {
+  --lib-ink: #0a0a0a;
+  --lib-dim: rgb(10 10 10 / 0.56);
+  --lib-faint: rgb(10 10 10 / 0.12);
+  --lib-accent: #e60024;
+  --lib-paper: #ffffff;
+  /* the mark keeps its red on this white bar in both states */
+  --pin-mark: #e60024;
+  --pin-mark-star: #ffffff;
+
+  min-height: 100dvh;
+  background: var(--lib-paper);
+  color: var(--lib-ink);
+}
+
+:root[data-pin-theme="crimson"] .site.lib-page {
+  --lib-ink: #e60024;
+  --lib-dim: rgb(10 10 10 / 0.6);
+  --pin-mark: #e60024;
+  --pin-mark-star: #ffffff;
+}
+
+.lib-page *,
+.lib-page *::before,
+.lib-page *::after {
+  box-sizing: border-box;
+}
+
+/* --- the bar across the top ---------------------------------------------- */
+
+.lib__bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5em;
+  height: 4.6em;
+  /* the bar spans the window, its contents the page's measure */
+  padding: 0 max(2.4em, calc((100% - 92em) / 2 + 2.4em));
+  background: var(--lib-paper);
+  /* the hairline only arrives once there is something passing under it */
+  box-shadow: 0 1px 0 transparent;
+  transition: box-shadow 0.25s ease;
+}
+
+.lib__bar[data-scrolled="true"] {
+  box-shadow: 0 1px 0 var(--lib-faint);
+}
+
+.lib__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.55em;
+}
+
+.lib__markButton {
+  display: grid;
+  width: 2.2em;
+  height: 2.6em;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.lib__mark {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.lib__word {
+  color: var(--lib-accent);
+  font-size: 1.6em;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  text-decoration: none;
+}
+
+.lib__links {
+  display: flex;
+  align-items: center;
+  gap: 1.6em;
+}
+
+.lib__link {
+  color: var(--lib-accent);
+  font-size: 1.05em;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  text-underline-offset: 0.2em;
+}
+
+.lib__link--icon {
+  display: grid;
+  width: 1.5em;
+  height: 1.5em;
+}
+
+.lib__link--icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+@media (hover: hover) {
+  .lib__link:not(.lib__link--icon):hover {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+  }
+
+  .lib__link--icon:hover {
+    opacity: 0.75;
+  }
+}
+
+/* --- the page ------------------------------------------------------------ */
+
+.lib {
+  max-width: 92em;
+  margin: 0 auto;
+  padding: 0 2.4em 5em;
+}
+
+.lib__intro {
+  padding: 4.2em 0 2.6em;
+}
+
+.lib__eyebrow {
+  margin: 0 0 1em;
+  color: var(--lib-accent);
+  font-size: 0.85em;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.lib__title {
+  margin: 0;
+  color: var(--lib-ink);
+  font-size: 5.2em;
+  font-weight: 500;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+}
+
+/* the count rides on the title's cap height, a square tag in the accent */
+.lib__total {
+  display: inline-block;
+  margin-left: 0.25em;
+  padding: 0.32em 0.4em 0.26em;
+  background: var(--lib-accent);
+  color: #ffffff;
+  font-size: 0.24em;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  vertical-align: 2.6em;
+}
+
+.lib__lead {
+  max-width: 34em;
+  margin: 1.3em 0 0;
+  color: var(--lib-dim);
+  font-size: 1.2em;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+}
+
+/*
+ * The shelf bar sticks under the top bar. Its band is the page's paper, so the
+ * cards pass under it cleanly, and it scrolls sideways rather than wrapping
+ * once there are more shelves than room.
+ */
+.lib__jumpWrap {
+  position: sticky;
+  top: 4.6em;
+  z-index: 10;
+  margin: 0 -2.4em 1.2em;
+  padding: 0.9em 2.4em;
+  background: var(--lib-paper);
+}
+
+.lib__jump {
+  display: flex;
+  gap: 0.6em;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.lib__jump::-webkit-scrollbar {
+  display: none;
+}
+
+.lib__chip {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.6em;
+  height: 2.6em;
+  padding: 0 0.95em;
+  border: 1px solid var(--lib-faint);
+  border-radius: 0;
+  background: var(--lib-paper);
+  color: var(--lib-ink);
+  font: inherit;
+  font-size: 1em;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.lib__chipCount {
+  color: var(--lib-dim);
+  font-size: 0.85em;
+  font-variant-numeric: tabular-nums;
+  transition: color 0.25s ease;
+}
+
+.lib__chip[aria-current="true"] {
+  border-color: var(--lib-accent);
+  background: var(--lib-accent);
+  color: #ffffff;
+}
+
+.lib__chip[aria-current="true"] .lib__chipCount {
+  color: rgb(255 255 255 / 0.75);
+}
+
+@media (hover: hover) {
+  .lib__chip:not([aria-current="true"]):hover {
+    border-color: var(--lib-accent);
+    color: var(--lib-accent);
+  }
+}
+
+.lib__chip:focus-visible,
+.lib__link:focus-visible,
+.lib__markButton:focus-visible {
+  outline: 2px solid var(--lib-accent);
+  outline-offset: 3px;
+}
+
+/* --- the shelves --------------------------------------------------------- */
+
+.lib__shelf {
+  /* lands clear of both sticky bars when it is jumped to */
+  scroll-margin-top: 10em;
+  padding-top: 2.4em;
+}
+
+.lib__shelf + .lib__shelf {
+  margin-top: 2.2em;
+  border-top: 1px solid var(--lib-faint);
+}
+
+/*
+ * Columns that hold their width: a shelf with one or two components keeps the
+ * same three-up rhythm as the rest, rather than stretching one card across the
+ * page — the landing shelf fills its rows, but these do not always.
+ */
+.lib .shelf__grid {
+  grid-template-columns: repeat(auto-fill, minmax(max(20em, calc((100% - 3em) / 3)), 1fr));
+}
+
+.lib__shelfHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.4em 2em;
+  margin-bottom: 1.5em;
+}
+
+.lib__shelfTitle {
+  margin: 0;
+  color: var(--lib-ink);
+  font-size: 2em;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.lib__shelfCount {
+  margin-left: 0.35em;
+  color: var(--lib-accent);
+  font-size: 0.55em;
+  font-weight: 500;
+  letter-spacing: 0;
+  vertical-align: 0.9em;
+}
+
+.lib__shelfNote {
+  margin: 0;
+  max-width: 30em;
+  color: var(--lib-dim);
+  font-size: 1.05em;
+  line-height: 1.45;
+}
+
+.lib__eyebrow,
+.lib__title,
+.lib__lead,
+.lib__word,
+.lib__link,
+.lib__shelfTitle,
+.lib__shelfNote {
+  transition: color var(--pin-theme-fade) var(--pin-theme-ease);
+}
+
+/* --- narrow -------------------------------------------------------------- */
+
+@media (max-width: 700px) {
+  .lib__bar {
+    height: 4.2em;
+    padding: 0 1.6em;
+  }
+
+  .lib {
+    padding: 0 1.6em 4em;
+  }
+
+  .lib__intro {
+    padding: 2.8em 0 1.8em;
+  }
+
+  .lib__title {
+    font-size: 3.6em;
+  }
+
+  .lib__jumpWrap {
+    top: 4.2em;
+    margin: 0 -1.6em 0.8em;
+    padding: 0.8em 1.6em;
+  }
+
+  .lib__shelfHead {
+    display: block;
+  }
+
+  .lib__shelfNote {
+    margin-top: 0.5em;
+  }
+}
+
+/* a chip is a tap target first: a physical floor, not a typographic one */
+@media (pointer: coarse) {
+  .lib__chip {
+    min-height: 40px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lib__chip,
+  .lib__chipCount,
+  .lib__bar {
+    transition: none;
+  }
+}

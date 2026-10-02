@@ -3,6 +3,7 @@
 import { motion, useReducedMotion } from "motion/react";
 import { softSpring } from "@/lib/motion";
 import ComponentCard from "../library/ComponentCard";
+import ViewAllCard from "./ViewAllCard";
 import PinterestPeek from "./PinterestPeek";
 import { LIBRARY } from "../library/registry";
 
@@ -14,7 +15,11 @@ import { LIBRARY } from "../library/registry";
  * every time it passes the viewport — a shelf that replays itself on every
  * scroll up reads as a glitch rather than a flourish. Each card handles its own
  * entrance, because each also owns when its clip is allowed to load.
+ *
+ * The shelf is a preview: the newest eight, and a ninth cell that opens the
+ * whole library, so the grid always closes on a full row of three.
  */
+const SHOWN = 8;
 export default function UniqueSection() {
   const reduced = useReducedMotion();
 
@@ -46,9 +51,10 @@ export default function UniqueSection() {
       </motion.div>
 
       <ul className="shelf__grid">
-        {LIBRARY.map((entry, i) => (
+        {LIBRARY.slice(0, SHOWN).map((entry, i) => (
           <ComponentCard key={entry.slug} entry={entry} index={i} />
         ))}
+        <ViewAllCard index={Math.min(SHOWN, LIBRARY.length)} total={LIBRARY.length} />
       </ul>
 
       <motion.p className="shelf__note" {...rise(0.12)}>

@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import { motion, useReducedMotion } from "motion/react";
 import ThemeMark from "../ThemeMark";
 import { softSpring } from "@/lib/motion";
-import { LIBRARY } from "./registry";
+import { LIBRARY, byCategory } from "./registry";
 import CreatorDot from "./CreatorDot";
 import "@/app/hero.css";
 import "./workbench.css";
@@ -23,22 +23,24 @@ import "./workbench.css";
  * The mark is the theme switch here too, the same gesture as everywhere else on
  * the site; the wordmark beside it goes home.
  */
+/* the library on its shelves — fixed for the life of the page */
+const GROUPS = byCategory();
+
 export default function WorkbenchShell({ children }: { children: ReactNode }) {
   const reduced = useReducedMotion();
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
 
-  const listRef = useRef<HTMLUListElement>(null);
-  const itemRefs = useRef<(HTMLLIElement | null)[]>([]);
+  const listRef = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<Record<string, HTMLLIElement | null>>({});
   /* where the pin sits, measured rather than calculated from the type scale */
   const [pinTop, setPinTop] = useState<number | null>(null);
   /* and the rail it rides, spanning the first row's centre to the last one's */
   const [rail, setRail] = useState<{ top: number; height: number } | null>(null);
 
-  const activeIndex = Math.max(
-    0,
-    LIBRARY.findIndex((entry) => pathname === `/components/${entry.slug}`),
-  );
+  const active = LIBRARY.find((entry) => pathname === `/components/${entry.slug}`);
+  /* the shelf the open component sits on: the rail runs down that one only */
+  const activeGroup = GROUPS.find((group) => group.id === active?.category);
 
   /*
    * The pin is placed from the real position of the active row, so it stays on
@@ -50,9 +52,7 @@ export default function WorkbenchShell({ children }: { children: ReactNode }) {
 
     const place = () => {
       const list = listRef.current;
-      const item = itemRefs.current[activeIndex];
-      const rows = itemRefs.current.filter(Boolean) as HTMLLIElement[];
-      if (!list || !item || rows.length === 0) return;
+      if (!list) return;
       /*
        * A closed panel is zero pixels wide, and everything in it measures as
        * such. Reading the rows in that state put the rail and the pin on
@@ -61,18 +61,29 @@ export default function WorkbenchShell({ children }: { children: ReactNode }) {
        */
       if (list.offsetWidth === 0) return;
 
-      setPinTop(centre(item));
+      const item = active ? itemRefs.current[active.slug] : null;
+      setPinTop(item ? centre(item) : null);
+
+      const rows = (activeGroup?.entries ?? [])
+        .map((entry) => itemRefs.current[entry.slug])
+        .filter(Boolean) as HTMLLIElement[];
+      if (rows.length === 0) {
+        setRail(null);
+        return;
+      }
       const first = centre(rows[0]);
       const last = centre(rows[rows.length - 1]);
       /* the design runs the rail a little past the last row rather than
          stopping dead on it, which is what stops it reading as a scrollbar */
-      setRail({ top: first, height: Math.max(0, last - first) + 8 });
+      setRail({ top: first - 8, height: Math.max(0, last - first) + 16 });
     };
     place();
     window.addEventListener("resize", place);
     return () => window.removeEventListener("resize", place);
     /* `collapsed` is a dependency so the panel re-measures as it reopens */
-  }, [activeIndex, collapsed]);
+    // both are found in module-level constants, so they keep their identity between renders
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active?.slug, collapsed]);
 
   return (
     <div className="site site--wb" data-collapsed={collapsed}>
@@ -119,9 +130,13 @@ export default function WorkbenchShell({ children }: { children: ReactNode }) {
           </button>
         </div>
 
-        <h1 className="wbnav__title">Components</h1>
+        <h1 className="wbnav__title">
+          <Link className="wbnav__titleLink" href="/components">
+            Components
+          </Link>
+        </h1>
 
-        <ul className="wbnav__list" ref={listRef}>
+        <div className="wbnav__list" ref={listRef}>
           {rail && (
             <span
               className="wbnav__rail"
@@ -140,26 +155,35 @@ export default function WorkbenchShell({ children }: { children: ReactNode }) {
             <span className="wbnav__pin" aria-hidden="true" style={{ top: pinTop }} />
           )}
 
-          {LIBRARY.map((entry, i) => (
-            <li
-              className="wbnav__item"
-              key={entry.slug}
-              ref={(el) => {
-                itemRefs.current[i] = el;
-              }}
-            >
-              <Link
-                className="wbnav__link"
-                href={`/components/${entry.slug}`}
-                aria-current={i === activeIndex ? "page" : undefined}
-              >
-                <span className="wbnav__text">{entry.name}</span>
-                {entry.isNew && <span className="wbnav__new">New</span>}
-                {entry.creator && <CreatorDot {...entry.creator} />}
-              </Link>
-            </li>
+          {GROUPS.map((group) => (
+            <section className="wbnav__group" key={group.id} aria-labelledby={`wbnav-${group.id}`}>
+              <h2 className="wbnav__groupLabel" id={`wbnav-${group.id}`}>
+                {group.name}
+              </h2>
+              <ul className="wbnav__rows">
+                {group.entries.map((entry) => (
+                  <li
+                    className="wbnav__item"
+                    key={entry.slug}
+                    ref={(el) => {
+                      itemRefs.current[entry.slug] = el;
+                    }}
+                  >
+                    <Link
+                      className="wbnav__link"
+                      href={`/components/${entry.slug}`}
+                      aria-current={entry.slug === active?.slug ? "page" : undefined}
+                    >
+                      <span className="wbnav__text">{entry.name}</span>
+                      {entry.isNew && <span className="wbnav__new">New</span>}
+                      {entry.creator && <CreatorDot {...entry.creator} />}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
           ))}
-        </ul>
+        </div>
       </nav>
 
       {collapsed && (

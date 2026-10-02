@@ -1,0 +1,54 @@
+/* ===========================================================================
+   Joystick — a pixel-art arcade stick.
+
+   One unit, --pjoy-px: the size of one art pixel on screen, set by the
+   component to the largest whole pixel its container has room for. The canvas
+   is 64 × 52 art pixels and is drawn at exactly that multiple, so the art never
+   blurs between pixels.
+=========================================================================== */
+
+.pjoy {
+  --pjoy-px: 8px;
+  --pjoy-glow: #b4c9e0;
+  --pjoy-ink: #1b2440;
+
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  /* room round the stick for the pool of light and the gate's knock */
+  padding: calc(var(--pjoy-px) * 4);
+  background: radial-gradient(closest-side at 50% 52%, var(--pjoy-glow), transparent 78%);
+  outline: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.3s ease;
+}
+
+/* at night: navy, with the light pooled a shade brighter */
+.pjoy[data-theme="dark"] {
+  --pjoy-glow: #2d3750;
+  --pjoy-ink: #e8edf7;
+}
+
+.pjoy[data-input="keys"]:focus-visible {
+  outline: 3px dashed var(--pjoy-ink);
+  outline-offset: -3px;
+}
+
+.pjoy__stage {
+  cursor: grab;
+  touch-action: none;
+  will-change: transform;
+}
+.pjoy__stage:active {
+  cursor: grabbing;
+}
+
+.pjoy__canvas {
+  display: block;
+  width: calc(var(--pjoy-px) * 64);
+  height: calc(var(--pjoy-px) * 52);
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}

@@ -132,7 +132,7 @@ export function componentJsonLd(component: ComponentMeta) {
     },
     breadcrumbJsonLd([
       { name: "Home", url: SITE_URL },
-      { name: "Components", url: `${SITE_URL}/#components` },
+      { name: "Components", url: `${SITE_URL}/components` },
       { name: component.name, url: pageUrl },
     ]),
   ];

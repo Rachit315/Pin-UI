@@ -11,7 +11,10 @@ tsconfig.tsbuildinfo
 # secrets - the Supabase key and site URL live here, never in the repo
 .env*.local
 
-# cloudflare / opennext build output and local secrets
+# vercel cli
+.vercel
+
+# leftovers from the old Cloudflare setup: build output and a local secrets file
 .open-next
 .wrangler
 .dev.vars*
@@ -34,3 +37,4 @@ Chips/
 OTP/
 /Record/
 /Taxi/
+/Joystick/

@@ -30,6 +30,20 @@ export type PropSpec = {
   note: string;
 };
 
+/**
+ * The shelves the library is sorted onto — the sections of the index page and
+ * of the sidebar, in the order they are read. A component's place within its
+ * shelf is its place in LIBRARY, newest first.
+ */
+export const CATEGORIES = [
+  { id: "controls", name: "Inputs & controls" },
+  { id: "cards", name: "Cards & widgets" },
+  { id: "media", name: "Audio & media" },
+  { id: "lists", name: "Lists & pickers" },
+] as const;
+
+export type CategoryId = (typeof CATEGORIES)[number]["id"];
+
 export type Entry = {
   slug: string;
   /** The name on the shelf card. */
@@ -105,6 +119,8 @@ export type Entry = {
   clipStage?: string;
   /** Recently added: flagged with a "New" tag in the sidebar and on the shelf. */
   isNew?: boolean;
+  /** Which shelf it sits on, in the sidebar and on the index page. */
+  category: CategoryId;
   /**
    * Who made it, shown as a small colour-cycling dot after the name — in the
    * sidebar and on the shelf — with a tooltip that links to their X profile.
@@ -129,7 +145,48 @@ export type Entry = {
 
 export const LIBRARY: Entry[] = [
   {
+    slug: "joystick",
+    category: "controls",
+    name: "Joystick",
+    isNew: true,
+    tagline: "A pixel-art arcade stick you can grab, push to the gate and let snap back.",
+    blurb:
+      "A real arcade stick, drawn a pixel at a time. Grab the ball and it follows your hand through an octagonal gate; let go and the return spring overshoots and settles. Four microswitches click as it crosses into each direction, the shaft knocks on the gate, and the spring twangs on release — all synthesised, with haptics on phones and rumble on a gamepad.",
+    highlights: ["Rasterised every frame", "Octagonal gate", "Microswitch clicks", "Keys and gamepad"],
+    clip: "/clips/loop/joystick.mp4",
+    poster: "/clips/loop/joystick.jpg",
+    hero: false,
+    sound: true,
+    zoom: 0.9,
+    stage: "#9ab5d3",
+    stageDark: "#1f2638",
+    wide: true,
+    usage: `import Joystick from "@/components/library/Joystick";
+
+<Joystick theme="light" onSwitch={(direction, on) => console.log(direction, on)} />`,
+    props: [
+      { name: "pixel", type: "number", fallback: "8", note: "The size of one art pixel, in CSS pixels. It steps down by whole pixels to fit a narrow container." },
+      { name: "sound", type: "boolean", fallback: "true", note: "Microswitch clicks, the gate's knock and the spring's twang, synthesised at play time." },
+      { name: "theme", type: "\"light\" | \"dark\"", fallback: "\"light\"", note: "Arcade blue by day, navy at night. The stick itself is the same red ball in both." },
+      { name: "autoFocus", type: "boolean", fallback: "false", note: "Take focus on mount, so the arrow keys and WASD drive it straight away." },
+      { name: "onMove", type: "(x, y) => void", note: "Fired as the stick moves, with x and y in −1…1; +y is toward the player." },
+      { name: "onSwitch", type: "(direction, on) => void", note: "Fired as each of the four microswitches makes and breaks — the events a game would read." },
+    ],
+    files: [
+      { name: "Joystick.tsx", lang: "tsx" },
+      { name: "joystick.css", lang: "css" },
+    ],
+    info: {
+      paragraphs: [
+        "Drag the red ball and the stick leans after it, tracking your hand on a stiff spring with a little mass; push it to the edge and it stops on an octagonal restrictor gate, flat sides facing the eight directions, with a knock and a nudge of the whole stick. Let go and the return spring throws it back past the centre and lets it settle. Focused, the arrow keys and WASD drive it, and a connected gamepad's stick or d-pad does too.",
+        "Nothing here is a sprite. The plate, the shaft and the ball are rasterised every frame onto a 64 × 52 canvas — outlined, banded and dithered like hand-made pixel art — from the stick's real 3D tilt, so every angle stays crisp, and the canvas is then scaled up by whole pixels. Four microswitches make and break with a little hysteresis so they never chatter, each with its own click.",
+      ],
+    },
+    origin: { label: "Joystick" },
+  },
+  {
     slug: "weather",
+    category: "cards",
     name: "Weather",
     isNew: true,
     tagline: "A weather square that opens out into a five-day forecast.",
@@ -169,6 +226,7 @@ export const LIBRARY: Entry[] = [
   },
   {
     slug: "recorder",
+    category: "media",
     name: "Recorder",
     isNew: true,
     tagline: "A voice recorder with a waveform that scrolls under the playhead.",
@@ -207,6 +265,7 @@ export const LIBRARY: Entry[] = [
   },
   {
     slug: "taxi",
+    category: "cards",
     name: "Taxi",
     isNew: true,
     tagline: "Hail a cab in one tap, and ride the whole trip on one card.",
@@ -246,6 +305,7 @@ export const LIBRARY: Entry[] = [
   },
   {
     slug: "chips",
+    category: "controls",
     name: "Chips",
     isNew: true,
     tagline: "A selection list of 3D chips that press into the surface.",
@@ -285,6 +345,7 @@ export const LIBRARY: Entry[] = [
   },
   {
     slug: "otp-input",
+    category: "controls",
     name: "Egg OTP",
     isNew: true,
     creator: { handle: "RachitThakur146", url: "https://x.com/RachitThakur146" },
@@ -327,6 +388,7 @@ export const LIBRARY: Entry[] = [
   },
   {
     slug: "add-member",
+    category: "lists",
     name: "Add Member",
     isNew: true,
     tagline: "Pick people for a project, and watch their faces fly into the stack.",
@@ -364,6 +426,7 @@ export const LIBRARY: Entry[] = [
   },
   {
     slug: "session-list",
+    category: "lists",
     name: "Count down",
     tagline: "A session broken into blocks, counting down in real time.",
     blurb:
@@ -399,6 +462,7 @@ export const LIBRARY: Entry[] = [
   },
   {
     slug: "balance-card",
+    category: "cards",
     name: "Balance Card",
     tagline: "A counting balance, a liquid currency selector and a drawer that settles.",
     blurb:
@@ -435,6 +499,7 @@ export const LIBRARY: Entry[] = [
   },
   {
     slug: "cart-card",
+    category: "cards",
     name: "Add To Cart",
     tagline: "A product card that is only a photo until you open it.",
     blurb:
@@ -472,3 +537,11 @@ export const LIBRARY: Entry[] = [
 
 
 export const bySlug = (slug: string) => LIBRARY.find((entry) => entry.slug === slug);
+
+/** The library sorted onto its shelves, empty shelves left out. */
+export function byCategory() {
+  return CATEGORIES.map((category) => ({
+    ...category,
+    entries: LIBRARY.filter((entry) => entry.category === category.id),
+  })).filter((group) => group.entries.length > 0);
+}

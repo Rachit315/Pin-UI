@@ -13,6 +13,7 @@ import AddMember from "./AddMember";
 import Weather from "./Weather";
 import Recorder from "./Recorder";
 import Taxi from "./Taxi";
+import Joystick from "./Joystick";
 import type { Entry } from "./registry";
 import { LINKS } from "@/lib/links";
 import { usePinTheme } from "@/lib/theme";
@@ -99,6 +100,7 @@ export default function WorkbenchStage({
           {entry.slug === "weather" && <Weather theme={theme} />}
           {entry.slug === "recorder" && <Recorder theme={theme} sound={sound} autoFocus />}
           {entry.slug === "taxi" && <Taxi theme={theme} sound={sound} />}
+          {entry.slug === "joystick" && <Joystick theme={theme} sound={sound} autoFocus />}
         </div>
 
         {entry.slug === "chips" && <ChipsEditor value={chips} onChange={setChips} />}

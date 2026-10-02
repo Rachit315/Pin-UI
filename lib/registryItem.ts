@@ -53,6 +53,7 @@ const FACES: Record<string, string | null> = {
   weather: "Inter Tight",
   recorder: "Roboto Mono (500)",
   taxi: "Inter (500 and 600) — after SF Pro, where the system has it",
+  joystick: null,
 };
 
 function docsFor(entry: Entry): string {

@@ -249,6 +249,110 @@ html[data-pin-scroll="smooth"] {
   }
 }
 
+/*
+ * View all — Figma 422:9 / 422:20.
+ *
+ * The last cell, filling it edge to edge where the others are framed cards,
+ * and exactly as tall as they are. The label sits on the bottom edge and the
+ * arrow on the top, so the design reads the same at any height.
+ * Measured in `cqw`, hundredths of its own width, so the 406 × 320 frame keeps
+ * its proportions at every column width: the label, the arrow and the gaps
+ * around them are the design's pixels divided by 4.06.
+ *
+ * The fields are the design's dither, as 32px tiles of 2px cells. They are
+ * drawn pixelated so a scaled page never smooths them into a flat grey.
+ */
+.viewall {
+  position: relative;
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  container-type: inline-size;
+  background: #000000;
+  color: #ffffff;
+  text-decoration: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.viewall__ghost {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.viewall__field {
+  position: absolute;
+  inset: 0;
+  background: url("/dither/view-all-rest.png") 0 0 / 32px 32px repeat;
+  image-rendering: pixelated;
+}
+
+.viewall__field--lit {
+  background-image: url("/dither/view-all-hover.png");
+  opacity: 0;
+  transition: opacity 0.32s cubic-bezier(0.22, 0.68, 0.16, 1);
+}
+
+.viewall__arrow {
+  position: absolute;
+  top: 4.19cqw;
+  left: 75.12cqw;
+  width: 20.69cqw;
+  height: 20.94cqw;
+  will-change: transform;
+}
+
+.viewall__arrow svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.viewall__label {
+  position: absolute;
+  bottom: 5.74cqw;
+  left: 5.91cqw;
+  width: 65.3cqw;
+  font-size: 10.43cqw;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.viewall:focus-visible {
+  outline: 2px solid var(--sec-ink);
+  outline-offset: 3px;
+}
+
+.viewall:focus-visible .viewall__field--lit,
+.viewall:active .viewall__field--lit {
+  opacity: 1;
+}
+
+@media (hover: hover) {
+  .viewall:hover .viewall__field--lit {
+    opacity: 1;
+  }
+}
+
+/* a touch screen cannot point first: a press lights it, and lifts it a touch */
+@media (hover: none) {
+  .viewall {
+    transition: transform 0.2s cubic-bezier(0.22, 0.68, 0.16, 1);
+  }
+
+  .viewall:active {
+    transform: scale(0.985);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .viewall__field--lit {
+    transition-duration: 0.01ms;
+  }
+}
+
 .shelf__note {
   margin: 2.4em 0 0;
   text-align: center;

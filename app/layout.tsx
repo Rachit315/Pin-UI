@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { SITE_URL } from "@/lib/site";
 import FaviconSync from "@/components/FaviconSync";
 import NoFlashScript from "@/components/NoFlashScript";
@@ -153,6 +154,12 @@ export default function RootLayout({
       <body>
         <FaviconSync />
         {children}
+        {/*
+          Vercel Web Analytics: page views counted in aggregate, with no cookies
+          and no cross-site tracking. It only reports from a Vercel deployment —
+          in development it stays in debug mode and sends nothing.
+        */}
+        <Analytics />
       </body>
     </html>
   );

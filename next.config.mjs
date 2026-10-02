@@ -38,6 +38,7 @@ const nextConfig = {
    */
   outputFileTracingIncludes: {
     "/components/[slug]": ["./components/library/*.tsx", "./components/library/*.css"],
+    "/r/[slug]": ["./components/library/*.tsx", "./components/library/*.css"],
   },
 
   /*
