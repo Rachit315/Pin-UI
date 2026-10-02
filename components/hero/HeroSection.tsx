@@ -4,6 +4,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import HeroMarquee from "./HeroMarquee";
 import PinterestPeek from "./PinterestPeek";
 import GitHubStars from "./GitHubStars";
+import SubmitNotch from "./SubmitNotch";
 import ThemeMark from "../ThemeMark";
 import { softSpring, spring } from "@/lib/motion";
 import { useRailed } from "./useRailed";
@@ -46,6 +47,8 @@ export default function HeroSection() {
   return (
     <main className="hero" id="top">
       <div className="hero__frame">
+        <SubmitNotch />
+
         {/*
           The masthead stands down once the rail takes over, and the mark is
           handed across by a shared `layoutId` rather than fading out here and

@@ -162,6 +162,139 @@
   overflow: hidden;
 }
 
+/* --- the notch — Figma 439:159 / 439:239 ----------------------------------- */
+/*
+ * Hung from the top edge of the frame, centred, above the masthead. Its own
+ * em is a tenth larger than the hero's, with a floor of 14px, so the shut line is never too small
+ * to read on a phone: 320 wide, 32 tall shut and 108 open, with 40px corners
+ * at the bottom. Black in both states, like the hardware it is borrowed from.
+ */
+.notch {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 4;
+  width: 20em;
+  margin-left: -10em;
+  font-size: max(1.1em, 14px);
+}
+
+.notch__body {
+  position: relative;
+  height: 2em;
+  overflow: hidden;
+  border-radius: 0 0 2.5em 2.5em;
+  background: #000000;
+  color: #f4f4f4;
+  cursor: default;
+}
+
+/* the hover zone reaches a little below the strip, so it is easy to catch */
+.notch__body::after {
+  content: "";
+  position: absolute;
+  inset: 100% 0 auto;
+  height: 0.75em;
+}
+
+/* the concave fillets where a notch meets its bezel */
+.notch__shoulder {
+  position: absolute;
+  top: 0;
+  width: 0.75em;
+  height: 0.75em;
+  pointer-events: none;
+}
+
+.notch__shoulder--left {
+  right: 100%;
+  background: radial-gradient(circle at 0 100%, transparent 0.74em, #000000 0.75em);
+}
+
+.notch__shoulder--right {
+  left: 100%;
+  background: radial-gradient(circle at 100% 100%, transparent 0.74em, #000000 0.75em);
+}
+
+/*
+ * Open, the notch is one centred column: 1.05em of air, the 20px line, 0.7em,
+ * the stamp, then 1.25em to the curve. The line sits at its open size and is
+ * scaled to 15px when shut, centred in the 32px strip.
+ */
+.notch__title {
+  position: absolute;
+  top: 0.84em; /* 1.05em of the notch, in the line's own em */
+  left: 0;
+  right: 0;
+  margin: 0;
+  font-size: 1.25em;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-align: center;
+  white-space: nowrap;
+  transform-origin: 50% 50%;
+  user-select: none;
+}
+
+.notch__submit {
+  position: absolute;
+  top: 3.25em;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 6em;
+  height: 2.25em;
+  margin-left: -3em;
+  color: #e60024;
+  text-decoration: none;
+  outline: none;
+}
+
+.notch__stamp {
+  position: absolute;
+  inset: 0;
+  background: #ffffff;
+  mask-image: url("/hero/stamp-submit.svg");
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  transition: background-color 0.2s ease;
+}
+
+.notch__submitLabel {
+  position: relative;
+  /* optically centred: the arrow's side bearing pulls the line a hair left */
+  padding-left: 0.1em;
+  font-size: 0.875em;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+/* hover changes colour only — the stamp stays exactly where it is */
+@media (hover: hover) {
+  .notch__submit:hover .notch__stamp {
+    background: #ffe3e7;
+  }
+}
+
+.notch__submit:active .notch__stamp {
+  background: #ffd1d8;
+}
+
+.notch__submit:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+}
+
+@media (max-width: 700px) {
+  .notch {
+    width: 18em;
+    margin-left: -9em;
+  }
+}
+
 /* --- masthead ------------------------------------------------------------ */
 
 .hero__masthead {
@@ -680,7 +813,8 @@
     flex-direction: column;
     justify-content: space-between;
     gap: 2.6em;
-    padding: var(--hero-gutter) var(--hero-gutter) 2.8em;
+    /* the top clears the notch's shut strip (32px at 16px, never under 26px) */
+    padding: calc(var(--hero-gutter) + max(2.4em, 30px)) var(--hero-gutter) 2.8em;
   }
 
   .hero__masthead,
