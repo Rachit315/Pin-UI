@@ -140,15 +140,136 @@ export type Entry = {
     paragraphs: string[];
     /** The Pinterest pin it came from, when the original recorded one. */
     pin?: string;
+    /** The designer's own site, credited after the pin. */
+    credit?: { label: string; href: string };
   };
 };
 
 export const LIBRARY: Entry[] = [
   {
+    slug: "liquid-tabs",
+    category: "lists",
+    name: "Liquid Tabs",
+    isNew: true,
+    tagline: "A notifications card whose active tab is liquid, flowing from tab to tab.",
+    blurb:
+      "The card and its active tab are one liquid shape: switch tabs and the tab slides under the next label, flowing into the card on the way. Rows leave toward where you came from and arrive from where you went, through a blur; the selected row's avatar inverts with a bounce, and the chevron swaps the third tab from an overflow menu.",
+    highlights: ["Liquid folder tab", "Direction-aware rows", "Overflow tab menu", "Light and dark"],
+    clip: "/clips/loop/liquid-tabs.mp4?v=2",
+    poster: "/clips/loop/liquid-tabs.jpg?v=2",
+    hero: false,
+    sound: false,
+    zoom: 1,
+    stage: "#e9e9eb",
+    clipStage: "#e8e8e8",
+    stageDark: "#0c0c0e",
+    usage: `import LiquidTabs from "@/components/library/LiquidTabs";
+
+<LiquidTabs corner={20} rows={4} theme="light" onSelect={(item, tab) => console.log(tab, item)} />`,
+    props: [
+      { name: "corner", type: "number", fallback: "20", note: "The card's corner radius, clamped to 0–40px. The tab and the menu follow it." },
+      { name: "rows", type: "2 | 3 | 4", fallback: "4", note: "How many rows each tab shows; the card is exactly that tall." },
+      { name: "theme", type: "\"light\" | \"dark\"", fallback: "\"light\"", note: "A white card on a grey strip, or graphite on near-black." },
+      { name: "onSelect", type: "(item, tab) => void", note: "Fired when a row is selected, with the tab it is on." },
+    ],
+    files: [
+      { name: "LiquidTabs.tsx", lang: "tsx" },
+      { name: "liquid-tabs.css", lang: "css" },
+    ],
+    info: {
+      paragraphs: [
+        "The card's body and the active tab are drawn as two shapes under one goo filter, so the tab reads as part of the card — a folder tab — and when you switch, it slides under the next label on a spring and the two run together on the way. The grey strip behind the other tabs sits outside the filter, so they stay flat.",
+        "The rows know which way you went: they leave toward the tab you came from and arrive from the one you went to, through a blur, on a short stagger. Hovering slides one highlight between rows, the selected row's avatar inverts with a small bounce, and the chevron opens an overflow menu whose pick replaces the third tab — its label rolling over as the tab slides to it. Arrow keys move between tabs.",
+      ],
+    },
+    origin: { label: "tab" },
+  },
+  {
+    slug: "thermal-dial",
+    category: "cards",
+    name: "Thermal Dial",
+    isNew: true,
+    tagline: "A thermal dial that undulates with heat and rolls through the seasons.",
+    blurb:
+      "Grab the dial and drag: 96 radial ticks undulate with a travelling wave and trailing comet while the needle sweeps. The season title staggers through a blur, the numbers roll per digit, and the ambient wash breathes with dynamic temperature gradient colors.",
+    highlights: ["Travelling wave ticks", "Seasons blur swap", "Dynamic heat wash", "Drag or scroll to dial"],
+    clip: "/clips/loop/thermal-dial.mp4?v=2",
+    poster: "/clips/loop/thermal-dial.jpg?v=2",
+    hero: false,
+    sound: false,
+    zoom: 1,
+    stage: "#ebe9e5",
+    clipStage: "#050706",
+    /* the glow under the dial runs past its box; clipped there it draws a hard line on a short stage */
+    spill: true,
+    stageDark: "#060606",
+    usage: `import ThermalDial from "@/components/library/ThermalDial";
+
+<ThermalDial defaultValue={38} theme="dark" onChange={(value, season) => console.log(value, season)} />`,
+    props: [
+      { name: "defaultValue", type: "number", fallback: "38", note: "The reading it sweeps up to and settles on when it first appears." },
+      { name: "min", type: "number", fallback: "-9", note: "The bottom of the scale." },
+      { name: "max", type: "number", fallback: "70", note: "The top of the scale." },
+      { name: "size", type: "number", fallback: "340", note: "How wide the card is drawn, in px. Everything on it scales with it; it never exceeds 80% of the viewport." },
+      { name: "theme", type: "\"light\" | \"dark\"", fallback: "\"dark\"", note: "Obsidian with an ember glow, or the same card in daylight porcelain." },
+      { name: "hint", type: "boolean", fallback: "true", note: "The line under the card saying how to use it." },
+      { name: "onChange", type: "(value, season) => void", note: "Fired whenever the reading is set, with the season it falls in." },
+    ],
+    files: [
+      { name: "ThermalDial.tsx", lang: "tsx" },
+      { name: "thermal-dial.css", lang: "css" },
+    ],
+    info: {
+      credit: { label: "bencho.dev", href: "https://bencho.dev/" },
+      paragraphs: [
+        "A hardware-inspired thermal dial. Grab the card and drag along its circumference to set the reading; the needle tracks your pointer on a damped spring that overshoots and settles with natural inertia, while mouse wheel and arrow keys step through whole degrees.",
+        "The radial ring is 96 ticks that carry an undulating wave and a brighter comet at the head. The digits roll individually with blur transitions, the season name changes with staggered letter-by-letter blurs, and the bottom heat wash blends through five dynamic color stops from deep arctic blue to scorching crimson.",
+      ],
+    },
+    origin: { label: "Temp" },
+  },
+  {
+    slug: "lamp-switch",
+    category: "controls",
+    name: "Lamp Switch",
+    isNew: true,
+    tagline: "A hanging ceramic lamp that swings on a cord and toggles with a liquid switch.",
+    blurb:
+      "A ceramic pendant lamp that drops in on its cord, lands into a stretch and a swing, and switches itself on. Pull the lamp down past the detent to click the light like a pull-chain, or drag the liquid switch with elastic rubber-banding. Turning it on flickers the bulb to life, casting a warm beam and ambient glow.",
+    highlights: ["Physics pendulum swing", "Pull-cord chain detent", "Liquid gooey switch", "Bulb warm-up flicker"],
+    clip: "/clips/loop/lamp-switch.mp4?v=2",
+    poster: "/clips/loop/lamp-switch.jpg?v=2",
+    hero: false,
+    sound: false,
+    zoom: 1,
+    stage: "#e4dfd6",
+    clipStage: "#e0ddd4",
+    stageDark: "#313539",
+    usage: `import LampSwitch from "@/components/library/LampSwitch";
+
+<LampSwitch theme="dark" onToggle={(on) => console.log(on)} />`,
+    props: [
+      { name: "autoOn", type: "boolean", fallback: "true", note: "Switch the light on by itself once the lamp has dropped in and landed." },
+      { name: "theme", type: "\"light\" | \"dark\"", fallback: "\"dark\"", note: "A dim room with a warm bulb, or the same lamp in a daylit parchment room." },
+      { name: "size", type: "number", fallback: "354", note: "The card's size in px at most. It shrinks to fit a narrow container, and the physics scales with it." },
+      { name: "onToggle", type: "(on) => void", note: "Fired whenever the light turns on or off — by the switch, or by pulling the lamp." },
+    ],
+    files: [
+      { name: "LampSwitch.tsx", lang: "tsx" },
+      { name: "lamp-switch.css", lang: "css" },
+    ],
+    info: {
+      paragraphs: [
+        "A suspended pendant lamp drawn inside an architectural shadow box. The lamp hangs on a flexible cord governed by semi-implicit Euler integration: drag it sideways to set it swinging on a pendulum, or tug it down past the detent to click the pull-chain mechanism and toggle the light.",
+        "The toggle switch at the base uses an SVG gooey filter: dragging the knob stretches a trailing drop that snaps with velocity projection. Turning it on runs a realistic bulb warm-up flicker sequence, illuminating the room with a radial beam and glowing ambient halo.",
+      ],
+    },
+    origin: { label: "On,off" },
+  },
+  {
     slug: "joystick",
     category: "controls",
     name: "Joystick",
-    isNew: true,
     tagline: "A pixel-art arcade stick you can grab, push to the gate and let snap back.",
     blurb:
       "A real arcade stick, drawn a pixel at a time. Grab the ball and it follows your hand through an octagonal gate; let go and the return spring overshoots and settles. Four microswitches click as it crosses into each direction, the shaft knocks on the gate, and the spring twangs on release — all synthesised, with haptics on phones and rumble on a gamepad.",
@@ -188,7 +309,6 @@ export const LIBRARY: Entry[] = [
     slug: "weather",
     category: "cards",
     name: "Weather",
-    isNew: true,
     tagline: "A weather square that opens out into a five-day forecast.",
     blurb:
       "One card, two states. Tap the square and it springs open into a black shell with the forecast sliding out beside it; pick a day and the panel takes its colour while the temperature rolls to the new reading, digit by digit. Every dimension is a custom property, so a tap mid-flight retargets from wherever the card has got to.",
@@ -228,7 +348,6 @@ export const LIBRARY: Entry[] = [
     slug: "recorder",
     category: "media",
     name: "Recorder",
-    isNew: true,
     tagline: "A voice recorder with a waveform that scrolls under the playhead.",
     blurb:
       "Record, pause, save, play back and scrub, on a dark card with a superellipse outline. The waveform is a fixed pool of bars driven by one frame loop, fading into progressive glass at both edges, and every key presses with real travel and a synthesised click. No microphone: the signal is generated, so it works anywhere.",
@@ -267,7 +386,6 @@ export const LIBRARY: Entry[] = [
     slug: "taxi",
     category: "cards",
     name: "Taxi",
-    isNew: true,
     tagline: "Hail a cab in one tap, and ride the whole trip on one card.",
     blurb:
       "One tap runs the ride: hailing, a driver found, the cab at the curb, the trip counting down, and a rating at the end. The corner glyph morphs point for point from a waving person to the cab to a check, gooey blobs burst off the panel at every milestone, and each beat has its own sound — the horn, the door, the engine.",
@@ -307,7 +425,6 @@ export const LIBRARY: Entry[] = [
     slug: "chips",
     category: "controls",
     name: "Chips",
-    isNew: true,
     tagline: "A selection list of 3D chips that press into the surface.",
     blurb:
       "Every chip is extruded: its lip is a hard shadow as deep as the chip travels, and a press drives it down by exactly that much while the lip shrinks to match, so it lands on its own edge instead of just shrinking. The selected chip stays pressed in, inverted, a pixel proud of the surface.",
@@ -347,7 +464,6 @@ export const LIBRARY: Entry[] = [
     slug: "otp-input",
     category: "controls",
     name: "Egg OTP",
-    isNew: true,
     creator: { handle: "RachitThakur146", url: "https://x.com/RachitThakur146" },
     tagline: "A one-time-code field made of eggs that crack on a wrong code.",
     blurb:
@@ -390,7 +506,6 @@ export const LIBRARY: Entry[] = [
     slug: "add-member",
     category: "lists",
     name: "Add Member",
-    isNew: true,
     tagline: "Pick people for a project, and watch their faces fly into the stack.",
     blurb:
       "The header springs the list open. Each row's toggle fills with a gooey drop that turns its plus into a minus, and the face flies from the row into the stack above Add to Project. Every sequence writes its end state down once it has had its time, so a background tab can never leave the card half-open.",

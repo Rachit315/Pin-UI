@@ -1,0 +1,388 @@
+/* ===========================================================================
+   Liquid Tabs.
+
+   The card's body and its active tab are two shapes under one goo filter, so
+   the tab is part of the card; the grey strip behind the other tabs sits
+   outside the filter, under both. Everything is themed through the tokens
+   below, which cross-fade when the theme flips.
+=========================================================================== */
+
+.pltabs {
+  --pltabs-card: #ffffff;
+  --pltabs-strip: #dfdfe2;
+  --pltabs-text: #0a0a0a;
+  --pltabs-tab-idle: #52525b;
+  --pltabs-muted: #71717a;
+  --pltabs-faint: #a1a1aa;
+  --pltabs-divider: #ececee;
+  --pltabs-hover: rgb(0 0 0 / 0.045);
+  --pltabs-ring: rgb(10 10 10 / 0.3);
+  --pltabs-avatar: #efeff1;
+  --pltabs-avatar-fg: #0a0a0a;
+  --pltabs-avatar-on: #1c1c1e;
+  --pltabs-avatar-on-fg: #ffffff;
+  --pltabs-card-shadow: drop-shadow(0 1px 1px rgb(0 0 0 / 0.04)) drop-shadow(0 8px 22px rgb(0 0 0 / 0.08));
+  --pltabs-menu-shadow: 0 10px 30px rgb(0 0 0 / 0.12);
+
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  color: var(--pltabs-text);
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pltabs[data-theme="dark"] {
+  --pltabs-card: #1d1d20;
+  --pltabs-strip: #141416;
+  --pltabs-text: #f4f4f5;
+  --pltabs-tab-idle: #a1a1aa;
+  --pltabs-muted: #8e8e96;
+  --pltabs-faint: #63636b;
+  --pltabs-divider: #2a2a2e;
+  --pltabs-hover: rgb(255 255 255 / 0.05);
+  --pltabs-ring: rgb(255 255 255 / 0.35);
+  --pltabs-avatar: #2a2a2f;
+  --pltabs-avatar-fg: #f4f4f5;
+  --pltabs-avatar-on: #f4f4f5;
+  --pltabs-avatar-on-fg: #111113;
+  --pltabs-card-shadow: drop-shadow(0 1px 0 rgb(255 255 255 / 0.04)) drop-shadow(0 12px 28px rgb(0 0 0 / 0.55));
+  --pltabs-menu-shadow: 0 12px 32px rgb(0 0 0 / 0.5);
+}
+
+.pltabs__defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+/* surfaces cross-fade when the theme flips */
+.pltabs__strip,
+.pltabs__body,
+.pltabs__blob,
+.pltabs__divider {
+  transition: background-color 0.4s ease;
+}
+
+.pltabs__strip {
+  position: absolute;
+  top: 6px;
+  right: 0;
+  left: 0;
+  background: var(--pltabs-strip);
+}
+
+.pltabs__surface {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  filter: var(--pltabs-card-shadow);
+}
+
+.pltabs__gooLayer {
+  position: absolute;
+  inset: 0;
+}
+
+.pltabs__body {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: var(--pltabs-card);
+}
+
+.pltabs__blob {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: var(--pltabs-card);
+}
+
+/* ── tabs ── */
+
+.pltabs__bar {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+}
+
+.pltabs__tabs {
+  display: flex;
+  align-items: stretch;
+}
+
+.pltabs__tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 84px;
+  padding: 0 20px;
+  border: 0;
+  background: none;
+  color: var(--pltabs-tab-idle);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  outline: none;
+  transition:
+    color 0.3s ease,
+    font-weight 0.3s ease;
+}
+
+.pltabs__tab[data-active="true"] {
+  color: var(--pltabs-text);
+  font-weight: 600;
+}
+
+@media (hover: hover) {
+  .pltabs__tab:hover {
+    color: var(--pltabs-text);
+  }
+}
+
+.pltabs__tabLabel {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  padding: 0 2px;
+  white-space: nowrap;
+}
+
+.pltabs__tab:focus-visible .pltabs__tabLabel {
+  border-radius: 6px;
+  box-shadow: 0 0 0 2px var(--pltabs-ring);
+}
+
+.pltabs__tabText {
+  display: block;
+}
+
+.pltabs__underline {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  width: 60px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--pltabs-text);
+  translate: -50% 0;
+}
+
+.pltabs__more {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  padding: 6px 10px 0 0;
+}
+
+.pltabs__chevron {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--pltabs-text);
+  cursor: pointer;
+  outline: none;
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+@media (hover: hover) {
+  .pltabs__chevron:hover {
+    background: var(--pltabs-hover);
+  }
+}
+
+.pltabs__chevron:active {
+  transform: scale(0.95);
+}
+
+.pltabs__chevron:focus-visible {
+  box-shadow: 0 0 0 2px var(--pltabs-ring);
+}
+
+.pltabs__chevronIcon {
+  display: grid;
+}
+
+.pltabs__menu {
+  position: absolute;
+  top: 46px;
+  right: 8px;
+  z-index: 30;
+  width: 160px;
+  padding: 4px;
+  border: 1px solid var(--pltabs-divider);
+  background: var(--pltabs-card);
+  box-shadow: var(--pltabs-menu-shadow);
+}
+
+.pltabs__menuItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--pltabs-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.2s ease;
+}
+
+.pltabs__menuItem:hover,
+.pltabs__menuItem:focus-visible {
+  background: var(--pltabs-hover);
+}
+
+.pltabs__check {
+  display: grid;
+}
+
+/* ── rows ── */
+
+.pltabs__panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.pltabs__list {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  padding: 0 6px;
+  list-style: none;
+}
+
+.pltabs__item {
+  position: relative;
+}
+
+.pltabs__divider {
+  position: absolute;
+  top: 0;
+  right: 16px;
+  left: 16px;
+  height: 1px;
+  background: var(--pltabs-divider);
+  transition:
+    opacity 0.2s ease,
+    background-color 0.4s ease;
+}
+
+.pltabs__row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 0 16px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+}
+
+.pltabs__hover {
+  position: absolute;
+  inset: 6px 0;
+  background: var(--pltabs-hover);
+}
+
+.pltabs__avatar {
+  --pltabs-icon-inset: var(--pltabs-avatar);
+
+  position: relative;
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--pltabs-avatar);
+  color: var(--pltabs-avatar-fg);
+  transition:
+    background-color 0.35s ease,
+    color 0.35s ease;
+}
+
+.pltabs__avatar[data-selected="true"] {
+  --pltabs-icon-inset: var(--pltabs-avatar-on);
+
+  background: var(--pltabs-avatar-on);
+  color: var(--pltabs-avatar-on-fg);
+}
+
+.pltabs__text {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.pltabs__title,
+.pltabs__subtitle {
+  display: block;
+  overflow: hidden;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.3s ease;
+}
+
+.pltabs__title {
+  color: var(--pltabs-text);
+  font-size: 14.5px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.pltabs__subtitle {
+  margin-top: 2px;
+  color: var(--pltabs-muted);
+  font-size: 12.5px;
+}
+
+.pltabs__time {
+  position: relative;
+  align-self: flex-start;
+  padding-top: 19px;
+  color: var(--pltabs-faint);
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  transition: color 0.3s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pltabs__strip,
+  .pltabs__body,
+  .pltabs__blob,
+  .pltabs__divider,
+  .pltabs__tab,
+  .pltabs__avatar {
+    transition: none;
+  }
+}

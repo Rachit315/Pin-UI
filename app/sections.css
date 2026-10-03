@@ -173,9 +173,9 @@ html[data-pin-scroll="smooth"] {
 }
 
 /*
- * The preview is the clip itself, parked on a still frame until the card is
- * hovered. Each recording framed its component at a different size, so the
- * zoom is a per-card token — and the hover lift multiplies it rather than
+ * The preview is the clip itself, showing its first frame as a still until
+ * the card scrolls into view, where it starts to play. Each recording framed
+ * its component at a different size, so the zoom is a per-card token — and the hover lift multiplies it rather than
  * replacing it, or the card would snap back to 1 the moment you touched it.
  */
 .card__video {

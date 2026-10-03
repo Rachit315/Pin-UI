@@ -14,6 +14,9 @@ import Weather from "./Weather";
 import Recorder from "./Recorder";
 import Taxi from "./Taxi";
 import Joystick from "./Joystick";
+import LiquidTabs from "./LiquidTabs";
+import ThermalDial from "./ThermalDial";
+import LampSwitch from "./LampSwitch";
 import type { Entry } from "./registry";
 import { LINKS } from "@/lib/links";
 import { usePinTheme } from "@/lib/theme";
@@ -101,6 +104,9 @@ export default function WorkbenchStage({
           {entry.slug === "recorder" && <Recorder theme={theme} sound={sound} autoFocus />}
           {entry.slug === "taxi" && <Taxi theme={theme} sound={sound} />}
           {entry.slug === "joystick" && <Joystick theme={theme} sound={sound} autoFocus />}
+          {entry.slug === "liquid-tabs" && <LiquidTabs theme={theme} />}
+          {entry.slug === "thermal-dial" && <ThermalDial theme={theme} />}
+          {entry.slug === "lamp-switch" && <LampSwitch theme={theme} />}
         </div>
 
         {entry.slug === "chips" && <ChipsEditor value={chips} onChange={setChips} />}
@@ -215,7 +221,10 @@ export default function WorkbenchStage({
         <div className="wbdoc">
           {about && (
             <section className="wbinfo" aria-label={`About ${entry.name}`}>
-              <h2 className="wbinfo__name">{entry.name}</h2>
+              <h2 className="wbinfo__name">
+                {entry.name}
+                {entry.isNew && <span className="wbinfo__new">New</span>}
+              </h2>
               <p className="wbinfo__lead">{entry.tagline}</p>
 
               <ul className="wbinfo__chips">
@@ -253,6 +262,19 @@ export default function WorkbenchStage({
                   >
                     find it here
                   </a>
+                  {entry.info.credit && (
+                    <>
+                      ,{" "}
+                      <a
+                        className="wbinfo__link"
+                        href={entry.info.credit.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {entry.info.credit.label}
+                      </a>
+                    </>
+                  )}
                   .
                 </p>
               )}

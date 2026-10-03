@@ -91,9 +91,13 @@
 .wbnav {
   position: relative;
   flex: 0 0 auto;
+  /* a column: the head and heading stay put, the list takes the rest and scrolls */
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   /* 362 at the reference root: content gutter 40, rail at 306 */
   width: 25.857em;
-  padding: 3.857em 0 0 2.857em;
+  padding: 3.857em 0 1.4em 2.857em;
   overflow: hidden;
 }
 
@@ -168,11 +172,155 @@
 
 /* --- the list, and the pin that marks your place -------------------------- */
 
+@property --wbnav-fade-top {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --wbnav-fade-end {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
 .wbnav__list {
   position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
   /* 10px under the heading (the first row's padding adds 7 more), rows set in 20px */
   margin: 0.714em 0 0;
-  padding: 0;
+  padding: 0 0 0.6em;
+  /*
+   * It scrolls, but draws no scrollbar: the faded edges and the meter below say
+   * there is more, and a bar would be a second vertical line beside the rail.
+   */
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  /* rows dissolve into whichever edge they continue past */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--wbnav-fade-top),
+    #000 calc(100% - var(--wbnav-fade-end)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--wbnav-fade-top),
+    #000 calc(100% - var(--wbnav-fade-end)),
+    transparent 100%
+  );
+  transition:
+    --wbnav-fade-top 0.3s ease,
+    --wbnav-fade-end 0.3s ease;
+}
+
+.wbnav__list::-webkit-scrollbar {
+  display: none;
+}
+
+.wbnav[data-at-start="false"] .wbnav__list {
+  --wbnav-fade-top: 2.2em;
+}
+
+.wbnav[data-at-end="false"] .wbnav__list {
+  --wbnav-fade-end: 3em;
+}
+
+/*
+ * The meter: a hairline under the list that fills as you scroll it, and a
+ * control on the rail's own axis that steps a page down (and, at the end, back
+ * up). It only shows while the list is taller than the panel.
+ */
+.wbnav__meter {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.6em;
+  /* the control centres on the rail, under the collapse control */
+  padding: 0.6em 2.857em 0 0;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.3s ease,
+    visibility 0s linear 0.3s;
+}
+
+.wbnav[data-scrollable="true"] .wbnav__meter {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s ease;
+}
+
+.wbnav__track {
+  position: relative;
+  flex: 1 1 auto;
+  height: 0.143em;
+  overflow: hidden;
+  background: var(--wb-rail);
+  opacity: 0.6;
+}
+
+.wbnav__fill {
+  position: absolute;
+  inset: 0;
+  background: var(--wb-pin);
+  transform: scaleX(var(--wbnav-progress, 0));
+  transform-origin: 0 50%;
+  /* a short follow, so a flicked list reads as one movement, not a jitter */
+  transition: transform 0.12s linear;
+}
+
+.wbnav__meter .wbnav__more {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 2.286em;
+  height: 2.286em;
+  color: var(--wb-icon);
+  font: inherit;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.wbnav__more svg {
+  display: block;
+  width: 1.286em;
+  height: 1.286em;
+  transition: transform 0.35s cubic-bezier(0.22, 0.68, 0.16, 1);
+}
+
+/* at the end of the list it points back up, and takes you there */
+.wbnav[data-at-end="true"] .wbnav__more svg {
+  transform: rotate(180deg);
+}
+
+@media (hover: hover) {
+  .wbnav__meter .wbnav__more:hover {
+    background: var(--wb-bar-hover);
+  }
+
+  .wbnav__meter .wbnav__more:hover svg {
+    translate: 0 0.1em;
+  }
+
+  .wbnav[data-at-end="true"] .wbnav__meter .wbnav__more:hover svg {
+    translate: 0 -0.1em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wbnav__list,
+  .wbnav__meter,
+  .wbnav__fill,
+  .wbnav__more svg {
+    transition: none;
+  }
 }
 
 /*
@@ -905,12 +1053,32 @@
 }
 
 .wbinfo__name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25em;
   margin: 0;
   font-size: 2.857em;
   font-weight: 500;
   line-height: 1.02;
   letter-spacing: -0.03em;
   color: var(--wb-title);
+}
+
+/* the sidebar's tag, set to the heading's scale */
+.wbinfo__new {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  margin-left: 0.15em;
+  padding: 0.3em 0.45em 0.26em;
+  background: var(--wb-pin);
+  color: #ffffff;
+  font-size: 0.24em;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .wbinfo__lead {
@@ -1265,11 +1433,19 @@
 }
 
 .wbnav__head,
-.wbnav__title,
-.wbnav__list {
+.wbnav__title {
   transition:
     opacity 0.3s ease,
     transform 0.46s cubic-bezier(0.22, 0.68, 0.16, 1);
+}
+
+/* the list keeps its edge fades in the same transition */
+.wbnav__list {
+  transition:
+    opacity 0.3s ease,
+    transform 0.46s cubic-bezier(0.22, 0.68, 0.16, 1),
+    --wbnav-fade-top 0.3s ease,
+    --wbnav-fade-end 0.3s ease;
 }
 
 .site--wb[data-collapsed="true"] .wbnav {
@@ -1280,7 +1456,8 @@
 
 .site--wb[data-collapsed="true"] .wbnav__head,
 .site--wb[data-collapsed="true"] .wbnav__title,
-.site--wb[data-collapsed="true"] .wbnav__list {
+.site--wb[data-collapsed="true"] .wbnav__list,
+.site--wb[data-collapsed="true"] .wbnav__meter {
   opacity: 0;
   transform: translateX(-1.4em);
 }
@@ -1370,11 +1547,37 @@
 
   .wbnav__list {
     display: flex;
+    flex: 0 0 auto;
     gap: 1.4em;
     overflow-x: auto;
+    overflow-y: hidden;
     margin-top: 0.4em;
     /* a strip across the top has no column to indent into */
-    padding: 0 0 0.6em;
+    padding: 0 0 0.3em;
+    /* across, the fades run left and right */
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 var(--wbnav-fade-top),
+      #000 calc(100% - var(--wbnav-fade-end)),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 var(--wbnav-fade-top),
+      #000 calc(100% - var(--wbnav-fade-end)),
+      transparent 100%
+    );
+  }
+
+  /* a swipe moves the strip; the meter is only the hairline under it */
+  .wbnav__meter {
+    padding: 0.2em 0 0;
+  }
+
+  .wbnav__meter .wbnav__more {
+    display: none;
   }
 
   .wbnav__item + .wbnav__item {

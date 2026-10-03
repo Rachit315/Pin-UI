@@ -1,0 +1,306 @@
+/* ===========================================================================
+   Thermal Dial.
+
+   The card is 440 × 458 in dial units, drawn at --pdial-w wide; every length
+   on it is a fraction of that width, so it scales as one object. The heat
+   palette — --pdial-c1 to --pdial-c3 — is rewritten live from the reading.
+=========================================================================== */
+
+.pdial {
+  --pdial-w: 340px;
+  --pdial-h: calc(var(--pdial-w) * 458 / 440);
+  --pdial-c1: #e3260f;
+  --pdial-c2: #ff6a1a;
+  --pdial-c3: #ffc457;
+  --pdial-font-head: var(--font-manrope, "Manrope"), system-ui, sans-serif;
+  --pdial-font-body: "Inter", system-ui, sans-serif;
+
+  /* dark: the reference */
+  --pdial-card-top: #161616;
+  --pdial-card-mid: #0b0b0b;
+  --pdial-card-bot: #060606;
+  --pdial-card-shadow: 0 0 0 1px rgba(255, 255, 255, 0.035), 0 50px 100px -40px rgba(0, 0, 0, 1);
+  --pdial-rim-top: rgba(255, 255, 255, 0.42);
+  --pdial-rim-mid: rgba(255, 255, 255, 0.07);
+  --pdial-ink: #ffffff;
+  --pdial-label-top: #f4f4f4;
+  --pdial-label-bot: #c6c6c6;
+  --pdial-lead-1: #ffffff;
+  --pdial-lead-2: rgba(255, 214, 200, 0.72);
+  --pdial-lead-3: rgba(255, 190, 170, 0.16);
+  --pdial-main-1: #ffffff;
+  --pdial-main-2: #ffe1d7;
+  --pdial-digit-sep: rgba(0, 0, 0, 0.6);
+  --pdial-wash-op: 1;
+  --pdial-hint: rgba(255, 255, 255, 0.5);
+
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: var(--pdial-font-body);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* light: the same object, daylight version */
+.pdial[data-theme="light"] {
+  --pdial-card-top: #fdfcfa;
+  --pdial-card-mid: #f6f4f0;
+  --pdial-card-bot: #efece7;
+  --pdial-card-shadow: 0 0 0 1px rgba(40, 25, 10, 0.06), 0 1px 2px rgba(40, 25, 10, 0.06), 0 40px 70px -35px rgba(80, 45, 20, 0.45);
+  --pdial-rim-top: rgba(255, 255, 255, 1);
+  --pdial-rim-mid: rgba(255, 255, 255, 0.4);
+  --pdial-ink: #141414;
+  --pdial-label-top: #1a1a1a;
+  --pdial-label-bot: #4a4744;
+  --pdial-lead-1: #161616;
+  --pdial-lead-2: rgba(70, 30, 15, 0.62);
+  --pdial-lead-3: rgba(120, 40, 15, 0.14);
+  --pdial-main-1: #141414;
+  --pdial-main-2: #3d1a10;
+  --pdial-digit-sep: rgba(255, 255, 255, 0.85);
+  --pdial-wash-op: 0.78;
+  --pdial-hint: rgba(20, 20, 20, 0.5);
+}
+
+.pdial__wrap {
+  position: relative;
+}
+
+.pdial__card {
+  position: relative;
+  width: var(--pdial-w);
+  height: var(--pdial-h);
+  border-radius: calc(var(--pdial-w) * 0.3);
+  background: radial-gradient(130% 80% at 50% 0%, var(--pdial-card-top) 0%, var(--pdial-card-mid) 45%, var(--pdial-card-bot) 100%);
+  box-shadow: var(--pdial-card-shadow);
+  opacity: 0;
+  touch-action: none;
+  cursor: grab;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+.pdial__card[data-dragging="true"] {
+  cursor: grabbing;
+}
+
+.pdial__card:focus-visible .pdial__rim {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--pdial-ink) 45%, transparent);
+}
+
+/* the hairline rim: lit along the top, warm along the bottom */
+.pdial__rim {
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    var(--pdial-rim-top) 0%,
+    var(--pdial-rim-mid) 22%,
+    var(--pdial-rim-mid) 52%,
+    color-mix(in srgb, var(--pdial-c2) 70%, transparent) 84%,
+    var(--pdial-c3) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+}
+
+.pdial__clip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+/* heat rising from the floor, kept to the lower third */
+.pdial__wash {
+  position: absolute;
+  inset: 0;
+  opacity: var(--pdial-wash-op);
+  background:
+    radial-gradient(62% 22% at 50% 102%, #fff3d2 0%, color-mix(in srgb, var(--pdial-c3) 80%, transparent) 40%, transparent 80%),
+    linear-gradient(
+      0deg,
+      var(--pdial-c3) 0%,
+      var(--pdial-c2) 8%,
+      var(--pdial-c1) 19%,
+      color-mix(in srgb, var(--pdial-c1) 38%, transparent) 29%,
+      transparent 40%
+    );
+  filter: blur(calc(var(--pdial-w) * 0.016));
+  transform-origin: 50% 100%;
+}
+
+/* daylight: the same heat, a touch softer and warmer so dark digits stay crisp */
+.pdial[data-theme="light"] .pdial__wash {
+  filter: blur(calc(var(--pdial-w) * 0.02)) saturate(0.88) brightness(1.1);
+}
+
+/* the lower side walls catch the light too */
+.pdial__walls {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: var(--pdial-wash-op);
+  box-shadow:
+    inset 0 calc(var(--pdial-w) * -0.02) calc(var(--pdial-w) * 0.04) calc(var(--pdial-w) * -0.012) color-mix(in srgb, var(--pdial-c3) 80%, white),
+    inset calc(var(--pdial-w) * 0.016) calc(var(--pdial-w) * -0.05) calc(var(--pdial-w) * 0.05) calc(var(--pdial-w) * -0.03) color-mix(in srgb, var(--pdial-c2) 80%, transparent),
+    inset calc(var(--pdial-w) * -0.016) calc(var(--pdial-w) * -0.05) calc(var(--pdial-w) * 0.05) calc(var(--pdial-w) * -0.03) color-mix(in srgb, var(--pdial-c2) 80%, transparent);
+}
+
+.pdial__bloom,
+.pdial__halo {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pdial__bloom {
+  right: 8%;
+  bottom: calc(var(--pdial-h) * -0.08);
+  left: 8%;
+  height: calc(var(--pdial-h) * 0.22);
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--pdial-c3) 85%, white), color-mix(in srgb, var(--pdial-c2) 80%, transparent) 55%, transparent);
+  filter: blur(calc(var(--pdial-w) * 0.07));
+}
+
+.pdial__halo {
+  inset: 45% -4% -2% -4%;
+  background: radial-gradient(60% 50% at 50% 80%, color-mix(in srgb, var(--pdial-c2) 45%, transparent), transparent 70%);
+  filter: blur(calc(var(--pdial-w) * 0.08));
+}
+
+.pdial__dial {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.pdial__ticks {
+  stroke: var(--pdial-ink);
+}
+
+.pdial__season {
+  position: absolute;
+  top: 15.5%;
+  right: 0;
+  left: 0;
+  margin: 0;
+  font-family: var(--pdial-font-head);
+  font-size: calc(var(--pdial-w) * 0.094);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.09em;
+  /* balances the trailing letter-space so the word sits centred */
+  text-indent: 0.09em;
+  text-align: center;
+}
+
+.pdial__season span {
+  display: inline-block;
+  /*
+   * background-clip: text only paints inside the box, so the box is padded to
+   * keep descenders (the g in Spring) whole, and the space handed back.
+   */
+  margin: -0.1em 0 -0.24em;
+  padding: 0.1em 0 0.24em;
+  background: linear-gradient(180deg, var(--pdial-label-top) 30%, var(--pdial-label-bot) 80%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  will-change: transform, filter, opacity;
+}
+
+.pdial__value {
+  position: absolute;
+  top: 46%;
+  right: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.pdial__num {
+  display: flex;
+  align-items: flex-start;
+  font-family: var(--pdial-font-head);
+  font-size: calc(var(--pdial-w) * 0.45);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.pdial__slot {
+  position: relative;
+  display: inline-block;
+}
+
+.pdial__slot > span {
+  display: inline-block;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* the tens digit sits a touch larger and lower, sinking into the heat */
+.pdial__lead {
+  z-index: 0;
+  margin-right: -0.07em;
+  transform: translateY(0.1em) scale(1.08);
+  transform-origin: 100% 0;
+}
+
+.pdial__lead > span {
+  background-image: linear-gradient(180deg, var(--pdial-lead-1) 0%, var(--pdial-lead-1) 42%, var(--pdial-lead-2) 70%, var(--pdial-lead-3) 100%);
+}
+
+.pdial__main {
+  z-index: 1;
+  filter: drop-shadow(calc(var(--pdial-w) * -0.006) 0 calc(var(--pdial-w) * 0.012) var(--pdial-digit-sep));
+}
+
+.pdial__main > span {
+  background-image: linear-gradient(180deg, var(--pdial-main-1) 0%, var(--pdial-main-1) 58%, var(--pdial-main-2) 100%);
+}
+
+.pdial__degree {
+  position: absolute;
+  top: 0.13em;
+  right: -0.15em;
+  width: 0.072em;
+  height: 0.072em;
+  border: 0.011em solid var(--pdial-ink);
+  border-radius: 50%;
+  opacity: 0.92;
+}
+
+.pdial__hint {
+  margin: calc(var(--pdial-w) * 0.22) 0 0;
+  color: var(--pdial-hint);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+  text-align: center;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pdial__card {
+    transition: none;
+  }
+}

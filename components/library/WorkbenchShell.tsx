@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { type ReactNode, useLayoutEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, useReducedMotion } from "motion/react";
@@ -26,11 +26,35 @@ import "./workbench.css";
 /* the library on its shelves — fixed for the life of the page */
 const GROUPS = byCategory();
 
+/*
+ * Bring the open component's row into the list's view when it is scrolled out
+ * of it — a component opened from a link deep in the list should not leave its
+ * own row hidden. Only the list moves: scrollIntoView would scroll the page too.
+ */
+function reveal(list: HTMLElement, item: HTMLElement) {
+  if (getComputedStyle(list).overflowX === "auto") {
+    const left = item.offsetLeft;
+    const right = left + item.offsetWidth;
+    if (left < list.scrollLeft || right > list.scrollLeft + list.clientWidth) {
+      list.scrollLeft = Math.max(0, left - list.clientWidth / 2 + item.offsetWidth / 2);
+    }
+    return;
+  }
+  const top = item.offsetTop;
+  const bottom = top + item.offsetHeight;
+  /* the faded edges cover about this much, so a row under them counts as hidden */
+  const pad = 28;
+  if (top < list.scrollTop + pad || bottom > list.scrollTop + list.clientHeight - pad) {
+    list.scrollTop = Math.max(0, top - list.clientHeight / 2 + item.offsetHeight / 2);
+  }
+}
+
 export default function WorkbenchShell({ children }: { children: ReactNode }) {
   const reduced = useReducedMotion();
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
 
+  const navRef = useRef<HTMLElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Record<string, HTMLLIElement | null>>({});
   /* where the pin sits, measured rather than calculated from the type scale */
@@ -63,6 +87,7 @@ export default function WorkbenchShell({ children }: { children: ReactNode }) {
 
       const item = active ? itemRefs.current[active.slug] : null;
       setPinTop(item ? centre(item) : null);
+      if (item) reveal(list, item);
 
       const rows = (activeGroup?.entries ?? [])
         .map((entry) => itemRefs.current[entry.slug])
@@ -85,9 +110,60 @@ export default function WorkbenchShell({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active?.slug, collapsed]);
 
+  /*
+   * The list scrolls inside the panel with no scrollbar of its own. What says
+   * there is more is the edge fading where rows run on, and the meter under the
+   * list filling as you go. Both are driven straight from the scroll position
+   * into the DOM — one write a frame, no re-render — so scrolling the list
+   * costs the page nothing.
+   */
+  useEffect(() => {
+    const nav = navRef.current;
+    const list = listRef.current;
+    if (!nav || !list) return;
+
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const across = getComputedStyle(list).overflowX === "auto";
+      const max = across ? list.scrollWidth - list.clientWidth : list.scrollHeight - list.clientHeight;
+      const at = across ? list.scrollLeft : list.scrollTop;
+      /* sub-pixel scroll positions stop a hair short of the end; count that as there */
+      const progress = max > 1 ? (at >= max - 1 ? 1 : Math.max(0, at / max)) : 1;
+      nav.dataset.scrollable = String(max > 1);
+      nav.dataset.atStart = String(at <= 1);
+      nav.dataset.atEnd = String(at >= max - 1);
+      nav.style.setProperty("--wbnav-progress", progress.toFixed(4));
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+
+    update();
+    list.addEventListener("scroll", schedule, { passive: true });
+    const observer = new ResizeObserver(schedule);
+    observer.observe(list);
+    for (const child of Array.from(list.children)) observer.observe(child);
+    void document.fonts?.ready.then(schedule);
+    return () => {
+      list.removeEventListener("scroll", schedule);
+      observer.disconnect();
+      cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  /* the meter's control: a page further down, or back to the top from the end */
+  function step() {
+    const list = listRef.current;
+    if (!list) return;
+    const behavior = reduced ? "auto" : "smooth";
+    const atEnd = navRef.current?.dataset.atEnd === "true";
+    list.scrollTo({ top: atEnd ? 0 : list.scrollTop + list.clientHeight * 0.7, behavior });
+  }
+
   return (
     <div className="site site--wb" data-collapsed={collapsed}>
-      <nav className="wbnav" aria-label="Components">
+      <nav className="wbnav" aria-label="Components" ref={navRef}>
         <div className="wbnav__head">
           <div className="wbnav__lockup">
             {/* the mark is the switch; the wordmark beside it goes home */}
@@ -183,6 +259,24 @@ export default function WorkbenchShell({ children }: { children: ReactNode }) {
               </ul>
             </section>
           ))}
+        </div>
+
+        {/* how far down the list you are; hidden while it all fits */}
+        <div className="wbnav__meter" aria-hidden="true">
+          <span className="wbnav__track">
+            <span className="wbnav__fill" />
+          </span>
+          <button
+            type="button"
+            className="wbnav__more"
+            onClick={step}
+            tabIndex={-1}
+            title="Scroll the list"
+          >
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M6 9.5 12 15.5 18 9.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
         </div>
       </nav>
 

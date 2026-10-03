@@ -11,20 +11,43 @@ import CreatorDot from "./CreatorDot";
 /**
  * A card on the shelf.
  *
- * The preview is a short loop whose poster is its own first frame — so the
- * still and the moving picture are the same pixels and hovering cannot make
- * the card jump. The still shows from the first paint; the clip is not fetched
- * until the card is near the viewport, and hovering is what starts playback:
- * three clips playing at once behind a landing page is a lot of work for a
- * browser to do for something nobody has looked at yet.
+ * The preview is a short loop whose poster is its own first frame, so the
+ * still and the moving picture are the same pixels and starting it can never
+ * make the card jump. The still shows from the first paint. The clip is only
+ * fetched once the card comes within a screen of the viewport, and it plays
+ * while the card is actually on screen: scroll it into view and it moves,
+ * scroll past and it stops, so a long page never has more than the few clips
+ * you can see decoding at once.
+ *
+ * Nothing moves for someone who has asked for reduced motion, or who has
+ * asked the browser to save data; a hidden tab pauses everything.
  */
 export default function ComponentCard({ entry, index }: { entry: Entry; index: number }) {
   const reduced = useReducedMotion();
   const videoRef = useRef<HTMLVideoElement>(null);
   const cellRef = useRef<HTMLLIElement>(null);
   const [near, setNear] = useState(false);
+  /* on screen: at least a third of the preview is showing */
+  const visible = useRef(false);
 
-  /* only load the clip once the card is within a screen of the viewport */
+  const sync = useCallback(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const still =
+      reduced ||
+      document.hidden ||
+      (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
+    if (visible.current && !still) {
+      if (video.paused) {
+        void video.play().catch(() => {
+          /* a browser that refuses to play silently is no reason to break the card */
+        });
+      }
+    } else if (!video.paused) {
+      video.pause();
+    }
+  }, [reduced]);
+
   useEffect(() => {
     const cell = cellRef.current;
     if (!cell) return;
@@ -32,43 +55,36 @@ export default function ComponentCard({ entry, index }: { entry: Entry; index: n
       setNear(true);
       return;
     }
-    const observer = new IntersectionObserver(
+
+    /* fetch the clip once the card is within a screen of the viewport */
+    const loader = new IntersectionObserver(
       (entries) => {
         if (entries.some((e) => e.isIntersecting)) {
           setNear(true);
-          observer.disconnect();
+          loader.disconnect();
         }
       },
       { rootMargin: "100% 0px" },
     );
-    observer.observe(cell);
-    return () => observer.disconnect();
-  }, []);
 
-  /* back to the first frame, which is exactly the poster, so leaving never jumps */
-  const park = useCallback(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    try {
-      video.currentTime = 0;
-    } catch {
-      /* nothing has loaded yet, and the poster is already showing */
-    }
-  }, []);
+    /* and play it only while it is really in view */
+    const watcher = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) visible.current = e.isIntersecting && e.intersectionRatio >= 0.35;
+        sync();
+      },
+      { threshold: [0, 0.35, 0.6] },
+    );
 
-  function enter() {
-    if (reduced) return;
-    void videoRef.current?.play().catch(() => {
-      /* a browser that refuses to play silently is no reason to break the card */
-    });
-  }
-
-  function leave() {
-    const video = videoRef.current;
-    if (!video) return;
-    video.pause();
-    park();
-  }
+    loader.observe(cell);
+    watcher.observe(cell);
+    document.addEventListener("visibilitychange", sync);
+    return () => {
+      loader.disconnect();
+      watcher.disconnect();
+      document.removeEventListener("visibilitychange", sync);
+    };
+  }, [sync]);
 
   return (
     <motion.li
@@ -79,14 +95,7 @@ export default function ComponentCard({ entry, index }: { entry: Entry; index: n
       viewport={{ once: true, amount: 0.3 }}
       transition={{ ...softSpring, delay: index * 0.08 }}
     >
-      <Link
-        className="card"
-        href={`/components/${entry.slug}`}
-        onPointerEnter={enter}
-        onPointerLeave={leave}
-        onFocus={enter}
-        onBlur={leave}
-      >
+      <Link className="card" href={`/components/${entry.slug}`}>
         {/* the recording's own field shows behind a clip zoomed out below 1 */}
         <span className="card__frame" style={{ background: entry.clipStage ?? entry.stage }}>
           {entry.clip ? (
@@ -101,7 +110,9 @@ export default function ComponentCard({ entry, index }: { entry: Entry; index: n
               muted
               playsInline
               loop
-              preload={near ? "metadata" : "none"}
+              /* the source arrives after the card was already in view: start it then */
+              onLoadedData={sync}
+              preload={near ? "auto" : "none"}
               tabIndex={-1}
               aria-hidden="true"
             />

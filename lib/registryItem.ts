@@ -54,6 +54,9 @@ const FACES: Record<string, string | null> = {
   recorder: "Roboto Mono (500)",
   taxi: "Inter (500 and 600) — after SF Pro, where the system has it",
   joystick: null,
+  "liquid-tabs": "Inter (500 and 600)",
+  "thermal-dial": "Manrope (500 and 800), with Inter for the hint — the site exposes Manrope as --font-manrope, and the stylesheet falls back to a face named \"Manrope\"",
+  "lamp-switch": "Inter (300)",
 };
 
 function docsFor(entry: Entry): string {

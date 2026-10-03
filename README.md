@@ -19,6 +19,9 @@ interactive, and ready to paste into your project. Three new ones every week.
 
 | Component | Description | Slug |
 | :-- | :-- | :-- |
+| **Liquid Tabs** | A notifications card whose active tab is liquid, flowing from tab to tab. Light and dark. | `liquid-tabs` |
+| **Thermal Dial** | A temperature dial with a travelling wave, rolling digits and a heat wash. Light and dark. | `thermal-dial` |
+| **Lamp Switch** | A pendant lamp on a cord with real swing physics and a liquid switch. Light and dark. | `lamp-switch` |
 | **Joystick** | A pixel-art arcade stick with a real gate, spring and microswitch clicks. Light and dark. | `joystick` |
 | **Weather** | A weather square that opens out into a five-day forecast. | `weather` |
 | **Recorder** | A voice recorder with a scrolling waveform, playback and scrubbing. | `recorder` |

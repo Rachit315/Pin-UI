@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
+import { Manrope } from "next/font/google";
 import { SITE_URL } from "@/lib/site";
 import FaviconSync from "@/components/FaviconSync";
 import NoFlashScript from "@/components/NoFlashScript";
@@ -14,6 +15,18 @@ import {
   safeJsonLd,
 } from "@/lib/jsonld";
 import "./globals.css";
+
+/*
+ * Manrope is the Thermal Dial's face. It is self-hosted by Next at build time
+ * and exposed as a variable rather than applied, and not preloaded: only the
+ * pages that draw the dial ever download it.
+ */
+const manrope = Manrope({
+  subsets: ["latin"],
+  variable: "--font-manrope",
+  display: "swap",
+  preload: false,
+});
 
 /* What a link preview says. The tab says less — see `title` below. */
 const TITLE = "Pin UI — Cool UI components for GenZ/Vibecoders";
@@ -105,7 +118,7 @@ export default function RootLayout({
   return (
     /* the theme attribute is written by the script below, before hydration,
        so React must not claim ownership of it */
-    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
+    <html lang="en" className={manrope.variable} data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         {/*
           Neue Montreal is the design's typeface; Switzer is the closest freely
