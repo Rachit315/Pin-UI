@@ -30,7 +30,8 @@
   --card-edge: #e60024;
   --rail-fill: #e60024;
   --rail-ink: #ffffff;
-  --rail-edge: transparent;
+  /* a white edge, as the light pill has a red one: on a red card it would vanish */
+  --rail-edge: #ffffff;
 }
 
 /* everything themed crosses over on the one curve the site already uses */
@@ -371,12 +372,18 @@ html[data-pin-scroll="smooth"] {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.05em;
-  padding: 1.4em 1em;
-  width: 7em;
+  /*
+   * One spacing for the whole pill: the mark, each hairline and the GitHub
+   * square all stand the same distance apart, and the pill is as wide as its
+   * longest link plus an even margin — "Testimonials" sat almost on the edge
+   * of a fixed 7em pill once it joined the list.
+   */
+  gap: 1.15em;
+  padding: 1.5em 1.35em;
+  width: max-content;
   border: var(--hero-rule) solid var(--rail-edge);
   /* a full pill, the way the design draws it */
-  border-radius: 3.5em;
+  border-radius: 999px;
   background: var(--rail-fill);
   color: var(--rail-ink);
   box-shadow: 0 1.2em 2.4em rgb(0 0 0 / 0.1);
@@ -402,6 +409,8 @@ html[data-pin-scroll="smooth"] {
 
 .rail__markArt {
   display: block;
+  /* the mark's outline runs a hair past its box; an svg would crop it there */
+  overflow: visible;
   width: 2.375em; /* the masthead's mark, at the same size */
   height: 2.8125em;
   /* the rail's own fill is what the star is knocked out of */
@@ -420,22 +429,24 @@ html[data-pin-scroll="smooth"] {
  */
 .rail__rule {
   display: block;
-  width: 1.5em; /* 21 — about a third of the pill's inner width */
+  width: 1.75em; /* about a third of the pill's inner width */
   height: 1px;
   background: currentColor;
   opacity: 0.5;
 }
 
+/* the links set as a list, not a stack: a line's height apart, each one its own row */
 .rail__links {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.3em;
+  gap: 0.55em;
 }
 
 .rail__link {
-  font-size: 1.0625em; /* 17 */
-  line-height: 1.25;
+  position: relative;
+  font-size: 1em;
+  line-height: 1.3;
   letter-spacing: -0.01em;
   color: inherit;
   text-decoration: none;
@@ -446,8 +457,8 @@ html[data-pin-scroll="smooth"] {
 .rail__github {
   position: relative;
   display: block;
-  width: 2.25em;
-  height: 2.25em;
+  width: 2.15em;
+  height: 2.15em;
 }
 
 .rail__githubMark {
@@ -547,6 +558,37 @@ html[data-pin-scroll="smooth"] {
 
   .shelf__lead {
     max-width: 26em;
+  }
+}
+
+/*
+ * A phone: the pill keeps the mark and trades its links and the GitHub mark
+ * for the menu button, so it stays small enough to sit over the page's
+ * content without covering it.
+ */
+@media (max-width: 700px) {
+  .rail .rail__links,
+  .rail .rail__github,
+  .rail .rail__rule + .rail__links + .rail__rule {
+    display: none;
+  }
+
+  /*
+   * Inside the pill the button is bare bars in the pill's own ink — a filled
+   * square there outweighed the mark beside it and swelled the pill. The
+   * square's 40px stays as the target; only its fill goes.
+   */
+  .rail .rail__menu {
+    width: 2.6em;
+    height: 2.6em;
+    margin: -0.3em -0.4em -0.3em -0.2em;
+    background: transparent;
+    color: var(--rail-ink);
+  }
+
+  .rail .rail__menu .mmenu__bars {
+    width: 1.35em;
+    height: 0.75em;
   }
 }
 
@@ -1085,5 +1127,27 @@ html[data-pin-scroll="smooth"] {
 @media (max-width: 420px) {
   .foot__dmLabel {
     display: none;
+  }
+}
+
+/*
+ * Fingers, not cursors. The nav links are set in 15–18px type, which is a fine
+ * size to read and a poor one to hit: each gets an invisible box around it,
+ * about 44px tall, so a tap lands without the links themselves moving apart.
+ * `::before` because the underline already lives on `::after`.
+ */
+@media (pointer: coarse) {
+  .hero__navLink::before,
+  .rail__link::before,
+  .foot__navLink::before,
+  .lib__link::before,
+  .tq__all::before {
+    content: "";
+    position: absolute;
+    inset: -0.75em -0.4em;
+  }
+
+  .tq__all {
+    position: relative;
   }
 }

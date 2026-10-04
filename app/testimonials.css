@@ -1,0 +1,539 @@
+/* ===========================================================================
+   What people are saying — the landing row and the /testimonials page.
+
+   Sized in the same `em` off `.site` as the shelf above it, so it scales with
+   the page. The cards take the site's own card tokens: red with white type in
+   the light state, a red-ruled white card in the crimson one — the same swap
+   the component cards make, on the same curve.
+=========================================================================== */
+
+.tq,
+.tqp {
+  --tq-red: #e60024;
+  /* a resting card's height: the row is exactly this tall */
+  --tq-face: 12em;
+  --tq-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tq {
+  /* the bottom is mostly the room kept under the row for an open card */
+  padding: 3.5em var(--hero-inset) 1.5em;
+  /* lands clear of the compact rail when a nav link jumps here */
+  scroll-margin-top: 3em;
+}
+
+.tq__head {
+  margin: 0 0 2.2em;
+}
+
+/* the link to the rest, over the right-hand end of the row */
+.tq__bar {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 0 0.9em;
+}
+
+.tq__all {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  color: var(--tq-red);
+  font-size: 1.07em;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.28em;
+  transition: text-decoration-color 0.25s ease;
+}
+
+.tq__all svg {
+  width: 1.05em;
+  height: 1.05em;
+  transition: transform 0.35s var(--tq-ease-out);
+}
+
+@media (hover: hover) {
+  .tq__all:hover {
+    text-decoration-color: transparent;
+  }
+
+  .tq__all:hover svg {
+    transform: translate(0.15em, -0.15em);
+  }
+}
+
+/* the shelf's heading, one for one, so the two sections read as a pair */
+.tq__title {
+  margin: 0;
+  text-align: center;
+  font-size: 3.5em;
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  color: var(--sec-ink);
+  transition: color var(--pin-theme-fade) var(--pin-theme-ease);
+}
+
+/* --- the row ------------------------------------------------------------- */
+
+/*
+ * The row runs the full width of the window — out past the page's gutters —
+ * and is clipped only at the window's edge, under the blur.
+ *
+ * The track is held at a resting card's height, so an opening card grows out
+ * of it rather than making it taller: below the track is padding exactly as
+ * deep as the tallest quote, measured, and an open card grows into that. The
+ * section is the same height open or shut, and nothing under it moves.
+ */
+.tq__viewport {
+  position: relative;
+  margin-inline: calc(var(--hero-inset) * -1);
+  overflow-x: clip;
+  overflow-y: visible;
+  padding-bottom: var(--tq-reserve, 10em);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.tq__track {
+  display: flex;
+  align-items: flex-start;
+  height: var(--tq-face);
+  gap: 0.4em;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  will-change: transform;
+}
+
+/*
+ * The edges are the hero band's, layer for layer: six backdrop blurs, each
+ * starting further out and blurring a little harder, over a narrow band, and
+ * no colour laid on top — the cards soften into the margin instead of being
+ * greyed out or smeared. Standard properties only, as the hero notes: paired
+ * with `-webkit-` forms the build keeps the prefixed one alone, and the blur
+ * silently disappears.
+ */
+.tq__edge {
+  position: absolute;
+  top: 0;
+  z-index: 2;
+  width: var(--hero-fade, 3.5em);
+  /* the resting row only; an open card's quote below it is never blurred */
+  height: var(--tq-face);
+  pointer-events: none;
+}
+
+.tq__edge--start {
+  left: 0;
+}
+
+/* the end is the start, mirrored */
+.tq__edge--end {
+  right: 0;
+  transform: scaleX(-1);
+}
+
+.tq__edge i {
+  position: absolute;
+  inset: 0;
+}
+
+.tq__edge i:nth-child(1) {
+  backdrop-filter: blur(0.5px);
+  mask-image: linear-gradient(to left, transparent 0%, #000 18%);
+}
+
+.tq__edge i:nth-child(2) {
+  backdrop-filter: blur(1.25px);
+  mask-image: linear-gradient(to left, transparent 15%, #000 34%);
+}
+
+.tq__edge i:nth-child(3) {
+  backdrop-filter: blur(2.5px);
+  mask-image: linear-gradient(to left, transparent 31%, #000 50%);
+}
+
+.tq__edge i:nth-child(4) {
+  backdrop-filter: blur(4.5px);
+  mask-image: linear-gradient(to left, transparent 47%, #000 66%);
+}
+
+.tq__edge i:nth-child(5) {
+  backdrop-filter: blur(7.5px);
+  mask-image: linear-gradient(to left, transparent 63%, #000 82%);
+}
+
+.tq__edge i:nth-child(6) {
+  backdrop-filter: blur(12px);
+  mask-image: linear-gradient(to left, transparent 79%, #000 100%);
+}
+
+/*
+ * On a touch screen the row's cards carry their quotes openly (set like the
+ * page's), so the row is as tall as its tallest card and needs no room kept
+ * under it; the blur runs its full height.
+ */
+.tq__viewport[data-touch] {
+  padding-bottom: 0;
+}
+
+.tq__viewport[data-touch] .tq__track {
+  height: auto;
+}
+
+.tq__viewport[data-touch] .tq__edge {
+  height: auto;
+  bottom: 0;
+}
+
+/* a still card in the row keeps the row's width; on the page it fills its column */
+.tq__track .tq__card[data-still] {
+  display: block;
+  flex: 0 0 auto;
+  width: min(24em, 84vw);
+}
+
+/* --- a card -------------------------------------------------------------- */
+
+.tq__card {
+  position: relative;
+  flex: 0 0 auto;
+  width: 24em;
+  background: var(--card-fill);
+  color: var(--card-ink);
+  /* the ruled edge the crimson state draws, inside the card so it adds no size */
+  box-shadow: inset 0 0 0 1px var(--card-edge);
+  transition:
+    background-color var(--pin-theme-fade) var(--pin-theme-ease),
+    color var(--pin-theme-fade) var(--pin-theme-ease),
+    box-shadow var(--pin-theme-fade) var(--pin-theme-ease);
+}
+
+.tq__card[data-open="true"]:not([data-still]) {
+  z-index: 1;
+}
+
+/* the resting card: who said it, at 2:1 */
+.tq__face {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: var(--tq-face);
+  padding: 0.7em;
+}
+
+.tq__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.tq__photo {
+  display: block;
+  width: 4.8em;
+  height: 4.8em;
+  object-fit: cover;
+  background: rgb(255 255 255 / 0.2);
+  -webkit-user-drag: none;
+}
+
+.tq__x {
+  display: grid;
+  place-items: center;
+  width: 2em;
+  height: 2em;
+  margin: -0.2em -0.2em 0 0;
+  color: inherit;
+  transition: opacity 0.2s ease;
+}
+
+.tq__x svg {
+  width: 1.1em;
+  height: 1.1em;
+}
+
+.tq__x:focus-visible,
+.tq__plus:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .tq__x:hover {
+    opacity: 0.65;
+  }
+}
+
+.tq__meta {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.8em;
+}
+
+.tq__who {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding-left: 0.1em;
+}
+
+.tq__name {
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+  min-width: 0;
+  font-size: 1.07em;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.tq__nameText {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* the badge is drawn in the card's own two colours, so it belongs to it */
+.tq__tick {
+  flex: none;
+  width: 1.05em;
+  height: 1.05em;
+}
+
+.tq__tickShape {
+  fill: var(--card-ink);
+  transition: fill var(--pin-theme-fade) var(--pin-theme-ease);
+}
+
+.tq__tickMark {
+  stroke: var(--card-fill);
+  transition: stroke var(--pin-theme-fade) var(--pin-theme-ease);
+}
+
+.tq__handle {
+  overflow: hidden;
+  font-size: 0.9em;
+  line-height: 1.35;
+  opacity: 0.72;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.tq__plus {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 1.55em;
+  height: 1.55em;
+  padding: 0;
+  border: 0;
+  background: var(--card-ink);
+  color: var(--card-fill);
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--pin-theme-fade) var(--pin-theme-ease),
+    color var(--pin-theme-fade) var(--pin-theme-ease);
+}
+
+.tq__plus svg {
+  width: 0.8em;
+  height: 0.8em;
+  transition: transform 0.4s var(--tq-ease-out);
+}
+
+.tq__card[data-open="true"] .tq__plus svg {
+  transform: rotate(45deg);
+}
+
+/* the touch target is larger than the little square it draws */
+@media (hover: none) {
+  .tq__plus {
+    position: relative;
+  }
+
+  .tq__plus::after {
+    content: "";
+    position: absolute;
+    inset: -0.9em;
+  }
+}
+
+/* --- the quote ----------------------------------------------------------- */
+
+/*
+ * The card grows by its quote's own height: the panel is a grid row going from
+ * 0fr to 1fr, which animates to the real height without anyone measuring it.
+ *
+ * Closing runs the other way round from opening — the words drop out first,
+ * quickly, and only then does the card fold up behind them.
+ */
+.tq__body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.34s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+}
+
+.tq__card[data-open="true"] .tq__body {
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.55s var(--tq-ease-out);
+}
+
+.tq__clip {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.tq__quote {
+  margin: 0;
+  padding: 0.15em 0.55em 0.75em;
+  font-size: 1.45em;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.018em;
+  overflow-wrap: anywhere;
+}
+
+/* each word in its own mask; the words of a line share a delay and rise as one */
+.tq__w {
+  display: inline-block;
+  overflow: hidden;
+  /* room for descenders inside the mask, given back to the line */
+  padding-bottom: 0.1em;
+  margin-bottom: -0.1em;
+  vertical-align: top;
+}
+
+.tq__wi {
+  display: inline-block;
+  transform: translateY(105%);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 1, 1);
+}
+
+.tq__card[data-open="true"] .tq__wi {
+  transform: none;
+  transition: transform 0.62s var(--tq-ease-out) calc(0.1s + var(--tq-line, 0) * 0.075s);
+}
+
+/* --- the testimonials page ----------------------------------------------- */
+
+/*
+ * Every quote, laid out to be read: columns rather than rows, so a long quote
+ * and a two-word one sit together without leaving holes, and nothing to open —
+ * on the page every card is already showing what it says.
+ */
+/* one sentence, set on one line wherever the page is wide enough to hold it */
+.lib__lead.tqp__lead {
+  max-width: none;
+  text-wrap: balance;
+}
+
+.tqp__grid {
+  columns: 3 21em;
+  column-gap: 0.6em;
+}
+
+.tqp__item {
+  break-inside: avoid;
+  margin: 0 0 0.6em;
+}
+
+.tq__card[data-still] {
+  display: block;
+  width: auto;
+}
+
+/*
+ * On the page a card has nothing to open, so its face does not need the row's
+ * 2:1 resting shape: the photo and the name sit side by side on one line and
+ * the quote follows straight under them — no tall empty panel in between.
+ */
+.tq__card[data-still] .tq__face {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 0.85em;
+  height: auto;
+  padding: 0.75em 0.75em 0.55em;
+}
+
+.tq__card[data-still] .tq__top,
+.tq__card[data-still] .tq__meta {
+  display: contents;
+}
+
+.tq__card[data-still] .tq__photo {
+  grid-column: 1;
+  grid-row: 1;
+  width: 3.6em;
+  height: 3.6em;
+}
+
+.tq__card[data-still] .tq__who {
+  grid-column: 2;
+  grid-row: 1;
+  padding: 0 2.2em 0 0;
+}
+
+.tq__card[data-still] .tq__x {
+  position: absolute;
+  top: 0.65em;
+  right: 0.65em;
+  margin: 0;
+}
+
+.tq__card[data-still] .tq__quote {
+  padding: 0.2em 0.55em 0.8em;
+}
+
+@media (max-width: 880px) {
+  .tq__title {
+    font-size: 2.875em;
+  }
+}
+
+@media (max-width: 700px) {
+  .tq {
+    padding-top: 2.5em;
+  }
+
+  /* wide enough that the longest quote stays short, so the room kept under the row is too */
+  .tq__card {
+    width: min(24em, 84vw);
+  }
+
+  .tq__handle {
+    font-size: 0.95em;
+  }
+
+  .tq__quote {
+    font-size: 1.35em;
+  }
+
+  .tqp__grid {
+    columns: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tq__body,
+  .tq__card[data-open="true"] .tq__body {
+    transition: none;
+  }
+
+  .tq__wi,
+  .tq__card[data-open="true"] .tq__wi {
+    transform: none;
+    transition: none;
+  }
+
+  .tq__plus svg,
+  .tq__all svg {
+    transition: none;
+  }
+}

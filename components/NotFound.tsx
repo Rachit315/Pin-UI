@@ -3,6 +3,7 @@
 import type React from "react";
 import { useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
+import MobileMenu from "./MobileMenu";
 import { animate, motion, useMotionValue, useReducedMotion } from "motion/react";
 import ThemeMark from "./ThemeMark";
 import { softSpring } from "@/lib/motion";
@@ -228,6 +229,7 @@ export default function NotFound() {
   return (
     <main className="nf">
       <h1 className="sr-only">Page not found (404)</h1>
+      <MobileMenu className="mmenu__toggle--float" />
 
       <div className="nf__stage">
         {/* the arm: both 4s, turning together round the pin */}

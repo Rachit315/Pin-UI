@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import BrandMark from "@/components/BrandMark";
+import MobileMenu from "@/components/MobileMenu";
 import WaitlistStage from "@/components/WaitlistStage";
 import { breadcrumbJsonLd, safeJsonLd } from "@/lib/jsonld";
 import { SITE_URL } from "@/lib/site";
@@ -24,6 +25,7 @@ export default function WaitlistPage() {
         dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbs) }}
       />
       <BrandMark />
+      <MobileMenu className="mmenu__toggle--float" />
       <WaitlistStage />
     </main>
   );

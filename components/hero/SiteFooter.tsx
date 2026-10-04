@@ -33,6 +33,9 @@ export default function SiteFooter() {
           <Link className="foot__navLink" href="/#components">
             Components
           </Link>
+          <Link className="foot__navLink" href="/#testimonials">
+            Testimonials
+          </Link>
         </nav>
 
         <div className="foot__dm">

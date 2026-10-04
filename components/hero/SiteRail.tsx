@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import ThemeMark from "../ThemeMark";
+import MobileMenu from "../MobileMenu";
 import { LINKS } from "@/lib/links";
 import { softSpring } from "@/lib/motion";
 import { usePinTheme } from "@/lib/theme";
@@ -97,6 +98,9 @@ export default function SiteRail() {
                 <a className="rail__link" href="#components">
                   Components
                 </a>
+                <a className="rail__link" href="#testimonials">
+                  Testimonials
+                </a>
               </>
             ) : (
               <>
@@ -106,11 +110,17 @@ export default function SiteRail() {
                 <Link className="rail__link" href="/#components">
                   Components
                 </Link>
+                <Link className="rail__link" href="/#testimonials">
+                  Testimonials
+                </Link>
               </>
             )}
           </div>
 
           <span className="rail__rule" aria-hidden="true" />
+
+          {/* on a phone the pill is the mark and the menu */}
+          <MobileMenu className="rail__menu" />
 
           <a
             className="rail__github"

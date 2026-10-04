@@ -162,6 +162,8 @@ export const LIBRARY: Entry[] = [
     zoom: 1,
     stage: "#e9e9eb",
     clipStage: "#e8e8e8",
+    /* the card's soft shadow runs past its box; clipped there it draws a line on a short stage */
+    spill: true,
     stageDark: "#0c0c0e",
     usage: `import LiquidTabs from "@/components/library/LiquidTabs";
 

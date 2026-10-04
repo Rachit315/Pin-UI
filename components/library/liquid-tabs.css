@@ -376,6 +376,23 @@
   transition: color 0.3s ease;
 }
 
+/*
+ * On the narrowest phones the card is under 300px wide, and three tabs at
+ * their full 84px minimum plus the chevron no longer fit — the chevron was
+ * pushed past the card's edge. The tabs tighten instead; the blob follows
+ * them, since it is placed from their measured boxes.
+ */
+@media (max-width: 400px) {
+  .pltabs__tab {
+    min-width: 0;
+    padding: 0 13px;
+  }
+
+  .pltabs__more {
+    padding-right: 6px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .pltabs__strip,
   .pltabs__body,

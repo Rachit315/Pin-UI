@@ -6,6 +6,8 @@ import PinterestPeek from "./PinterestPeek";
 import GitHubStars from "./GitHubStars";
 import SubmitNotch from "./SubmitNotch";
 import ThemeMark from "../ThemeMark";
+import MobileMenu from "../MobileMenu";
+import ThemeHint from "../ThemeHint";
 import { softSpring, spring } from "@/lib/motion";
 import { useRailed } from "./useRailed";
 
@@ -78,6 +80,8 @@ export default function HeroSection() {
                 />
 
                 <span className="hero__wordmark">Pin UI</span>
+                {/* under, not over: the frame's edge sits right above the lockup and would cut an arc */}
+                <ThemeHint mark=".hero__markButton" word=".hero__wordmark" under />
               </motion.div>
 
               <motion.nav className="hero__nav" {...rise(0.12)}>
@@ -87,10 +91,18 @@ export default function HeroSection() {
                 <a className="hero__navLink" href="#components">
                   Components
                 </a>
+                <a className="hero__navLink" href="#testimonials">
+                  Testimonials
+                </a>
               </motion.nav>
 
               {/* the octocat lifts away on hover and the star count rises into its place */}
               <GitHubStars {...rise(0.18)} />
+
+              {/* on a phone the links and the square fold into the menu */}
+              <motion.div className="hero__menu" {...rise(0.18)}>
+                <MobileMenu />
+              </motion.div>
             </motion.header>
           )}
         </AnimatePresence>

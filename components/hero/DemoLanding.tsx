@@ -4,6 +4,7 @@ import HeroSection from "./HeroSection";
 import SiteFooter from "./SiteFooter";
 import SiteRail from "./SiteRail";
 import SmoothScroll from "./SmoothScroll";
+import Testimonials from "./Testimonials";
 import UniqueSection from "./UniqueSection";
 
 /**
@@ -18,6 +19,7 @@ export default function DemoLanding() {
     <div className="site">
       <HeroSection />
       <UniqueSection />
+      <Testimonials />
       <SiteFooter />
       <SiteRail />
       <SmoothScroll />

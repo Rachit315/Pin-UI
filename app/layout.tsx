@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
-import { Manrope } from "next/font/google";
+import { Caveat, Manrope } from "next/font/google";
 import { SITE_URL } from "@/lib/site";
 import FaviconSync from "@/components/FaviconSync";
 import NoFlashScript from "@/components/NoFlashScript";
@@ -26,6 +26,19 @@ const manrope = Manrope({
   variable: "--font-manrope",
   display: "swap",
   preload: false,
+});
+
+/*
+ * Caveat is the hand the "switch theme" note beside the logo is written in.
+ * The note is at the top of almost every page, so this one is preloaded — a
+ * fallback face swapping into script a second late is exactly the jolt a
+ * handwritten aside should not make.
+ */
+const scribble = Caveat({
+  subsets: ["latin"],
+  weight: ["600"],
+  variable: "--font-scribble",
+  display: "swap",
 });
 
 /* What a link preview says. The tab says less — see `title` below. */
@@ -118,7 +131,7 @@ export default function RootLayout({
   return (
     /* the theme attribute is written by the script below, before hydration,
        so React must not claim ownership of it */
-    <html lang="en" className={manrope.variable} data-scroll-behavior="smooth" suppressHydrationWarning>
+    <html lang="en" className={`${manrope.variable} ${scribble.variable}`} data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         {/*
           Neue Montreal is the design's typeface; Switzer is the closest freely

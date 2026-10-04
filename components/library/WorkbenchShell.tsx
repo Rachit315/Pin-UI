@@ -6,6 +6,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, useReducedMotion } from "motion/react";
 import ThemeMark from "../ThemeMark";
+import MobileMenu from "../MobileMenu";
+import ThemeHint from "../ThemeHint";
 import { softSpring } from "@/lib/motion";
 import { LIBRARY, byCategory } from "./registry";
 import CreatorDot from "./CreatorDot";
@@ -176,6 +178,7 @@ export default function WorkbenchShell({ children }: { children: ReactNode }) {
             <Link className="wbnav__word" href="/">
               Pin UI
             </Link>
+            <ThemeHint mark=".wbnav__markButton" word=".wbnav__word" />
           </div>
 
           <button
@@ -204,6 +207,9 @@ export default function WorkbenchShell({ children }: { children: ReactNode }) {
               />
             </svg>
           </button>
+
+          {/* on a phone the sidebar is a strip, and the rest of the site is in here */}
+          <MobileMenu at={900} />
         </div>
 
         <h1 className="wbnav__title">

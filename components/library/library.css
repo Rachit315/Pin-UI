@@ -64,10 +64,16 @@
   gap: 0.55em;
 }
 
+/*
+ * The lockup at the hero's own proportions: the mark stands 1.25 times the
+ * wordmark's size and is as wide as 0.84 of its height. At 2.6em against a
+ * 1.6em word the mark was half as large again as that, and the pair read as a
+ * big badge with a caption rather than as one logo.
+ */
 .lib__markButton {
   display: grid;
-  width: 2.2em;
-  height: 2.6em;
+  width: 1.85em;
+  height: 2.19em;
   padding: 0;
   border: 0;
   background: none;
@@ -83,7 +89,9 @@
 
 .lib__word {
   color: var(--lib-accent);
-  font-size: 1.6em;
+  font-size: 1.75em;
+  line-height: 1;
+  white-space: nowrap;
   font-weight: 500;
   letter-spacing: -0.03em;
   text-decoration: none;
@@ -96,7 +104,9 @@
 }
 
 .lib__link {
+  position: relative;
   color: var(--lib-accent);
+  white-space: nowrap;
   font-size: 1.05em;
   letter-spacing: -0.01em;
   text-decoration: none;
@@ -324,6 +334,13 @@
 }
 
 /* --- narrow -------------------------------------------------------------- */
+
+/* a phone: the bar's links fold into the menu */
+@media (max-width: 700px) {
+  .lib__links {
+    display: none;
+  }
+}
 
 @media (max-width: 700px) {
   .lib__bar {

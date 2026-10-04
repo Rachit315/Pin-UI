@@ -3,6 +3,7 @@ import DemoLanding from "@/components/hero/DemoLanding";
 import { homepageJsonLd, safeJsonLd } from "@/lib/jsonld";
 import "./hero.css";
 import "./sections.css";
+import "./testimonials.css";
 
 export const metadata: Metadata = {
   /* the root page's title carries the name alone; the rest of the site suffixes it */

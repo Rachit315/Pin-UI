@@ -1,0 +1,137 @@
+/* ===========================================================================
+   The "switch theme" note beside the logo.
+
+   It takes the colour of the lockup it sits in (`currentColor` on its host),
+   so it is red where the wordmark is red and white where the wordmark is
+   white — every lockup already flips with the theme, and the note follows.
+=========================================================================== */
+
+/* the lockups it is written beside: positioned, and inked like their wordmarks */
+.hero__brand,
+.lib__brand,
+.wbnav__lockup {
+  position: relative;
+}
+
+.lib__brand {
+  color: var(--lib-accent);
+}
+
+.wbnav__lockup {
+  color: var(--wb-title);
+}
+
+.brand {
+  color: var(--pin-brand);
+}
+
+/* the host is the lockup; the note is laid out in its pixels */
+.thint {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* a little quieter than the logo it annotates */
+  opacity: 0.92;
+}
+
+.thint__draw {
+  --thint-wait: 0.9s;
+
+  position: absolute;
+  inset: 0;
+}
+
+/* drawn again on a switch, without the first visit's long wait */
+.thint__draw[data-replay] {
+  --thint-wait: 0.25s;
+}
+
+.thint__svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
+}
+
+.thint__rock {
+  transform-box: view-box;
+  animation: thint-rock 3.2s ease-in-out calc(var(--thint-wait) + 1.3s) infinite alternate;
+}
+
+.thint__line,
+.thint__head {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.thint__line {
+  animation: thint-draw 0.95s cubic-bezier(0.55, 0.05, 0.25, 1) var(--thint-wait) forwards;
+}
+
+.thint__head {
+  animation: thint-draw 0.22s ease-out calc(var(--thint-wait) + 0.9s) forwards;
+}
+
+.thint__text {
+  position: absolute;
+  font-family: var(--font-scribble), "Caveat", "Segoe Print", "Bradley Hand", cursive;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+  /* written on left to right, as a pen would */
+  clip-path: inset(-20% 100% -20% 0);
+  transform: translateY(-50%) rotate(-5deg);
+  transform-origin: 0 50%;
+  animation: thint-write 0.75s cubic-bezier(0.45, 0, 0.3, 1) calc(var(--thint-wait) - 0.15s) forwards;
+}
+
+@keyframes thint-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes thint-write {
+  to {
+    clip-path: inset(-20% -5% -20% 0);
+  }
+}
+
+/* the arrow rocks on its tail, a few degrees either way */
+@keyframes thint-rock {
+  from {
+    transform: rotate(-3.5deg);
+  }
+  to {
+    transform: rotate(3deg);
+  }
+}
+
+/* pointing at the switch while you are on it: it rocks quicker, eagerly */
+:where(.hero__brand, .lib__brand, .wbnav__lockup, .brand):has(button:hover) .thint__rock {
+  animation-duration: 0.7s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thint__line,
+  .thint__head,
+  .thint__text,
+  .thint__rock {
+    animation: none;
+  }
+
+  .thint__line,
+  .thint__head {
+    stroke-dashoffset: 0;
+  }
+
+  .thint__text {
+    clip-path: none;
+  }
+}

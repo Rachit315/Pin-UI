@@ -881,14 +881,23 @@
   }
 }
 
-/* narrower still: the nav and the lockup can no longer share a line */
-@media (max-width: 420px) {
-  .hero__masthead {
-    flex-wrap: wrap;
-    row-gap: 0.7em;
+/*
+ * A phone: the links and the GitHub square fold into the menu, and the
+ * masthead is the lockup and the menu button, one at either end.
+ */
+.hero__menu {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  .hero__masthead .hero__nav,
+  .hero__masthead .ghs {
+    display: none;
   }
 
-  .hero__brand {
-    margin-right: auto;
+  .hero__menu {
+    display: block;
+    line-height: 0;
   }
 }
+

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import PinMark from "./PinMark";
+import ThemeHint from "./ThemeHint";
 import { usePinTheme } from "@/lib/theme";
 import { softSpring } from "@/lib/motion";
 
@@ -51,6 +52,7 @@ export default function BrandMark() {
       </motion.button>
 
       <span className="brand__word">Pin UI</span>
+      <ThemeHint mark=".brand__mark" word=".brand__word" />
     </motion.div>
   );
 }

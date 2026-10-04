@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
 import ThemeMark from "../ThemeMark";
+import MobileMenu from "../MobileMenu";
+import ThemeHint from "../ThemeHint";
 import SiteFooter from "../hero/SiteFooter";
 import ComponentCard from "./ComponentCard";
 import { LIBRARY, byCategory, type Entry } from "./registry";
@@ -108,10 +110,14 @@ export default function LibraryIndex() {
           <Link className="lib__word" href="/">
             Pin UI
           </Link>
+          <ThemeHint mark=".lib__markButton" word=".lib__word" />
         </div>
         <nav className="lib__links" aria-label="Site">
           <Link className="lib__link" href="/">
             Home
+          </Link>
+          <Link className="lib__link" href="/#testimonials">
+            Testimonials
           </Link>
           <a className="lib__link lib__link--icon" href={LINKS.github} target="_blank" rel="noopener noreferrer" aria-label="Pin UI on GitHub">
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -122,6 +128,7 @@ export default function LibraryIndex() {
             </svg>
           </a>
         </nav>
+        <MobileMenu />
       </header>
 
       <main className="lib" id="top">
@@ -136,8 +143,8 @@ export default function LibraryIndex() {
             </span>
           </motion.h1>
           <motion.p className="lib__lead" {...rise(0.1)}>
-            Every one started as a Pinterest pin and ends as a single file you own. Hover a card to
-            watch it move; open it to play with it live and copy the source.
+            Every one started as a Pinterest pin and ends as a single file you own. Each card plays
+            as it comes into view; open one to play with it live and copy the source.
           </motion.p>
         </section>
 

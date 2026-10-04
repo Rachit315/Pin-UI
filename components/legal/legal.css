@@ -45,6 +45,8 @@
   top: 0;
   z-index: 5;
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 1.9em 0 1.4em;
   background: var(--legal-paper);
 }

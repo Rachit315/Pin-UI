@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import SiteFooter from "../hero/SiteFooter";
+import MobileMenu from "../MobileMenu";
 import SmoothScroll from "../hero/SmoothScroll";
 import "@/app/hero.css";
 import "@/app/sections.css";
@@ -61,6 +62,7 @@ export default function LegalPage({
             </span>
             Back to home
           </Link>
+          <MobileMenu />
         </div>
 
         <h1 className="legal__title">{title}</h1>
