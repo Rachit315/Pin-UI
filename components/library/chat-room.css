@@ -1,0 +1,351 @@
+/* ===========================================================================
+   Chat Room.
+
+   A pill of faces and the voice chat card it opens into, drawn as one
+   surface. Everything is themed through the tokens below; the dark set
+   swaps in on data-theme="dark".
+=========================================================================== */
+
+.pvc {
+  --pvc-surface: #ffffff;
+  --pvc-surface-2: #f6f6f7;
+  --pvc-line: rgb(0 0 0 / 0.06);
+  --pvc-muted: #6b6b73;
+  --pvc-subtle: #a3a3ab;
+  --pvc-chip: #ececef;
+  --pvc-chip-hover: #e2e2e6;
+  --pvc-btn-top: #3a3a3d;
+  --pvc-btn-bottom: #0d0d0e;
+  --pvc-btn-text: #ffffff;
+  --pvc-btn-shadow: rgb(0 0 0 / 0.5);
+  --pvc-badge: #18181b;
+  --pvc-badge-ink: #ffffff;
+  --pvc-ring: rgb(0 0 0 / 0.07);
+  --pvc-shadow:
+    0 0 0 1px rgb(0 0 0 / 0.05),
+    0 12px 28px -10px rgb(0 0 0 / 0.16),
+    0 2px 6px -2px rgb(0 0 0 / 0.06);
+
+  display: flex;
+  justify-content: center;
+  color: var(--pvc-muted);
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pvc[data-theme="dark"] {
+  --pvc-surface: #1a1a1d;
+  --pvc-surface-2: #202024;
+  --pvc-line: rgb(255 255 255 / 0.06);
+  --pvc-muted: #a1a1aa;
+  --pvc-subtle: #6b6b73;
+  --pvc-chip: #2a2a2f;
+  --pvc-chip-hover: #34343a;
+  --pvc-btn-top: #fafafa;
+  --pvc-btn-bottom: #d6d6da;
+  --pvc-btn-text: #0c0c0d;
+  --pvc-btn-shadow: rgb(0 0 0 / 0.7);
+  --pvc-badge: #f4f4f5;
+  --pvc-badge-ink: #18181b;
+  --pvc-ring: rgb(255 255 255 / 0.08);
+  --pvc-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.07),
+    0 16px 36px -12px rgb(0 0 0 / 0.7),
+    0 2px 6px -2px rgb(0 0 0 / 0.4);
+}
+
+.pvc *,
+.pvc *::before,
+.pvc *::after {
+  box-sizing: border-box;
+}
+
+.pvc__stage {
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+
+/* --- the two faces of the one surface ----------------------------------- */
+
+.pvc__card {
+  position: relative;
+  overflow: hidden;
+  background: var(--pvc-surface);
+  box-shadow: var(--pvc-shadow);
+  transition: background-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.pvc__pill {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 6px 14px 6px 6px;
+  background: var(--pvc-surface);
+  box-shadow: var(--pvc-shadow);
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.pvc__pill:focus-visible {
+  outline: 2px solid var(--pvc-subtle);
+  outline-offset: 3px;
+}
+
+/* --- the live badge ------------------------------------------------------ */
+
+.pvc__badge {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  background: var(--pvc-badge);
+  pointer-events: none;
+}
+
+.pvc__badge--card {
+  top: 4px;
+  left: 8px;
+  z-index: 10;
+}
+
+.pvc__badge--pill {
+  top: -8px;
+  left: -8px;
+  z-index: 20;
+  box-shadow: 0 0 0 3px var(--pvc-surface);
+}
+
+.pvc__bars {
+  display: flex;
+  align-items: center;
+}
+
+.pvc__bars--lg {
+  height: 12px;
+  gap: 2px;
+}
+
+.pvc__bars--sm {
+  height: 8px;
+  gap: 1.5px;
+}
+
+.pvc__bar {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+}
+
+.pvc__bars--lg .pvc__bar {
+  width: 2px;
+  background: var(--pvc-badge-ink);
+}
+
+.pvc__bars--sm .pvc__bar {
+  width: 1.5px;
+  background: var(--pvc-muted);
+}
+
+/* --- "+3" ------------------------------------------------------------------ */
+
+.pvc__more {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--pvc-subtle);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+  transition: color 0.2s ease;
+}
+
+.pvc__more--card {
+  position: absolute;
+  top: 62px;
+  right: 16px;
+  pointer-events: none;
+}
+
+.pvc__more--pill {
+  margin-left: 8px;
+}
+
+.pvc__pill:hover .pvc__more--pill {
+  color: var(--pvc-muted);
+}
+
+.pvc__chevron {
+  width: 15px;
+  height: 15px;
+  transition: transform 0.3s ease;
+}
+
+.pvc__pill:hover .pvc__chevron {
+  transform: translateY(1px);
+}
+
+/* --- faces ----------------------------------------------------------------- */
+
+.pvc__seat {
+  position: relative;
+}
+
+.pvc__seat--overlap {
+  margin-left: -6px;
+}
+
+.pvc__avatar {
+  display: block;
+  width: 46px;
+  height: 46px;
+  border: 2.5px solid var(--pvc-surface);
+  border-radius: 999px;
+  background: var(--pvc-chip);
+  object-fit: cover;
+  box-shadow:
+    0 0 0 1px var(--pvc-ring),
+    0 2px 5px rgb(0 0 0 / 0.08);
+  user-select: none;
+  -webkit-user-select: none;
+  transition: border-color 0.35s ease;
+}
+
+/* --- the card -------------------------------------------------------------- */
+
+.pvc__head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  border-bottom: 1px solid var(--pvc-line);
+  background: var(--pvc-surface-2);
+  transition: background-color 0.35s ease;
+}
+
+.pvc__title {
+  color: var(--pvc-muted);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.pvc__close {
+  position: absolute;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--pvc-chip);
+  color: var(--pvc-subtle);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.pvc__close:hover {
+  background: var(--pvc-chip-hover);
+  color: var(--pvc-muted);
+}
+
+.pvc__close:focus-visible {
+  outline: 2px solid var(--pvc-subtle);
+  outline-offset: 2px;
+}
+
+.pvc__close svg {
+  width: 12px;
+  height: 12px;
+}
+
+.pvc__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  row-gap: 14px;
+  margin: 0;
+  padding: 16px 12px 0;
+  list-style: none;
+}
+
+.pvc__member {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pvc__speaking {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  display: grid;
+  place-items: center;
+  width: 19px;
+  height: 19px;
+  border-radius: 999px;
+  background: var(--pvc-surface);
+  box-shadow:
+    0 0 0 1px var(--pvc-ring),
+    0 2px 4px rgb(0 0 0 / 0.1);
+}
+
+.pvc__name {
+  margin-top: 4px;
+  color: var(--pvc-muted);
+  font-size: 13px;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.pvc__foot {
+  padding: 20px 14px 14px;
+}
+
+.pvc__join {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 40px;
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  border-radius: 11px;
+  background: linear-gradient(180deg, var(--pvc-btn-top) 0%, var(--pvc-btn-bottom) 100%);
+  box-shadow:
+    0 8px 16px -8px var(--pvc-btn-shadow),
+    inset 0 1px 0 rgb(255 255 255 / 0.14);
+  color: var(--pvc-btn-text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.pvc__join:focus-visible {
+  outline: 2px solid var(--pvc-subtle);
+  outline-offset: 2px;
+}
+
+.pvc__note {
+  position: relative;
+  height: 16px;
+  margin-top: 10px;
+  overflow: hidden;
+  color: var(--pvc-subtle);
+  font-size: 12px;
+  line-height: 16px;
+  text-align: center;
+}
+
+.pvc__swap {
+  display: block;
+}

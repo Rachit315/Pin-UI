@@ -126,6 +126,11 @@ export type Entry = {
    * sidebar and on the shelf — with a tooltip that links to their X profile.
    */
   creator?: { handle: string; url: string };
+  /**
+   * Who asked for it, shown as a "Requested by @handle" chip at the top of its
+   * stage that links to their X profile.
+   */
+  requestedBy?: { handle: string; url: string };
   /** The import used on the page and in the copy button. */
   usage: string;
   props: PropSpec[];
@@ -146,6 +151,129 @@ export type Entry = {
 };
 
 export const LIBRARY: Entry[] = [
+  {
+    slug: "chat-room",
+    requestedBy: { handle: "hrstwt", url: "https://x.com/hrstwt" },
+    category: "lists",
+    name: "Chat Room",
+    isNew: true,
+    tagline: "A stack of faces that morphs into a voice chat card, and back.",
+    blurb:
+      "A pill of faces that grows into a voice chat card. The faces fly to their seats, the hidden ones rise into the grid after them, the live badge parks in the corner and the count dissolves on the way in — then the whole thing folds back into the pill. One spring drives every piece, so they all land together, each step with its own soft synthesised sound.",
+    highlights: ["Shared-surface morph", "Faces fly to their seats", "Live equaliser badges", "Synthesised UI sounds"],
+    clip: "/clips/loop/chat-room.mp4",
+    poster: "/clips/loop/chat-room.jpg",
+    hero: false,
+    sound: true,
+    zoom: 1,
+    stage: "#f5f5f6",
+    clipStage: "#f5f5f6",
+    /* the card's soft shadow runs past its box; clipped there it draws a line */
+    spill: true,
+    stageDark: "#0c0c0d",
+    usage: `import ChatRoom from "@/components/library/ChatRoom";
+
+<ChatRoom corner={20} rows={4} theme="light" onJoinChange={(joined) => console.log(joined)} />`,
+    props: [
+      { name: "corner", type: "number", fallback: "20", note: "The open card's corner radius, clamped to 0–40px." },
+      { name: "rows", type: "2 | 3 | 4", fallback: "4", note: "How many faces the closed pill shows; the rest are counted as \"+3\"." },
+      { name: "people", type: "ChatRoomPerson[]", fallback: "seven people", note: "Who is in the room — id, name, portrait URL and whether they are speaking. Up to eight sit on the card." },
+      { name: "theme", type: "\"light\" | \"dark\"", fallback: "\"light\"", note: "A white card on soft grey, or graphite on near-black." },
+      { name: "sound", type: "boolean", fallback: "true", note: "The opening and closing pops and the join and leave chimes, synthesised at play time." },
+      { name: "onJoinChange", type: "(joined) => void", note: "Fired when the join button is pressed, with whether you are now in." },
+    ],
+    files: [
+      { name: "ChatRoom.tsx", lang: "tsx" },
+      { name: "chat-room.css", lang: "css" },
+    ],
+    info: {
+      paragraphs: [
+        "The pill and the card are one surface, shared through a layout id, inside a fixed stage — so the card grows out of the pill's own centre and nothing around it moves. The faces on the pill fly to their seats on the card, the hidden ones rise into the grid after them on a short stagger, the live badge parks in the header corner and the \"+3\" travels in and dissolves.",
+        "Closing runs it backwards: the card's contents fade out first, then the surface folds back into the pill and focus returns to it. Escape or a press outside closes it. Every equaliser bar animates by transform only, so nothing touches layout, and the sounds — a rising pop to open, a falling one to close, a two-note chime to join and its mirror to leave — are synthesised with Web Audio, with no files to load.",
+      ],
+    },
+    origin: { label: "chat-room" },
+  },
+  {
+    slug: "dynamic-drop-zone",
+    requestedBy: { handle: "hrstwt", url: "https://x.com/hrstwt" },
+    category: "controls",
+    name: "Dynamic Drop Zone",
+    isNew: true,
+    tagline: "A file drop zone that turns into a magnetic black hole.",
+    blurb:
+      "Carry a file over it and the paper dims into ink: eight dashed rings fall into a tunnel that bends toward your pointer while debris spirals in from the rim. Drop it and the hole swallows the file, flashes back to paper and stacks its rings into an upload pill, with a spinner that turns into a drawn check.",
+    highlights: ["Magnetic ring tunnel", "Debris spiralling in", "Rings stack into a pill", "Real files or a demo file"],
+    clip: "/clips/loop/dynamic-drop-zone.mp4?v=3",
+    poster: "/clips/loop/dynamic-drop-zone.jpg?v=3",
+    hero: false,
+    sound: false,
+    zoom: 1,
+    stage: "#e6e8ee",
+    clipStage: "#e6e8ee",
+    /* the zone's soft shadow, and the hole's swelling, run past its box */
+    spill: true,
+    stageDark: "#050506",
+    usage: `import DynamicDropZone from "@/components/library/DynamicDropZone";
+
+<DynamicDropZone theme="light" onDrop={(files) => console.log(files)} />`,
+    props: [
+      { name: "theme", type: "\"light\" | \"dark\"", fallback: "\"light\"", note: "A paper zone with pale dashed rings, or a graphite one with faint ones." },
+      { name: "corner", type: "number", fallback: "28", note: "The zone's corner radius, clamped to 0–40px. The rings step in from it." },
+      { name: "uploadMs", type: "number", fallback: "3400", note: "How long the spinner runs before the check lands, in ms." },
+      { name: "demoFile", type: "boolean", fallback: "true", note: "The draggable demo file under the zone, so it can be tried without a file to hand." },
+      { name: "onDrop", type: "(files) => void", note: "Fired with the files dropped from the desktop. The demo file sends none." },
+    ],
+    files: [
+      { name: "DynamicDropZone.tsx", lang: "tsx" },
+      { name: "dynamic-drop-zone.css", lang: "css" },
+    ],
+    info: {
+      paragraphs: [
+        "Carry a file over the zone and it dims from paper through grey into ink. Its eight dashed rings blink out and come back as a tunnel, bunched toward the centre, and the tunnel bends toward the pointer — the inner rings lean furthest — while squares and dots of debris spiral in from the rim on a quarter-turn swirl and shrink to nothing at the core.",
+        "Drop it and the hole pulls itself in and swallows the file, then flashes back out to paper: the innermost ring becomes an upload pill and the others stack behind it like drawers spilling off the bottom edge. The spinner shrinks to a point and a check is drawn in its place before everything resets. It takes real files from the desktop, and carries a demo file of its own — drag it with a mouse, pen or finger, or focus it and press Enter to watch the drag played for you.",
+      ],
+    },
+    origin: { label: "dynamic-drop-zone" },
+  },
+  {
+    slug: "swap-card",
+    category: "cards",
+    name: "Swap Card",
+    isNew: true,
+    tagline: "A token swap card where every number rolls and the button is liquid.",
+    blurb:
+      "Swap, Buy and Stake on one card. The quote rolls in like an odometer, flipping the pair sends the two token pills gliding past each other, and the token list opens out of its pill through a blur. The button is liquid: light drifts across it, it ripples where you press, shakes when it can't swap and bursts when a swap lands.",
+    highlights: ["Odometer quotes", "Pills trade panels on flip", "Liquid button", "Light and dark"],
+    clip: "/clips/loop/swap-card.mp4",
+    poster: "/clips/loop/swap-card.jpg",
+    hero: false,
+    sound: false,
+    zoom: 1,
+    stage: "#eaecef",
+    clipStage: "#eaecef",
+    /* the token list and the swap burst open past the card's box */
+    spill: true,
+    stageDark: "#0e0f12",
+    usage: `import SwapCard from "@/components/library/SwapCard";
+
+<SwapCard theme="light" onSwap={(trade) => console.log(trade)} />`,
+    props: [
+      { name: "theme", type: "\"light\" | \"dark\"", fallback: "\"light\"", note: "White panels on cool grey, or graphite on near-black with a softer blue." },
+      { name: "onSwap", type: "(trade) => void", note: "Fired when a swap, buy or stake lands, with the mode, the pair, the amount paid and the amount received." },
+    ],
+    files: [
+      { name: "SwapCard.tsx", lang: "tsx" },
+      { name: "swap-card.css", lang: "css" },
+    ],
+    info: {
+      paragraphs: [
+        "Swap, Buy and Stake share one card, and the tab pill slides between them. Type an amount and the quote rolls in like an odometer — each character that changes slides out the top while its replacement rises from below. Flip the pair and the two token pills, each with its own layout id, glide past each other to trade panels while the arrow turns half a circle; flipping back restores what you typed rather than compounding the rounding.",
+        "The token list opens out of its pill through a blur with the current token centred, the rate line rolls over when the pair changes, and the details drawer unfolds on the same spring as everything else. The button is liquid: pools of light drift across it and glints twinkle on its surface, it ripples from wherever it is pressed, shakes \"no\" when there is nothing to swap, sweeps while the swap is in flight and throws a ring of specks when it lands.",
+      ],
+    },
+    origin: { label: "swap-card" },
+  },
   {
     slug: "liquid-tabs",
     category: "lists",

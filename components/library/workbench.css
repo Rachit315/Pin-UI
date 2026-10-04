@@ -1618,3 +1618,149 @@
     padding-inline: 0;
   }
 }
+
+/*
+ * "Requested by @handle" — the toolbar's twin at the top of the stage, for a
+ * component somebody asked for. The whole chip is the link to their X
+ * profile; pointing at it slides the address out beside the name.
+ */
+.wbreq {
+  position: absolute;
+  left: 50%;
+  top: 0.8em;
+  z-index: 3;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  height: 2.571em;
+  max-width: calc(100% - 1.6em);
+  padding: 0 1.05em;
+  border-radius: 999px;
+  background: var(--wb-bar);
+  color: var(--wb-bar-ink);
+  box-shadow:
+    0 0 0 1px var(--wb-bar-edge),
+    0 0.35em 0.9em rgb(0 0 0 / 0.14);
+  font-size: 0.929em;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+  /* its own drop-in: the shared rise would drop the centring translate while it plays */
+  animation: wbreq-in 0.5s cubic-bezier(0.22, 0.68, 0.16, 1) 0.15s backwards;
+  transition:
+    background-color var(--pin-theme-fade, 0.5s) var(--pin-theme-ease, ease),
+    color var(--pin-theme-fade, 0.5s) var(--pin-theme-ease, ease),
+    box-shadow 0.25s ease;
+}
+
+@keyframes wbreq-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -0.9em);
+  }
+}
+
+.wbreq:focus-visible {
+  outline: 2px solid var(--wb-pin);
+  outline-offset: 3px;
+}
+
+
+/* the lead-in is quieter than the name; mixed rather than faded, so the name stays at full strength */
+.wbreq__text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: color-mix(in srgb, currentColor 68%, transparent);
+}
+
+/* red on the white bar, white on the black one */
+.wbreq__handle {
+  color: var(--wb-title);
+  font-weight: 600;
+  transition: color var(--pin-theme-fade, 0.5s) var(--pin-theme-ease, ease);
+}
+
+/* folded to nothing; a 0fr → 1fr track opens it to its own width, no measuring */
+.wbreq__more {
+  display: grid;
+  grid-template-columns: 0fr;
+  transition: grid-template-columns 0.45s cubic-bezier(0.22, 0.68, 0.16, 1);
+}
+
+.wbreq__moreInner {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.wbreq__rule {
+  flex: none;
+  width: 1px;
+  height: 1.1em;
+  margin: 0 0.7em;
+  background: currentColor;
+  opacity: 0.2;
+}
+
+.wbreq__url {
+  opacity: 0.6;
+}
+
+.wbreq__arrow {
+  flex: none;
+  width: 0.85em;
+  height: 0.85em;
+  margin-left: 0.35em;
+  transition: transform 0.35s cubic-bezier(0.22, 0.68, 0.16, 1);
+}
+
+.wbreq:is(:hover, :focus-visible) .wbreq__more {
+  grid-template-columns: 1fr;
+}
+
+.wbreq:is(:hover, :focus-visible) .wbreq__moreInner {
+  opacity: 1;
+  transition-delay: 0.08s;
+}
+
+.wbreq:hover .wbreq__arrow {
+  transform: translate(0.1em, -0.1em);
+}
+
+.wbreq:hover {
+  box-shadow:
+    0 0 0 1px var(--wb-bar-edge),
+    0 0.5em 1.2em rgb(0 0 0 / 0.18);
+}
+
+/* on a touch screen there is no pointing: the address is simply shown */
+@media (hover: none) {
+  .wbreq__more {
+    grid-template-columns: 1fr;
+  }
+
+  .wbreq__moreInner {
+    opacity: 1;
+  }
+}
+
+/* a phone has no room for the address beside the name; the chip is still the link */
+@media (max-width: 420px) {
+  .wbreq__more {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wbreq,
+  .wbreq__more,
+  .wbreq__moreInner,
+  .wbreq__arrow {
+    animation: none;
+    transition: none;
+  }
+}

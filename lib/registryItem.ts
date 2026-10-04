@@ -57,6 +57,9 @@ const FACES: Record<string, string | null> = {
   "liquid-tabs": "Inter (500 and 600)",
   "thermal-dial": "Manrope (500 and 800), with Inter for the hint — the site exposes Manrope as --font-manrope, and the stylesheet falls back to a face named \"Manrope\"",
   "lamp-switch": "Inter (300)",
+  "chat-room": "Inter (400 and 500)",
+  "dynamic-drop-zone": "Inter (400 to 600)",
+  "swap-card": "Inter (400 and 500)",
 };
 
 function docsFor(entry: Entry): string {
@@ -103,6 +106,20 @@ function docsFor(entry: Entry): string {
     lines.push(
       "",
       "There is no microphone: the waveform is a generated, speech-shaped signal and playback is a silent replay of the take. Wire your own MediaRecorder to it if you need real audio. The keyboard shortcuts (Space, S, arrows) listen on the card, so they work once it has focus.",
+    );
+  }
+
+  if (entry.slug === "chat-room") {
+    lines.push(
+      "",
+      "The default faces are not part of this package: they point at /library/voice/*.webp. Pass your own `people` — id, name, portrait URL and whether they are speaking — or copy the portraits from https://github.com/Rachit315/Pin-UI/tree/main/public/library/voice into your own public folder.",
+    );
+  }
+
+  if (entry.slug === "dynamic-drop-zone") {
+    lines.push(
+      "",
+      "While it is mounted, a file dropped anywhere on the page outside the zone is kept from opening in the browser. The upload itself is a timed animation: read the files from `onDrop` and send them wherever they need to go.",
     );
   }
 

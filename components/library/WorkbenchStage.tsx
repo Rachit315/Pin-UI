@@ -17,6 +17,10 @@ import Joystick from "./Joystick";
 import LiquidTabs from "./LiquidTabs";
 import ThermalDial from "./ThermalDial";
 import LampSwitch from "./LampSwitch";
+import ChatRoom from "./ChatRoom";
+import DynamicDropZone from "./DynamicDropZone";
+import SwapCard from "./SwapCard";
+import RequestChip from "./RequestChip";
 import type { Entry } from "./registry";
 import { LINKS } from "@/lib/links";
 import { usePinTheme } from "@/lib/theme";
@@ -107,9 +111,14 @@ export default function WorkbenchStage({
           {entry.slug === "liquid-tabs" && <LiquidTabs theme={theme} />}
           {entry.slug === "thermal-dial" && <ThermalDial theme={theme} />}
           {entry.slug === "lamp-switch" && <LampSwitch theme={theme} />}
+          {entry.slug === "chat-room" && <ChatRoom theme={theme} sound={sound} />}
+          {entry.slug === "dynamic-drop-zone" && <DynamicDropZone theme={theme} />}
+          {entry.slug === "swap-card" && <SwapCard theme={theme} />}
         </div>
 
         {entry.slug === "chips" && <ChipsEditor value={chips} onChange={setChips} />}
+
+        {entry.requestedBy && <RequestChip handle={entry.requestedBy.handle} url={entry.requestedBy.url} />}
 
         <div className="wbbar" role="toolbar" aria-label="Stage">
           <button

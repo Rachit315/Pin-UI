@@ -1,0 +1,626 @@
+/* ===========================================================================
+   Swap Card.
+
+   Two panels, a flip button on the seam between them and a liquid button
+   under them. Everything is themed through the tokens below; --pswap-page is
+   the field the card sits on, which the flip button's ring is cut from.
+=========================================================================== */
+
+.pswap {
+  --pswap-page: #eaecef;
+  --pswap-card: #ffffff;
+  --pswap-ink: #1b1d22;
+  --pswap-muted: #8a8f99;
+  --pswap-faint: #a9adb5;
+  --pswap-chip: #f2f3f5;
+  --pswap-chip-hover: #e8e9ed;
+  --pswap-accent: #2f6bff;
+  --pswap-accent-soft: #e8f0ff;
+  --pswap-list-shadow: 0 0 0 1px rgb(0 0 0 / 0.05), 0 16px 32px -12px rgb(0 0 0 / 0.25);
+
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  color: var(--pswap-ink);
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pswap[data-theme="dark"] {
+  --pswap-page: #0e0f12;
+  --pswap-card: #17191d;
+  --pswap-ink: #f3f4f6;
+  --pswap-muted: #8b909a;
+  --pswap-faint: #5f646e;
+  --pswap-chip: #23262c;
+  --pswap-chip-hover: #2c3037;
+  --pswap-accent: #6b97ff;
+  --pswap-accent-soft: rgb(107 151 255 / 0.16);
+  --pswap-list-shadow: 0 0 0 1px rgb(255 255 255 / 0.06), 0 16px 32px -12px rgb(0 0 0 / 0.6);
+}
+
+.pswap *,
+.pswap *::before,
+.pswap *::after {
+  box-sizing: border-box;
+}
+
+.pswap button {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pswap :is(button, input):focus-visible {
+  outline: 2px solid var(--pswap-accent);
+  outline-offset: 2px;
+}
+
+.pswap__card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 340px;
+}
+
+/* --- tabs ------------------------------------------------------------------- */
+
+.pswap__tabsRow {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.pswap__tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.pswap .pswap__tab {
+  position: relative;
+  height: 28px;
+  padding: 0 19px;
+  border-radius: 999px;
+  color: var(--pswap-muted);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.pswap .pswap__tab:hover,
+.pswap .pswap__tab[aria-selected="true"] {
+  color: var(--pswap-ink);
+}
+
+.pswap__tabPill {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: var(--pswap-card);
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.06),
+    0 2px 8px -2px rgb(0 0 0 / 0.06);
+}
+
+.pswap__tabText {
+  position: relative;
+}
+
+/* --- panels ----------------------------------------------------------------- */
+
+.pswap__slot {
+  position: relative;
+  z-index: 0;
+}
+
+/* the panel whose token list is open sits over the other one */
+.pswap__slot[data-raised] {
+  z-index: 30;
+}
+
+.pswap__panel {
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: var(--pswap-card);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.03);
+  transition: background-color 0.3s ease;
+}
+
+.pswap__panelLabel {
+  margin: 0 0 12px;
+  color: var(--pswap-muted);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.pswap__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pswap__amount {
+  flex: 1 1 0;
+  min-width: 0;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  transition: font-size 0.2s ease;
+}
+
+.pswap__input {
+  width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--pswap-ink);
+  font-family: inherit;
+  caret-color: var(--pswap-accent);
+  outline: none;
+}
+
+.pswap .pswap__input:focus-visible {
+  outline: none;
+}
+
+.pswap__input::placeholder {
+  color: var(--pswap-faint);
+  opacity: 1;
+}
+
+.pswap__out {
+  display: flex;
+  align-items: center;
+  color: var(--pswap-ink);
+}
+
+.pswap__out[data-empty] {
+  color: var(--pswap-faint);
+}
+
+.pswap__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  color: var(--pswap-muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+}
+
+.pswap__footRight {
+  display: flex;
+  align-items: center;
+}
+
+.pswap__usd {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pswap__faint,
+.pswap__have {
+  color: var(--pswap-faint);
+}
+
+.pswap__have {
+  margin-left: 4px;
+}
+
+.pswap .pswap__max {
+  margin-left: 6px;
+  padding: 3px 4px;
+  border-radius: 4px;
+  background: var(--pswap-accent-soft);
+  color: var(--pswap-accent);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.pswap .pswap__max:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+/* --- the flip button on the seam ----------------------------------------- */
+
+.pswap__seam {
+  position: relative;
+  z-index: 20;
+  height: 6px;
+}
+
+.pswap .pswap__flip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  translate: -50% -50%;
+  border: 4px solid var(--pswap-page);
+  border-radius: 999px;
+  background: var(--pswap-card);
+  color: var(--pswap-ink);
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.pswap__flipIcon {
+  display: grid;
+  place-items: center;
+}
+
+.pswap__flipIcon svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* --- token picker ------------------------------------------------------------ */
+
+.pswap__select {
+  position: relative;
+  flex: none;
+}
+
+.pswap .pswap__pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 4px 10px 4px 6px;
+  background: var(--pswap-chip);
+  color: var(--pswap-ink);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.pswap .pswap__pill:hover {
+  background: var(--pswap-chip-hover);
+}
+
+.pswap__pillToken {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pswap__pillChevron {
+  display: grid;
+  color: var(--pswap-muted);
+}
+
+.pswap__chevron {
+  display: block;
+  width: 14px;
+  height: 14px;
+}
+
+.pswap__coin {
+  display: block;
+  flex: none;
+}
+
+.pswap__list {
+  position: absolute;
+  top: 38px;
+  right: 0;
+  z-index: 50;
+  width: 224px;
+  max-height: 196px;
+  margin: 0;
+  padding: 6px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-radius: 16px;
+  background: var(--pswap-card);
+  box-shadow: var(--pswap-list-shadow);
+  list-style: none;
+  scrollbar-width: thin;
+  scrollbar-color: var(--pswap-chip-hover) transparent;
+}
+
+.pswap__list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.pswap__list::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: var(--pswap-chip-hover);
+}
+
+.pswap .pswap__option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.pswap .pswap__option:hover,
+.pswap .pswap__option:focus-visible {
+  background: var(--pswap-chip);
+  outline: none;
+}
+
+.pswap__optionName {
+  flex: 1;
+  line-height: 1.25;
+}
+
+.pswap__optionSymbol {
+  display: block;
+  color: var(--pswap-ink);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.pswap__optionFull {
+  display: block;
+  color: var(--pswap-muted);
+  font-size: 11px;
+}
+
+.pswap__optionBalance {
+  color: var(--pswap-muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pswap__optionCheck {
+  width: 16px;
+  height: 16px;
+  color: var(--pswap-accent);
+}
+
+/* --- rate line and details ------------------------------------------------------ */
+
+.pswap .pswap__rate {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 6px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  color: var(--pswap-muted);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.pswap__rateText {
+  position: relative;
+  height: 14px;
+  overflow: hidden;
+  line-height: 14px;
+}
+
+.pswap__rateChevron {
+  display: grid;
+  place-items: center;
+}
+
+.pswap__rateChevron svg {
+  transition: color 0.15s ease;
+}
+
+.pswap .pswap__rate:hover .pswap__rateChevron svg {
+  color: var(--pswap-ink);
+}
+
+.pswap__drawer {
+  overflow: hidden;
+}
+
+.pswap__details {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 2px 14px 10px;
+  font-size: 11.5px;
+  line-height: 1.4;
+}
+
+.pswap__detail {
+  display: flex;
+  justify-content: space-between;
+}
+
+.pswap__detail dt {
+  color: var(--pswap-muted);
+}
+
+.pswap__detail dd {
+  margin: 0;
+  color: var(--pswap-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- rolling text --------------------------------------------------------------- */
+
+.pswap__swap {
+  display: block;
+  white-space: nowrap;
+}
+
+.pswap__roll {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+
+.pswap__odometer {
+  position: relative;
+  display: inline-flex;
+  overflow: hidden;
+  padding: 0.12em 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.pswap__digit {
+  display: inline-block;
+}
+
+/* --- the liquid button -------------------------------------------------------------- */
+
+.pswap__go {
+  position: relative;
+  margin-top: 2px;
+}
+
+.pswap__burst {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.pswap__burstRing {
+  position: absolute;
+  inset: 0;
+  border: 2px solid #4d82ff;
+  border-radius: 999px;
+}
+
+.pswap__burstCore {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
+
+.pswap__speck {
+  position: absolute;
+  border-radius: 999px;
+}
+
+.pswap .pswap__button {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 46px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #4d82ff 0%, #2f64f5 100%);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 400;
+  cursor: pointer;
+  /* the round shape holds its overflow clip through the transforms inside it */
+  isolation: isolate;
+}
+
+.pswap .pswap__button[data-state="disabled"] {
+  cursor: not-allowed;
+}
+
+.pswap .pswap__button[data-state="busy"] {
+  cursor: progress;
+}
+
+.pswap__water {
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.pswap__blob {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(10px);
+}
+
+.pswap__spark {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 999px;
+  background: #ffffff;
+}
+
+.pswap__glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.pswap__sweep {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 33.333%;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.38), transparent);
+  pointer-events: none;
+}
+
+.pswap__ripple {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: radial-gradient(closest-side, rgb(255 255 255 / 0.55), rgb(255 255 255 / 0));
+  pointer-events: none;
+}
+
+.pswap__buttonText {
+  position: relative;
+  display: block;
+}
+
+.pswap__label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
+  overflow: hidden;
+  line-height: 20px;
+}
+
+.pswap__labelInner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pswap__spin,
+.pswap__done {
+  width: 15px;
+  height: 15px;
+}
+
+.pswap__spin {
+  animation: pswap-spin 1s linear infinite;
+}
+
+@keyframes pswap-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pswap__spin {
+    animation-duration: 2.4s;
+  }
+}
