@@ -34,8 +34,14 @@ const K = 0.5523;
  */
 function outline(w: number, h: number, em: number) {
   const f = FLARE * em;
-  const rx = CORNER * em;
-  const ry = Math.max(0, Math.min(h - f, rx));
+  /*
+   * A true circle, never an ellipse: shut, the strip is too short for the full
+   * 40px corner, and a corner 40px across but half that deep is the squashed
+   * curve that read as an odd radius. It shrinks to fit instead, the same
+   * amount both ways.
+   */
+  const rx = Math.max(0, Math.min(CORNER * em, h - f));
+  const ry = rx;
   const k = K;
   const r = (n: number) => Math.round(n * 100) / 100;
   return (

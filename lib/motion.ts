@@ -76,3 +76,10 @@ export const swapVariants: Variants = {
 
 /** Invalid-field nudge. */
 export const shake = { x: [0, -7, 6, -4, 3, 0] };
+
+/**
+ * A copy button's icon swap. Feedback for a click has to land on the click:
+ * a short tween rather than a spring, with the old face and the new crossing
+ * at once instead of one waiting for the other to leave.
+ */
+export const swapQuick: Transition = { duration: 0.12, ease: [0.2, 0, 0, 1] };

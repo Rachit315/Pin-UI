@@ -181,6 +181,8 @@
 
 .tq__viewport[data-touch] .tq__track {
   height: auto;
+  /* each card is only as tall as its own quote, the row hanging from one top line */
+  align-items: flex-start;
 }
 
 .tq__viewport[data-touch] .tq__edge {

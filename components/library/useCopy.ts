@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /* ---------------------------------------------------------------- copying -- */
 
@@ -18,6 +18,9 @@ export type CopyState = "idle" | "done" | "failed";
  */
 export function useCopy() {
   const [state, setState] = useState<CopyState>("idle");
+  /* one reset at a time: a second click restarts it rather than racing the first */
+  const timer = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(timer.current), []);
 
   async function copy(text: string, source: HTMLElement | null) {
     let ok = false;
@@ -50,7 +53,8 @@ export function useCopy() {
     }
 
     setState(ok ? "done" : "failed");
-    setTimeout(() => setState("idle"), ok ? 1800 : 4000);
+    window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => setState("idle"), ok ? 1400 : 4000);
   }
 
   return { state, copy };

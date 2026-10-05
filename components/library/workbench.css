@@ -596,7 +596,7 @@
   gap: 0.43em;
   height: 2.857em;
   padding: 0 0.5em;
-  border-radius: 999px;
+  border-radius: 0;
   background: var(--wb-bar);
   color: var(--wb-bar-ink);
   /*
@@ -628,7 +628,7 @@
   gap: 0.9em;
   height: 2.857em;
   padding: 0 0.6em 0 1em;
-  border-radius: 999px;
+  border-radius: 0;
   background: var(--wb-bar);
   color: var(--wb-bar-ink);
   box-shadow:
@@ -800,7 +800,7 @@
     max-width: calc(100% - 1.6em);
     height: auto;
     padding: 0.55em 0.9em;
-    border-radius: 1.2em;
+    border-radius: 0;
   }
 
   .wbedit__rule {
@@ -809,7 +809,7 @@
 }
 
 /*
- * The hit area is the whole rounded square, not just the 20px glyph — the icon
+ * The hit area is the whole square, not just the 20px glyph — the icon
  * keeps the size the design draws while the target stays a comfortable 34px,
  * and that square is what carries the hover.
  */
@@ -819,7 +819,7 @@
   place-items: center;
   width: 2.43em;
   height: 2.43em;
-  border-radius: 999px;
+  border-radius: 0;
   color: inherit;
   opacity: 0.75;
   transition:
@@ -1201,18 +1201,6 @@
 
 .install__tab--on {
   color: var(--code-ink);
-}
-
-.install__icon {
-  display: block;
-  width: 1.05em;
-  height: 1.05em;
-}
-
-.install__icon svg {
-  display: block;
-  width: 100%;
-  height: 100%;
 }
 
 .install__rule {
@@ -1635,7 +1623,7 @@
   height: 2.571em;
   max-width: calc(100% - 1.6em);
   padding: 0 1.05em;
-  border-radius: 999px;
+  border-radius: 0;
   background: var(--wb-bar);
   color: var(--wb-bar-ink);
   box-shadow:

@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { softSpring, spring } from "@/lib/motion";
+import { spring, swapQuick } from "@/lib/motion";
 import { useCopy } from "./useCopy";
 
 export type CodePane = { name: string; lang: "tsx" | "css"; code: string };
@@ -93,14 +93,14 @@ export default function CodeBlock({ panes, label }: { panes: CodePane[]; label?:
         </div>
 
         <button type="button" className="code__copy" onClick={() => copy(pane.code, preRef.current)}>
-          <AnimatePresence mode="wait" initial={false}>
+          <AnimatePresence mode="popLayout" initial={false}>
             <motion.span
               key={state}
               className="code__copyFace"
               initial={reduced ? false : { opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={reduced ? { opacity: 0 } : { opacity: 0, y: -6 }}
-              transition={softSpring}
+              transition={swapQuick}
             >
               {state === "done" ? (
                 <>

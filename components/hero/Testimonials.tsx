@@ -55,22 +55,14 @@ export default function Testimonials() {
   const openRef = useRef<number | null>(null);
   const hovering = useRef(false);
   /*
-   * A screen with no hover has nothing to point with, so a quote that waits to
-   * be pointed at would only ever be reached through its plus. There the row
-   * carries every quote openly, set like the page's cards, and simply drifts.
+   * Every quote is shown openly, set like the page's cards: they are the point
+   * of the section, so nobody should have to point at a card to read what was
+   * said. The row still drifts, and holds still under the pointer so a card can
+   * be read to the end. (The name is kept from when only a screen without hover
+   * showed them open.)
    */
-  const [touch, setTouch] = useState(false);
-  const touchRef = useRef(false);
-  useEffect(() => {
-    const query = window.matchMedia("(hover: none)");
-    const sync = () => {
-      touchRef.current = query.matches;
-      setTouch(query.matches);
-    };
-    sync();
-    query.addEventListener("change", sync);
-    return () => query.removeEventListener("change", sync);
-  }, []);
+  const touch = true;
+  const touchRef = useRef(true);
   const panning = useRef(false);
   const onScreen = useRef(false);
 
