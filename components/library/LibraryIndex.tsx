@@ -103,7 +103,7 @@ export default function LibraryIndex() {
         } as const);
 
   return (
-    <div className="site lib-page">
+    <div className="site lib-page cards-v2">
       <header className="lib__bar" data-scrolled={scrolled}>
         <div className="lib__brand">
           <ThemeMark buttonClassName="lib__markButton" markClassName="lib__mark" tap={0.88} />

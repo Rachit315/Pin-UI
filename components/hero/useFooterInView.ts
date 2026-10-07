@@ -17,7 +17,7 @@ export function useFooterInView(): boolean {
   const [inView, setInView] = useState(false);
 
   useEffect(() => {
-    const footer = document.querySelector("footer.foot");
+    const footer = document.querySelector("footer.pfoot, footer.foot");
     if (!footer || typeof IntersectionObserver === "undefined") return;
 
     const observer = new IntersectionObserver(

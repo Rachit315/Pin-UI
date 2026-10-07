@@ -362,6 +362,96 @@ html[data-pin-scroll="smooth"] {
   color: var(--sec-note);
 }
 
+
+/* --- the cards, as the new landing draws them ---------------------------------
+   The recording with a name bar under it: black with white type on the light
+   face, charcoal with white type and a hairline round the card on the dark one.
+   Shared by the landing's shelf and the library page, both of which carry
+   `.cards-v2` on their wrapper.
+------------------------------------------------------------------------------ */
+
+.site.cards-v2 {
+  --lc-bar: #0f0f0f;
+  --lc-bar-ink: #ffffff;
+  --lc-edge: transparent;
+}
+
+:root[data-pin-theme="crimson"] .site.cards-v2 {
+  --lc-bar: #272727;
+  --lc-bar-ink: #ffffff;
+  --lc-edge: #666666;
+}
+
+/* 14px corners on the whole card, none between the clip and the bar */
+.cards-v2 .card {
+  position: relative;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0.875em; /* 14 */
+  background: var(--lc-bar);
+  color: var(--lc-bar-ink);
+}
+
+/* the hairline sits over the clip and the bar alike, inside the card so it adds no size */
+.cards-v2 .card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--lc-edge);
+  pointer-events: none;
+  transition: box-shadow var(--pin-theme-fade) var(--pin-theme-ease);
+}
+
+.cards-v2 .card__frame {
+  border-radius: 0;
+}
+
+/* a taller bar with larger type: about a tenth of the card's width, as the reference draws it */
+.cards-v2 .card__foot {
+  height: 3.6em; /* ≈ 50 */
+  padding: 0 1.15em;
+}
+
+.cards-v2 .card__title {
+  font-size: 1.45em; /* ≈ 20 */
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.cards-v2 .card__new {
+  background: var(--lc-bar-ink);
+  color: var(--lc-bar);
+}
+
+.cards-v2 .card__arrow {
+  width: 1.4em;
+  height: 1.4em;
+}
+
+/* the last cell: the red dither field at rest, the arrow already in its corner */
+.cards-v2 .viewall {
+  border-radius: 0.875em;
+}
+
+.cards-v2 .viewall--lit .viewall__field--lit {
+  opacity: 1;
+}
+
+
+@media (max-width: 700px) {
+  .cards-v2 .card__foot {
+    height: 3.4em;
+    padding: 0 1em;
+  }
+
+  .cards-v2 .card__title {
+    font-size: 1.35em;
+  }
+}
+
 /* --- the rail ------------------------------------------------------------ */
 
 .rail {
@@ -378,15 +468,20 @@ html[data-pin-scroll="smooth"] {
    * longest link plus an even margin — "Testimonials" sat almost on the edge
    * of a fixed 7em pill once it joined the list.
    */
-  gap: 1.15em;
-  padding: 1.5em 1.35em;
+  /* compact: a small, quiet pill that stays out of the page's way */
+  gap: 0.75em;
+  padding: 0.95em 0.72em;
   width: max-content;
-  border: var(--hero-rule) solid var(--rail-edge);
+  border: 1px solid var(--rail-edge);
   /* a full pill, the way the design draws it */
   border-radius: 999px;
   background: var(--rail-fill);
   color: var(--rail-ink);
-  box-shadow: 0 1.2em 2.4em rgb(0 0 0 / 0.1);
+  box-shadow:
+    0 0.15em 0.4em rgb(0 0 0 / 0.06),
+    0 0.8em 1.8em rgb(0 0 0 / 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .rail__mark {
@@ -411,8 +506,8 @@ html[data-pin-scroll="smooth"] {
   display: block;
   /* the mark's outline runs a hair past its box; an svg would crop it there */
   overflow: visible;
-  width: 2.375em; /* the masthead's mark, at the same size */
-  height: 2.8125em;
+  width: 1.45em;
+  height: 1.717em;
   /* the rail's own fill is what the star is knocked out of */
   --pin-mark: var(--rail-ink);
   --pin-mark-star: var(--rail-fill);
@@ -429,7 +524,7 @@ html[data-pin-scroll="smooth"] {
  */
 .rail__rule {
   display: block;
-  width: 1.75em; /* about a third of the pill's inner width */
+  width: 1.1em;
   height: 1px;
   background: currentColor;
   opacity: 0.5;
@@ -440,13 +535,13 @@ html[data-pin-scroll="smooth"] {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.55em;
+  gap: 0.42em;
 }
 
 .rail__link {
   position: relative;
-  font-size: 1em;
-  line-height: 1.3;
+  font-size: 0.82em;
+  line-height: 1.25;
   letter-spacing: -0.01em;
   color: inherit;
   text-decoration: none;
@@ -457,20 +552,16 @@ html[data-pin-scroll="smooth"] {
 .rail__github {
   position: relative;
   display: block;
-  width: 2.15em;
-  height: 2.15em;
+  width: 1.45em;
+  height: 1.45em;
 }
 
 .rail__githubMark {
   display: block;
   width: 100%;
   height: 100%;
-  transition: opacity var(--pin-theme-fade) var(--pin-theme-ease);
-}
-
-.rail__githubMark--alt {
-  position: absolute;
-  inset: 0;
+  color: var(--rail-ink);
+  transition: color var(--pin-theme-fade) var(--pin-theme-ease);
 }
 
 @media (hover: hover) {
@@ -504,15 +595,15 @@ html[data-pin-scroll="smooth"] {
     max-width: calc(100% - 2 * var(--hero-inset));
     margin-inline: auto;
     flex-direction: row;
-    gap: 0.95em;
-    padding: 0.7em 1.15em;
+    gap: 0.8em;
+    padding: 0.5em 0.95em;
     border-radius: 3.5em;
   }
 
   /* the divider turns with everything else */
   .rail__rule {
     width: 1px;
-    height: 1.55em;
+    height: 1.1em;
   }
 
   .rail__links {
@@ -521,13 +612,13 @@ html[data-pin-scroll="smooth"] {
   }
 
   .rail__markArt {
-    width: 1.75em;
-    height: 2.07em;
+    width: 1.4em;
+    height: 1.66em;
   }
 
   .rail__github {
-    width: 1.75em;
-    height: 1.75em;
+    width: 1.4em;
+    height: 1.4em;
   }
 
   /*
@@ -537,8 +628,8 @@ html[data-pin-scroll="smooth"] {
    * of a phone is a link you miss.
    */
   .rail__link {
-    font-size: 1em;
-    padding: 0.5em 0.25em;
+    font-size: 0.9em;
+    padding: 0.45em 0.2em;
   }
 }
 

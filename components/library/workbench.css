@@ -42,11 +42,18 @@
   --wb-bar-ink: #e5e5e5;
   --wb-bar-hover: rgb(255 255 255 / 0.12);
   --wb-bar-edge: rgb(255 255 255 / 0.14);
+  /*
+   * The landing page's dark face: the stage's frame takes the hero frame's
+   * pale hairline instead of red, and the mark is the white bubble with the
+   * red star. The component on the stage keeps its own look — only the
+   * workbench around it changes.
+   */
+  --wb-edge: #aaaaaa;
 
-  --pin-mark: #e60024;
-  --pin-mark-star: #ffffff;
+  --pin-mark: #ffffff;
+  --pin-mark-star: #e60024;
 
-  background: linear-gradient(180deg, #0f0f0f 0%, #0a0a0a 100%);
+  background: #000000;
 }
 
 .site--wb *,

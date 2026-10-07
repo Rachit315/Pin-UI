@@ -102,7 +102,9 @@
 }
 
 :root[data-pin-theme="crimson"] {
-  --pin-page: #e60024;
+  /* the dark face everywhere: black paper under every page, the waitlist included */
+  --pin-page: #000000;
+  color-scheme: dark;
   --pin-brand: #ffffff;
   --pin-mark: #ffffff;
   --pin-mark-star: #e60024;
@@ -411,6 +413,11 @@ a {
   place-items: center;
   cursor: pointer;
   isolation: isolate;
+}
+
+/* on the black page the button would vanish in its black: it takes the brand red instead */
+:root[data-pin-theme="crimson"] .submit {
+  background: var(--pin-red);
 }
 
 .submit:disabled {
@@ -1327,4 +1334,41 @@ a {
   --cdot-size: 0.26em;
   margin-left: 0.38em;
   top: -0.12em;
+}
+
+/*
+ * The page's own scrollbar, in the brand's colours: a thin red thumb on a
+ * track the colour of the page — white in the light state, black in the dark
+ * one. Square, like everything else the site draws for itself, and a shade
+ * deeper under the pointer so it reads as something you can take hold of.
+ */
+:root {
+  --pin-scroll-thumb: #e60024;
+  --pin-scroll-thumb-hover: #b8001d;
+  --pin-scroll-track: #ffffff;
+  scrollbar-width: thin;
+  scrollbar-color: var(--pin-scroll-thumb) var(--pin-scroll-track);
+}
+
+:root[data-pin-theme="crimson"] {
+  --pin-scroll-track: #000000;
+  --pin-scroll-thumb-hover: #ff1a3c;
+}
+
+html::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+html::-webkit-scrollbar-track {
+  background: var(--pin-scroll-track);
+}
+
+html::-webkit-scrollbar-thumb {
+  background: var(--pin-scroll-thumb);
+  border-radius: 0;
+}
+
+html::-webkit-scrollbar-thumb:hover {
+  background: var(--pin-scroll-thumb-hover);
 }

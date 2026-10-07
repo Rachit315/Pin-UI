@@ -1,0 +1,481 @@
+/* ===========================================================================
+   The landing page — Figma 502:2937 (light) and 502:2938 (dark).
+   ---------------------------------------------------------------------------
+   Loaded after hero.css and sections.css, and scoped to `.landing`, so it
+   changes only the front page: the library, the testimonials page and the
+   legal pages keep their own looks.
+
+   Sizes are the design's pixels over 16, in `em`, against the one clamped root
+   on `.site` — so the hero, the shelf and the testimonials scale together as
+   one composition. The design's own coordinates are used for proportion, not
+   nailed down: everything centred is centred, every gap is the design's gap,
+   and the edges line up with the hero frame's at every width.
+
+   The site's theme switch flips the landing between its two drawn faces: white
+   paper and a pale frame, or black paper and a near-black frame. The footer is
+   red in both.
+=========================================================================== */
+
+/* --- the two faces -------------------------------------------------------- */
+
+.site.landing {
+  --hero-page: #ffffff;
+  --hero-field: #f7f7f7;
+  --hero-rule-colour: #e60024;
+  --hero-red: #e60024;
+  --hero-ink: #000000;
+  --hero-paper: #ffffff;
+  --hero-pinterest: #e60024;
+  --hero-stamp-shape: #e60024;
+  --hero-stamp-label: #ffffff;
+  --pin-mark: #e60024;
+  --pin-mark-star: #ffffff;
+
+  --hero-rule: 1px;
+  --hero-radius: 1.125em; /* 18 */
+  --hero-sub: rgb(15 15 15 / 0.8);
+  /* the stamp as Figma 501:931 draws it, at its 241.92 × 66.53 */
+  --hero-stamp-w: 15.12em;
+  --hero-stamp-h: 4.158em;
+  --hero-stamp-type: 1.4175em; /* 22.68 */
+
+  /* the shelf */
+  --sec-ink: #000000;
+  --sec-note: rgb(15 15 15 / 0.8);
+
+  /* testimonials and the rail keep the light face's red cards and white pill */
+  --card-fill: #e60024;
+  --card-ink: #ffffff;
+  --card-edge: transparent;
+}
+
+:root[data-pin-theme="crimson"] .site.landing {
+  --hero-page: #000000;
+  --hero-field: #0f0f0f;
+  --hero-rule-colour: #aaaaaa;
+  --hero-red: #ffffff;
+  --hero-ink: #f7f7f7;
+  --hero-paper: #0f0f0f;
+  --hero-pinterest: #ffffff;
+  --hero-stamp-shape: #ffffff;
+  --hero-stamp-label: #e60024;
+  --pin-mark: #ffffff;
+  /* the brand's red star in the white mark, as the dark lockup is drawn */
+  --pin-mark-star: #e60024;
+  --hero-sub: rgb(255 255 255 / 0.8);
+
+  --sec-ink: #f7f7f7;
+  --sec-note: rgb(255 255 255 / 0.72);
+
+  /* on black paper the testimonial cards stay red, as the dark frame draws them */
+  --card-fill: #e60024;
+  --card-ink: #ffffff;
+  --card-edge: transparent;
+  /* the rail takes the dark face too: charcoal glass, white type, a hairline edge */
+  --rail-fill: rgb(20 20 20 / 0.96);
+  --rail-ink: #ffffff;
+  --rail-edge: rgb(255 255 255 / 0.16);
+}
+
+/* the rail's mark in the dark face: the white bubble with the brand's red star */
+:root[data-pin-theme="crimson"] .landing .rail__markArt {
+  --pin-mark-star: #e60024;
+}
+
+/* on black paper the pill needs a deeper shadow to lift off it */
+:root[data-pin-theme="crimson"] .landing .rail {
+  box-shadow:
+    0 0.15em 0.4em rgb(0 0 0 / 0.4),
+    0 0.8em 1.8em rgb(0 0 0 / 0.5);
+}
+
+/* the paper itself turns, under every section */
+.site.landing {
+  background: var(--hero-page);
+  transition: background-color var(--pin-theme-fade) var(--pin-theme-ease);
+}
+
+/* --- the hero frame --------------------------------------------------------- */
+
+.landing .hero__frame {
+  border-radius: var(--hero-radius);
+  isolation: isolate;
+}
+
+/*
+ * The wall: rows of recordings, centred on the frame and wider than it, the
+ * first row starting 148px down (9.25em) as drawn. Each tile is 383.5 × 226.8
+ * with 24px corners, 20px apart both ways.
+ */
+.hwall {
+  position: absolute;
+  top: 9.25em;
+  right: 0;
+  left: 0;
+  z-index: -1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25em;
+  pointer-events: none;
+}
+
+.hwall__track,
+.hwall__pass {
+  display: flex;
+  gap: 1.25em;
+}
+
+.hwall__track {
+  will-change: transform;
+}
+
+.hwall__tile {
+  flex: 0 0 auto;
+  width: 23.97em;
+  height: 14.175em;
+  overflow: hidden;
+  border-radius: 1.5em; /* 24 */
+}
+
+.hwall__media {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/*
+ * The frame's foot: a progressive blur the wall dissolves into. Six layers
+ * over a 9em band, each starting lower and blurring twice as hard as the one
+ * before (0.25px up to 2.5px), and each eased in through its own mask, so the
+ * strength builds smoothly toward the edge with no line where it starts. It
+ * only softens the clips, never smears them. A faint wash of the frame's own
+ * colour settles the very bottom so the clips end on the frame rather than
+ * being cut by it.
+ */
+.hero__haze {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  height: 4em;
+  overflow: hidden;
+  border-radius: 0 0 var(--hero-radius) var(--hero-radius);
+  pointer-events: none;
+}
+
+.hero__haze span {
+  position: absolute;
+  inset: 0;
+  -webkit-mask-image: linear-gradient(to bottom, transparent var(--haze-from), #000 var(--haze-to));
+  mask-image: linear-gradient(to bottom, transparent var(--haze-from), #000 var(--haze-to));
+}
+
+/* the prefixed line first: the CSS pipeline keeps only the last of the pair, and Chrome needs the unprefixed one */
+.hero__haze span:nth-child(1) {
+  --haze-from: 0%;
+  --haze-to: 30%;
+  -webkit-backdrop-filter: blur(0.25px);
+  backdrop-filter: blur(0.25px);
+}
+
+.hero__haze span:nth-child(2) {
+  --haze-from: 12%;
+  --haze-to: 45%;
+  -webkit-backdrop-filter: blur(0.5px);
+  backdrop-filter: blur(0.5px);
+}
+
+.hero__haze span:nth-child(3) {
+  --haze-from: 28%;
+  --haze-to: 60%;
+  -webkit-backdrop-filter: blur(0.8px);
+  backdrop-filter: blur(0.8px);
+}
+
+.hero__haze span:nth-child(4) {
+  --haze-from: 44%;
+  --haze-to: 75%;
+  -webkit-backdrop-filter: blur(1.2px);
+  backdrop-filter: blur(1.2px);
+}
+
+.hero__haze span:nth-child(5) {
+  --haze-from: 60%;
+  --haze-to: 90%;
+  -webkit-backdrop-filter: blur(1.8px);
+  backdrop-filter: blur(1.8px);
+}
+
+.hero__haze span:nth-child(6) {
+  --haze-from: 76%;
+  --haze-to: 100%;
+  -webkit-backdrop-filter: blur(2.5px);
+  backdrop-filter: blur(2.5px);
+}
+
+/* the wash: the frame's colour, eased in over the lowest stretch and kept light */
+.hero__haze::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    color-mix(in srgb, var(--hero-field) 8%, transparent) 80%,
+    color-mix(in srgb, var(--hero-field) 22%, transparent) 100%
+  );
+  transition: background var(--pin-theme-fade) var(--pin-theme-ease);
+}
+
+/* the masthead sits 19.6px in, on the design's own inset */
+.landing .hero__masthead {
+  top: 1.225em;
+  left: 1.225em;
+  right: 1.225em;
+}
+
+/* --- the centre: the request line, the claim, the stamp ----------------------- */
+
+.hero__center {
+  position: absolute;
+  top: 11.54em; /* 184.6 */
+  left: 50%;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: max-content;
+  max-width: calc(100% - 2 * 1.225em);
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+.hero__submit {
+  margin-bottom: 1em; /* 16, between its line and the claim's cap height */
+  color: var(--hero-sub);
+  font-size: 0.875em; /* 14 */
+  line-height: 1;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  transition:
+    color var(--pin-theme-fade) var(--pin-theme-ease),
+    text-underline-offset 0.25s ease;
+}
+
+.hero__submit span {
+  display: inline-block;
+  transition: transform 0.3s cubic-bezier(0.22, 0.68, 0.16, 1);
+}
+
+@media (hover: hover) {
+  /* the site's red, in both faces */
+  .hero__submit:hover {
+    color: var(--pin-red, #e60024);
+    transition:
+      color 0.2s ease,
+      text-underline-offset 0.25s ease;
+    text-underline-offset: 0.28em;
+  }
+
+  .hero__submit:hover span {
+    transform: translateX(0.2em);
+  }
+}
+
+.hero__submit:focus-visible {
+  outline: 2px solid var(--hero-red);
+  outline-offset: 4px;
+}
+
+.landing .hero__claim {
+  line-height: 1;
+  text-align: center;
+}
+
+.landing .hero__stamp {
+  margin-top: 2.125em; /* 34 */
+}
+
+/* --- the shelf — Figma 502:291 ------------------------------------------------ */
+
+/*
+ * The page breathes on one rhythm: 8em (≈112px) between the hero and the
+ * shelf and between the testimonials and the footer, 6em between the shelf's
+ * grid and the next heading, and every heading a clear 4.5em above what it
+ * introduces. Figma draws these sections almost touching; at full width that
+ * read as cramped, so the gaps are opened up and kept consistent instead.
+ */
+.landing .shelf {
+  /* the grid's edges are the hero frame's edges */
+  padding: 8em var(--hero-inset) 6em;
+}
+
+.landing .shelf__head {
+  margin: 0 0 4.5em;
+}
+
+.landing .shelf__title {
+  font-size: 2.75em; /* 44 */
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.landing .shelf__lead {
+  max-width: none;
+  margin-top: 1.29em; /* 18 under the title */
+  font-size: 0.875em; /* 14 */
+  line-height: 1.3;
+  letter-spacing: 0;
+}
+
+.landing .shelf__grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  /* 46px between columns and 20px between rows, as drawn */
+  gap: 1.25em 2.875em;
+}
+
+/* the cards themselves are drawn in sections.css, shared with the library page */
+
+/* --- testimonials on the landing --------------------------------------------- */
+
+.landing .tq {
+  padding-top: 0;
+  padding-bottom: 8em;
+}
+
+.landing .tq__head {
+  margin-bottom: 3em;
+}
+
+.landing .tq,
+.landing .tq__title {
+  transition: color var(--pin-theme-fade) var(--pin-theme-ease);
+}
+
+/* --- Lenis ------------------------------------------------------------------- */
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* --- narrower screens -------------------------------------------------------- */
+
+/* two columns of cards once three no longer fit their titles */
+@media (max-width: 880px) {
+  .landing .shelf__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25em 1.5em;
+  }
+
+  .landing .hero__claim {
+    font-size: 3.5em;
+  }
+}
+
+/*
+ * A phone: the frame grows to hold its content rather than being a fixed
+ * screen, the centre block takes its place under the masthead in the flow, and
+ * the wall runs behind both. One column of cards.
+ */
+@media (max-width: 700px) {
+  .landing .hero__frame {
+    display: block;
+    min-height: 82dvh;
+    padding: 0;
+  }
+
+  .landing .hero__masthead {
+    position: absolute;
+    top: 1.1em;
+    left: 1.1em;
+    right: 1.1em;
+  }
+
+  .landing .hero__center {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: auto;
+    max-width: none;
+    margin: 0 auto;
+    padding: 9.5em 1.1em 0;
+    transform: none;
+  }
+
+  /* each drawn line stays on one line of its own between the gutters (see hero.css) */
+  .landing .hero__claim {
+    font-size: min(3.1em, 7.4vw);
+    line-height: 1.06;
+  }
+
+  .hwall {
+    top: 7.5em;
+  }
+
+  .hwall__tile {
+    width: 17em;
+    height: 10.05em;
+    border-radius: 1.1em;
+  }
+
+  .hwall,
+  .hwall__track,
+  .hwall__pass {
+    gap: 0.9em;
+  }
+
+  .landing .shelf {
+    padding: 5em 1.25em 4.5em;
+  }
+
+  .landing .tq {
+    padding-bottom: 5em;
+  }
+
+  .landing .tq__head {
+    margin-bottom: 2.2em;
+  }
+
+  .landing .shelf__title {
+    font-size: 2.1em;
+  }
+
+  .landing .shelf__lead {
+    font-size: 0.95em;
+    max-width: 24em;
+  }
+
+  .landing .shelf__head {
+    margin-bottom: 2.8em;
+  }
+
+  .landing .shelf__grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1em;
+  }
+
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__submit,
+  .hero__submit span {
+    transition: none;
+  }
+}

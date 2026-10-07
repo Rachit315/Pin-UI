@@ -1,36 +1,31 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import HeroMarquee from "./HeroMarquee";
+import HeroWall from "./HeroWall";
 import PinterestPeek from "./PinterestPeek";
 import GitHubStars from "./GitHubStars";
-import SubmitNotch from "./SubmitNotch";
 import ThemeMark from "../ThemeMark";
 import MobileMenu from "../MobileMenu";
 import ThemeHint from "../ThemeHint";
 import { softSpring, spring } from "@/lib/motion";
 import { useRailed } from "./useRailed";
 
+/** Where the "submit a design" line goes: the request form. */
+const SUBMIT_URL = "https://tally.so/r/2EQY9e";
+
 /**
- * The landing hero, Figma 299:19.
+ * The landing hero — Figma 501:915 (light) and 502:118 (dark).
  *
- * The frame is one red rule inset from the viewport, with three bands inside
- * it: the masthead at the top, the component band running across the middle,
- * and the claim with its stamp at the foot. The design is drawn at 1280; the
- * whole thing is sized in `em` off a single clamped root, so it scales as one
- * object instead of needing a breakpoint per element.
+ * One rounded frame inset from the viewport. Behind everything, a wall of the
+ * library's own recordings fades up row by row; over it, the masthead along
+ * the top and, centred, the line asking for designs, the claim and the stamp.
+ * A soft blur runs along the frame's foot so the wall dissolves into it.
  *
- * Clicking the pin — only the pin, never the wordmark beside it — inverts the
- * page, the same gesture the waitlist uses. It runs through the shared
- * `usePinTheme` store rather than a local state, so the choice persists across
- * reloads and follows you between the two pages, and the no-flash script in the
- * layout has already written it before first paint.
- *
- * Two things are deliberately not the Figma file. The Pinterest mark is set
- * inline in the sentence rather than absolutely positioned over a gap in it, so
- * the line stays together at any width; and the foot is a real two-column row
- * rather than two floating blocks, so the stamp cannot collide with the claim
- * when the type reflows.
+ * Sized in `em` off the one clamped root on `.site`, so the whole hero scales
+ * as one object. Clicking the pin — only the pin — flips the page between its
+ * light and dark faces through the shared `usePinTheme` store, so the choice
+ * persists and follows you around the site; the scribbled note beside the logo
+ * says so.
  */
 export default function HeroSection() {
   const reduced = useReducedMotion();
@@ -48,14 +43,22 @@ export default function HeroSection() {
 
   return (
     <main className="hero" id="top">
-      {/*
-        The notch hangs from the frame's top rule, but sits outside the frame:
-        inside it, the frame's clip and its rule would share one anti-aliased
-        edge and leave a hairline of paper between the two.
-      */}
-      <SubmitNotch />
-
       <div className="hero__frame">
+        <HeroWall />
+        {/*
+          The wall softens into the frame's foot rather than stopping at it: a
+          progressive blur, six layers each starting lower and blurring twice
+          as hard, so there is no line where it begins.
+        */}
+        <div className="hero__haze" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+          <span />
+          <span />
+          <span />
+        </div>
+
         {/*
           The masthead stands down once the rail takes over, and the mark is
           handed across by a shared `layoutId` rather than fading out here and
@@ -107,11 +110,17 @@ export default function HeroSection() {
           )}
         </AnimatePresence>
 
-        <div className="hero__band">
-          <HeroMarquee />
-        </div>
+        <div className="hero__center">
+          <motion.a
+            className="hero__submit"
+            href={SUBMIT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            {...rise(0.2)}
+          >
+            Want to submit a design?? <span aria-hidden="true">→</span>
+          </motion.a>
 
-        <div className="hero__foot">
           {/*
             The claim rises out of a clipping mask a line at a time, so the
             sentence arrives the way it reads rather than fading in whole.
@@ -141,12 +150,7 @@ export default function HeroSection() {
             </span>
           </h1>
 
-          {/*
-            The stamp points at the shelf on this page, not back at this page.
-            It used to read `/demo`, the page it is now the front of — so clicking
-            it navigated to the current URL and the whole thing reloaded. A
-            fragment travels there instead, smoothly, with nothing refetched.
-          */}
+          {/* the stamp goes to the shelf on this page, gliding there */}
           <motion.a
             className="hero__stamp"
             href="#components"

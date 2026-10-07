@@ -13,6 +13,7 @@
 
 import { SITE_URL } from "./site";
 import { LINKS } from "./links";
+import { LIBRARY } from "@/components/library/registry";
 
 /* ── helpers ────────────────────────────────────────────────────────────── */
 
@@ -59,7 +60,7 @@ export function webSiteJsonLd() {
     url: SITE_URL,
     publisher: { "@id": `${SITE_URL}/#organization` },
     description:
-      "Cool UI components for GenZ and vibecoders. Browse, preview, and copy-paste production-ready React components.",
+      "Components worth building with. Browse, preview, and copy-paste free, open-source React components built from Pinterest designs, in light and dark.",
     inLanguage: "en-US",
   };
 }
@@ -74,9 +75,11 @@ export function homepageJsonLd() {
       "@type": "WebPage",
       "@id": `${SITE_URL}/#webpage`,
       url: SITE_URL,
-      name: "Pin UI — Cool UI components for GenZ/Vibecoders",
+      name: "Pin UI — Components worth building with",
       description:
         "Pin UI is a free, open-source React component library that turns Pinterest-inspired designs into production-ready, copy-paste components for modern web apps.",
+      /* the same card the link previews use */
+      primaryImageOfPage: `${SITE_URL}/opengraph-image.jpg`,
       isPartOf: { "@id": `${SITE_URL}/#website` },
       about: { "@id": `${SITE_URL}/#software` },
       inLanguage: "en-US",
@@ -94,11 +97,15 @@ export function homepageJsonLd() {
         price: "0.00",
         priceCurrency: "USD",
       },
-      author: { "@id": `${SITE_URL}/#organization` },
+      image: `${SITE_URL}/opengraph-image.jpg`,
+      author: { "@type": "Person", name: "Rachit Thakur", url: LINKS.x },
+      publisher: { "@id": `${SITE_URL}/#organization` },
       codeRepository: LINKS.github,
       programmingLanguage: ["TypeScript", "React", "CSS"],
       description:
-        "A free, open-source React component library that turns Pinterest-inspired designs into production-ready, copy-paste components. Includes Count down, Balance Card, Add To Cart, Chips, Egg OTP, Add Member and more.",
+        `A free, open-source React component library that turns Pinterest-inspired designs into production-ready, copy-paste components. Includes ${LIBRARY.slice(0, 8)
+          .map((entry) => entry.name)
+          .join(", ")} and more.`,
     },
   ];
 }

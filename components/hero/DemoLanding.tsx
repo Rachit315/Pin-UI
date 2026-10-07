@@ -3,7 +3,7 @@
 import HeroSection from "./HeroSection";
 import SiteFooter from "./SiteFooter";
 import SiteRail from "./SiteRail";
-import SmoothScroll from "./SmoothScroll";
+import LenisScroll from "./LenisScroll";
 import Testimonials from "./Testimonials";
 import UniqueSection from "./UniqueSection";
 
@@ -16,13 +16,13 @@ import UniqueSection from "./UniqueSection";
  */
 export default function DemoLanding() {
   return (
-    <div className="site">
+    <div className="site landing cards-v2">
       <HeroSection />
       <UniqueSection />
       <Testimonials />
       <SiteFooter />
       <SiteRail />
-      <SmoothScroll />
+      <LenisScroll />
     </div>
   );
 }

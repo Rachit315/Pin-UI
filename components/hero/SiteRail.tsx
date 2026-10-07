@@ -7,7 +7,6 @@ import ThemeMark from "../ThemeMark";
 import MobileMenu from "../MobileMenu";
 import { LINKS } from "@/lib/links";
 import { softSpring } from "@/lib/motion";
-import { usePinTheme } from "@/lib/theme";
 import { useRailed } from "./useRailed";
 import { useCompactRail } from "./useCompactRail";
 import { useFooterInView } from "./useFooterInView";
@@ -30,11 +29,8 @@ export default function SiteRail() {
   const compact = useCompactRail();
   /* the footer has its own lockup and links; the rail steps aside for it */
   const footerUp = useFooterInView();
-  /* the mark owns the switch itself; this is only for the two GitHub faces */
-  const { theme } = usePinTheme();
   const pathname = usePathname();
 
-  const inverted = theme === "crimson";
   /*
    * The rail follows you onto the component pages, where `#components` is not
    * on the page at all. On the landing page the links stay bare hashes so the
@@ -129,22 +125,13 @@ export default function SiteRail() {
             rel="noopener noreferrer"
             aria-label="Pin UI on GitHub"
           >
-            <img
-              src="/hero/github.svg"
-              alt=""
-              width={40}
-              height={40}
-              className="rail__githubMark"
-              style={{ opacity: inverted ? 0 : 1 }}
-            />
-            <img
-              src="/hero/github-crimson.svg"
-              alt=""
-              width={40}
-              height={40}
-              className="rail__githubMark rail__githubMark--alt"
-              style={{ opacity: inverted ? 1 : 0 }}
-            />
+            {/* drawn in the pill's own ink, so it follows both themes with no second file */}
+            <svg viewBox="0 0 24 24" className="rail__githubMark" aria-hidden="true">
+              <path
+                fill="currentColor"
+                d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.4-4-1.4-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 0-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.2.5-2.3 1.3-3.1-.2-.4-.6-1.6 0-3.2 0 0 1-.3 3.4 1.2a11.5 11.5 0 0 1 6 0C17.3 4.6 18.3 5 18.3 5c.7 1.6.2 2.8.1 3.2.8.8 1.3 1.9 1.3 3.1 0 4.6-2.8 5.6-5.5 5.9.5.4.9 1.1.9 2.2v3.3c0 .3.1.7.8.6A12 12 0 0 0 12 .3"
+              />
+            </svg>
           </a>
         </motion.nav>
       )}

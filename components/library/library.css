@@ -13,6 +13,8 @@
   --lib-faint: rgb(10 10 10 / 0.12);
   --lib-accent: #e60024;
   --lib-paper: #ffffff;
+  /* the bar's wordmark, links and theme note: red on white, white in the dark */
+  --lib-chrome: #e60024;
   /* the mark keeps its red on this white bar in both states */
   --pin-mark: #e60024;
   --pin-mark-star: #ffffff;
@@ -23,10 +25,35 @@
 }
 
 :root[data-pin-theme="crimson"] .site.lib-page {
-  --lib-ink: #e60024;
-  --lib-dim: rgb(10 10 10 / 0.6);
-  --pin-mark: #e60024;
-  --pin-mark-star: #ffffff;
+  /*
+   * The dark face, on the landing page's palette: black paper, near-white
+   * type, the brand red kept for the accents, and the white mark with its
+   * red star.
+   */
+  --lib-ink: #f7f7f7;
+  --lib-dim: rgb(255 255 255 / 0.6);
+  --lib-faint: rgb(255 255 255 / 0.14);
+  --lib-accent: #e60024;
+  --lib-paper: #000000;
+  --lib-chrome: #ffffff;
+  --pin-mark: #ffffff;
+  --pin-mark-star: #e60024;
+
+  /* the cards and the testimonials as the landing draws them in the dark */
+  --sec-ink: #f7f7f7;
+  --sec-note: rgb(255 255 255 / 0.72);
+  --card-fill: #e60024;
+  --card-ink: #ffffff;
+  --card-edge: transparent;
+  --rail-fill: rgb(20 20 20 / 0.96);
+  --rail-ink: #ffffff;
+  --rail-edge: rgb(255 255 255 / 0.16);
+}
+
+.site.lib-page {
+  transition:
+    background-color var(--pin-theme-fade) var(--pin-theme-ease),
+    color var(--pin-theme-fade) var(--pin-theme-ease);
 }
 
 .lib-page *,
@@ -88,7 +115,7 @@
 }
 
 .lib__word {
-  color: var(--lib-accent);
+  color: var(--lib-chrome);
   font-size: 1.75em;
   line-height: 1;
   white-space: nowrap;
@@ -105,7 +132,7 @@
 
 .lib__link {
   position: relative;
-  color: var(--lib-accent);
+  color: var(--lib-chrome);
   white-space: nowrap;
   font-size: 1.05em;
   letter-spacing: -0.01em;

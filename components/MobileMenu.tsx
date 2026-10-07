@@ -10,6 +10,7 @@ import PinMark from "./PinMark";
 import { LINKS } from "@/lib/links";
 import { usePinTheme } from "@/lib/theme";
 import "./mobile-menu.css";
+import { lenisRef, scrollToElement } from "@/lib/lenis";
 
 /**
  * The site's menu on a phone.
@@ -94,6 +95,8 @@ export default function MobileMenu({
     const root = document.documentElement;
     const before = root.style.overflow;
     root.style.overflow = "hidden";
+    /* on the landing page Lenis moves the page itself, so it has to stand still too */
+    lenisRef.current?.stop();
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -124,6 +127,7 @@ export default function MobileMenu({
       window.clearTimeout(t);
       document.removeEventListener("keydown", onKey);
       root.style.overflow = before;
+      lenisRef.current?.start();
     };
   }, [open]);
 
@@ -134,7 +138,7 @@ export default function MobileMenu({
     if (target) {
       const el = document.getElementById(target);
       if (el) {
-        el.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+        scrollToElement(el, !reduced);
         history.replaceState(null, "", target === "top" ? "/" : `#${target}`);
       }
       return;
@@ -265,12 +269,12 @@ export default function MobileMenu({
                 type="button"
                 className="mmenu__theme"
                 onClick={toggleTheme}
-                aria-label={`Switch to the ${inverted ? "light" : "crimson"} theme`}
+                aria-label={`Switch to the ${inverted ? "light" : "dark"} theme`}
               >
                 <span className="mmenu__themeTrack" data-on={inverted}>
                   <span className="mmenu__themeKnob" />
                 </span>
-                {inverted ? "Crimson" : "Light"}
+                {inverted ? "Dark" : "Light"}
               </button>
             </div>
           </motion.div>

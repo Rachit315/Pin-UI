@@ -18,7 +18,21 @@ import { softSpring } from "@/lib/motion";
  * computed once into 32px tiles: the effect is static, so a tile reproduces it
  * exactly without asking every visitor's GPU for a shader.
  */
-export default function ViewAllCard({ index, total }: { index: number; total: number }) {
+export default function ViewAllCard({
+  index,
+  total,
+  arrowAtRest = false,
+}: {
+  index: number;
+  total: number;
+  /**
+   * The landing's version (Figma 502:405): red at rest with the arrow already
+   * in its corner. Pointed at, the arrow flies out through the top-right and
+   * comes straight back in from the bottom-left — the same forward-only
+   * motion, as one loop.
+   */
+  arrowAtRest?: boolean;
+}) {
   const reduced = useReducedMotion();
   const cardRef = useRef<HTMLAnchorElement>(null);
   const arrowRef = useRef<HTMLSpanElement>(null);
@@ -37,18 +51,31 @@ export default function ViewAllCard({ index, total }: { index: number; total: nu
      * from the start — otherwise nothing on the card would say it goes
      * anywhere.
      */
+    if (arrowAtRest) {
+      animate(arrow, { x: 0, y: 0, opacity: 1 }, { duration: 0 });
+      return;
+    }
     if (!canHover.current || reduced) {
       animate(arrow, { x: 0, y: 0, opacity: canHover.current ? 0 : 1 }, { duration: 0 });
     } else {
       const d = offset();
       animate(arrow, { x: -d, y: d, opacity: 1 }, { duration: 0 });
     }
-  }, [reduced]);
+  }, [reduced, arrowAtRest]);
 
   function enter() {
     const arrow = arrowRef.current;
     if (!arrow || hovered.current || !canHover.current) return;
     hovered.current = true;
+    if (arrowAtRest) {
+      if (reduced) return;
+      const d = offset();
+      void animate(arrow, { x: d * 0.45, y: -d * 0.45 }, { duration: 0.26, ease: [0.4, 0, 1, 1] }).then(() => {
+        if (!arrowRef.current) return;
+        animate(arrowRef.current, { x: [-d * 0.6, 0], y: [d * 0.6, 0] }, { duration: 0.55, ease: [0.16, 1, 0.3, 1] });
+      });
+      return;
+    }
     if (reduced) {
       animate(arrow, { opacity: 1 }, { duration: 0.2 });
       return;
@@ -61,6 +88,7 @@ export default function ViewAllCard({ index, total }: { index: number; total: nu
     const arrow = arrowRef.current;
     if (!arrow || !hovered.current || !canHover.current) return;
     hovered.current = false;
+    if (arrowAtRest) return;
     if (reduced) {
       animate(arrow, { opacity: 0 }, { duration: 0.2 });
       return;
@@ -82,7 +110,7 @@ export default function ViewAllCard({ index, total }: { index: number; total: nu
     >
       <Link
         ref={cardRef}
-        className="viewall"
+        className={arrowAtRest ? "viewall viewall--lit" : "viewall"}
         href="/components"
         aria-label={`View all ${total} components`}
         onPointerEnter={(e) => e.pointerType === "mouse" && enter()}

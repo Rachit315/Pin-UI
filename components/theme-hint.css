@@ -14,7 +14,7 @@
 }
 
 .lib__brand {
-  color: var(--lib-accent);
+  color: var(--lib-chrome, var(--lib-accent));
 }
 
 .wbnav__lockup {

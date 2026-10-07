@@ -3,8 +3,8 @@
 
    The sheet is rendered at the root of the document, outside any page's
    wrapper, so it takes its colours from the theme on `:root` directly: white
-   with red type in the light state, red with white type in the crimson one —
-   the hero's own two faces.
+   with red type in the light state, and the landing page's dark face in the
+   other — black, white type, the red kept for the one call to action.
 =========================================================================== */
 
 :root {
@@ -18,12 +18,22 @@
 }
 
 :root[data-pin-theme="crimson"] {
-  --mm-paper: #e60024;
+  --mm-paper: #0a0a0a;
   --mm-ink: #ffffff;
-  --mm-quiet: rgb(255 255 255 / 0.72);
-  --mm-rule: rgb(255 255 255 / 0.24);
+  --mm-quiet: rgb(255 255 255 / 0.55);
+  --mm-rule: rgb(255 255 255 / 0.14);
   --mm-btn: #ffffff;
   --mm-btn-ink: #e60024;
+}
+
+/* in the dark the one call to action keeps the brand red, and the mark its red star */
+:root[data-pin-theme="crimson"] .mmenu__submit {
+  background: #e60024;
+  color: #ffffff;
+}
+
+:root[data-pin-theme="crimson"] .mmenu__brand {
+  --pin-mark-star: #e60024;
 }
 
 /* --- the button ---------------------------------------------------------- */

@@ -1,7 +1,11 @@
 /** Hook-free so the root layout (a server component) can import it. */
 export type PinTheme = "light" | "crimson";
 
-export const DEFAULT_THEME: PinTheme = "light";
+/**
+ * Dark by default: a first visit opens on the black face of the site. A
+ * visitor who has picked a side keeps it — the stored choice always wins.
+ */
+export const DEFAULT_THEME: PinTheme = "crimson";
 
 export const THEME_STORAGE_KEY = "pin-ui-theme";
 

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { Caveat, Manrope } from "next/font/google";
+import { LINKS } from "@/lib/links";
 import { SITE_URL } from "@/lib/site";
 import FaviconSync from "@/components/FaviconSync";
 import NoFlashScript from "@/components/NoFlashScript";
@@ -42,12 +43,12 @@ const scribble = Caveat({
 });
 
 /* What a link preview says. The tab says less — see `title` below. */
-const TITLE = "Pin UI — Cool UI components for GenZ/Vibecoders";
+const TITLE = "Pin UI — Components worth building with";
 const DESCRIPTION =
-  "Cool UI components for GenZ and vibecoders. Launching soon — 50 spots on the waitlist.";
+  "Free, open-source React components built from Pinterest designs: animated, in light and dark, ready to copy into your project. Designed and built by Rachit Thakur.";
 
 /**
- * `app/opengraph-image.png` and `app/twitter-image.png` are picked up by Next
+ * `app/opengraph-image.jpg` and `app/twitter-image.jpg` are picked up by Next
  * automatically: it emits the tags with absolute URLs, real dimensions and the
  * right mime type, which is what every scraper wants and what hand-written tags
  * usually get wrong.
@@ -66,12 +67,19 @@ export const metadata: Metadata = {
   title: "Pin UI",
   description: DESCRIPTION,
   applicationName: "Pin UI",
+  authors: [{ name: "Rachit Thakur", url: LINKS.x }],
+  creator: "Rachit Thakur",
+  publisher: "Pin UI",
   keywords: [
     "Pin UI",
     "UI components",
     "React components",
-    "design system",
-    "waitlist",
+    "Next.js components",
+    "animated components",
+    "Motion",
+    "open source",
+    "Pinterest designs",
+    "dark mode",
   ],
   alternates: { canonical: "/" },
   openGraph: {
@@ -86,6 +94,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: TITLE,
     description: DESCRIPTION,
+    creator: "@RachitThakur146",
   },
   robots: { index: true, follow: true },
 };
@@ -107,9 +116,10 @@ const noFlash = `
 (function () {
   var icons = ${JSON.stringify(FAVICONS)};
   var theme = ${JSON.stringify(DEFAULT_THEME)};
+  /* a choice the visitor has made, either way, always wins over the default */
   try {
-    if (localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)}) === "crimson")
-      theme = "crimson";
+    var stored = localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)});
+    if (stored === "crimson" || stored === "light") theme = stored;
   } catch (e) {}
 
   document.documentElement.dataset.pinTheme = theme;

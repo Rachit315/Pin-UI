@@ -8,7 +8,7 @@ import { SITE_URL } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Join Waitlist Pin UI",
   description:
-    "Be first in line for Pin UI — cool UI components for GenZ/Vibecoders.",
+    "Be first in line for Pin UI — components worth building with.",
   alternates: { canonical: "/waitlist" },
 };
 

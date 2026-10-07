@@ -1,0 +1,373 @@
+/* ===========================================================================
+   The footer — Figma 502:1939.
+
+   Drawn at 1280 × 600. Every size is the design's pixel over 16, in `em`, and
+   the footer sets its own root — 16px at 1280 wide, scaling with the screen
+   between a floor and a ceiling — so it holds its proportions on any page it
+   sits under, whatever that page's own type scale is.
+=========================================================================== */
+
+.pfoot {
+  --pfoot-red: #de0120;
+  --pfoot-ink: #ffffff;
+  --pfoot-quiet: rgb(247 247 247 / 0.8);
+  --pin-mark: #ffffff;
+  --pin-mark-star: #de0120;
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  height: 37.5em; /* 600 */
+  border-top: 1px solid #fc6161;
+  background: var(--pfoot-red);
+  color: var(--pfoot-ink);
+  font-family: var(--pin-font);
+  font-size: clamp(11px, 1.25vw, 17px);
+  box-sizing: border-box;
+}
+
+.pfoot *,
+.pfoot *::before,
+.pfoot *::after {
+  box-sizing: border-box;
+}
+
+/*
+ * The key, as Figma places it: the picture at the footer's full width (a
+ * hair over, 100.63%), standing on the strip of red the small print runs
+ * along, 40px up from the bottom edge. The window it is seen through stops at
+ * that strip, so while the scroll lifts it into place it never slides over
+ * the small print.
+ */
+.pfoot__art {
+  position: absolute;
+  inset: 0 0 2.5em;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.pfoot__artInner {
+  position: absolute;
+  bottom: 0;
+  left: -0.32%;
+  width: 100.63%;
+  transform-origin: 50% 100%;
+  will-change: transform;
+}
+
+.pfoot__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* --- the top row: lockup on the left, links and the two ways to reach us on the right --- */
+
+.pfoot__top {
+  position: absolute;
+  top: 2.44em; /* 39 */
+  left: 2em; /* 32 */
+  right: 2em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25em;
+}
+
+.pfoot__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625em; /* 10 */
+  color: inherit;
+  text-decoration: none;
+}
+
+.pfoot__mark {
+  display: block;
+  width: 2.375em; /* 38 */
+  height: 2.8125em; /* 45 */
+}
+
+.pfoot__word {
+  font-size: 2.25em; /* 36 */
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  /* the cap height sits on the mark's centre, as drawn */
+  transform: translateY(0.02em);
+}
+
+.pfoot__right {
+  display: flex;
+  align-items: center;
+  gap: 1.25em; /* 20 */
+}
+
+.pfoot__nav {
+  display: flex;
+  align-items: center;
+  gap: 1.25em; /* 20 */
+}
+
+.pfoot__navLink {
+  position: relative;
+  color: inherit;
+  font-size: 1.125em; /* 18 */
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.005em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* an underline that draws in from the left, and leaves to the right */
+.pfoot__navLink::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.25em;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 0.35s cubic-bezier(0.22, 0.68, 0.16, 1);
+}
+
+@media (hover: hover) {
+  .pfoot__navLink:hover::after {
+    transform: scaleX(1);
+    transform-origin: left center;
+  }
+}
+
+.pfoot__rule {
+  width: 1px;
+  height: 0.625em; /* 10 */
+  background: currentColor;
+  opacity: 0.8;
+}
+
+.pfoot__socials {
+  display: flex;
+  align-items: center;
+  gap: 0.4375em; /* 7 */
+}
+
+.pfoot__social {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 1.4em; /* 22.4 */
+  height: 1.4em;
+  color: inherit;
+  transition: transform 0.25s cubic-bezier(0.22, 0.68, 0.16, 1);
+}
+
+.pfoot__social svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (hover: hover) {
+  .pfoot__social:hover {
+    transform: translateY(-2px);
+  }
+}
+
+/* --- the small print ------------------------------------------------------ */
+
+.pfoot__bar {
+  position: absolute;
+  left: 2em;
+  right: 2em;
+  bottom: 0.75em; /* 12 */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75em 1.75em;
+}
+
+.pfoot__small {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25em 1.75em; /* 28 */
+  margin: 0;
+  color: var(--pfoot-quiet);
+  font-size: 0.875em; /* 14 */
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: 0.005em;
+}
+
+.pfoot__link {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+@media (hover: hover) {
+  .pfoot__link:hover {
+    color: var(--pfoot-ink);
+  }
+}
+
+.pfoot a:focus-visible {
+  outline: 2px solid var(--pfoot-ink);
+  outline-offset: 3px;
+}
+
+/* on a touch screen each link gets a full-size target without growing */
+@media (pointer: coarse) {
+  .pfoot__navLink::before,
+  .pfoot__link::before,
+  .pfoot__social::before {
+    content: "";
+    position: absolute;
+    inset: 50% auto auto 50%;
+    width: max(100%, 44px);
+    height: 44px;
+    transform: translate(-50%, -50%);
+  }
+
+  .pfoot__link {
+    position: relative;
+  }
+}
+
+/*
+ * A phone. The row across the top becomes a small grid: the lockup on the
+ * left with the two icons across from it on the same line, and the three
+ * links on a row of their own underneath, spaced evenly. The key fills the
+ * field below, set larger and centred on the press, and the small print sits
+ * under it as two tidy rows.
+ */
+@media (max-width: 700px) {
+  /* a column, in reading order: the top row, the key, the small print */
+  .pfoot {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 0;
+    padding-bottom: 0;
+    font-size: 15px;
+  }
+
+  .pfoot__top {
+    order: 1;
+  }
+
+  .pfoot__art {
+    order: 2;
+  }
+
+  .pfoot__bar {
+    order: 3;
+  }
+
+  .pfoot__top {
+    position: relative;
+    top: auto;
+    right: auto;
+    left: auto;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "brand socials"
+      "nav nav";
+    align-items: center;
+    gap: 1.4em 1em;
+    padding: 1.6em 1.25em 0;
+  }
+
+  .pfoot__top > :first-child {
+    grid-area: brand;
+  }
+
+  /* the right-hand group comes apart so its pieces can take their own places */
+  .pfoot__right {
+    display: contents;
+  }
+
+  .pfoot__nav {
+    grid-area: nav;
+    justify-content: space-between;
+    gap: 1em;
+    padding-top: 1.1em;
+    border-top: 1px solid rgb(255 255 255 / 0.28);
+  }
+
+  .pfoot__navLink {
+    font-size: 1.05em;
+  }
+
+  .pfoot__rule {
+    display: none;
+  }
+
+  .pfoot__socials {
+    grid-area: socials;
+    gap: 0.9em;
+  }
+
+  .pfoot__social {
+    width: 1.35em;
+    height: 1.35em;
+  }
+
+  .pfoot__mark {
+    width: 2em;
+    height: 2.37em;
+  }
+
+  .pfoot__word {
+    font-size: 1.9em;
+  }
+
+  /* the key: a fixed-height window over the press, the picture larger than it */
+  .pfoot__art {
+    position: relative;
+    inset: auto;
+    height: 17em;
+    margin-top: 1em;
+  }
+
+  .pfoot__artInner {
+    left: -55%;
+    width: 185%;
+  }
+
+  .pfoot__bar {
+    position: static;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.55em;
+    padding: 0.9em 1.25em 1.2em;
+    border-top: 1px solid rgb(255 255 255 / 0.18);
+  }
+
+  .pfoot__small {
+    justify-content: space-between;
+    gap: 0.4em 1em;
+    font-size: 0.8em;
+  }
+}
+
+/* the narrowest phones: the small print's two halves wrap rather than squeeze */
+@media (max-width: 360px) {
+  .pfoot__small {
+    justify-content: flex-start;
+    gap: 0.4em 1.1em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pfoot__navLink::after,
+  .pfoot__social {
+    transition: none;
+  }
+}

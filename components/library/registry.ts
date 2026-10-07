@@ -152,6 +152,47 @@ export type Entry = {
 
 export const LIBRARY: Entry[] = [
   {
+    slug: "calendar-card",
+    category: "cards",
+    name: "Calendar",
+    isNew: true,
+    tagline: "A month card where the selected day glides from date to date.",
+    blurb:
+      "A soft, double-walled month card that opens on today, by the visitor's own clock. The selected day is one red square that glides to whichever date you pick, the big number above rolls a digit at a time, the month name swaps through a blur and the bar fills to how far through the month you are. Tap the month to pick any month and year, or press the little calendar in the corner to tear a page off to the next month.",
+    highlights: ["Opens on today", "Gliding selected day", "Month and year picker", "Tear-off month turn"],
+    clip: "/clips/loop/calendar-card.mp4?v=2",
+    poster: "/clips/loop/calendar-card.jpg?v=2",
+    hero: false,
+    sound: false,
+    zoom: 1,
+    stage: "#f4f4f4",
+    clipStage: "#f4f4f4",
+    /* the card's long soft shadow runs past its box */
+    spill: true,
+    stageDark: "#0b0b0c",
+    usage: `import CalendarCard from "@/components/library/CalendarCard";
+
+<CalendarCard theme="light" onChange={(date) => console.log(date)} />`,
+    props: [
+      { name: "defaultDate", type: "Date", fallback: "today", note: "The date it opens on. Left out, it is today by the visitor's clock, read on the client so it is their date in their timezone." },
+      { name: "theme", type: "\"light\" | \"dark\"", fallback: "\"light\"", note: "A pale double-walled card, or the same card in graphite with a brighter red." },
+      { name: "onChange", type: "(date) => void", note: "Fired whenever the selected date changes — by a click, a key or a month turn." },
+    ],
+    files: [
+      { name: "CalendarCard.tsx", lang: "tsx" },
+      { name: "calendar-card.css", lang: "css" },
+    ],
+    info: {
+      paragraphs: [
+        "It opens on today. The date comes from the visitor's own clock, not the server's, so it is their day wherever they are — the card holds its footprint for the one frame before that is known, then arrives with the date already set, and nothing on the page moves. Today stays marked in red as you browse — in the grid and in the month picker. Left open past midnight, the card moves on to the new day by itself, as long as it was still sitting on the old one.",
+        "The selected day is a single red square shared through a layout id, so picking another date glides it there on a spring instead of switching a highlight off in one place and on in another; a soft grey square follows the pointer between days the same way. The big number rolls a digit at a time, the month name swaps through a blur toward the way the page turned, and the four-part bar fills to how far through the month the date falls.",
+        "Tap the month line — the month and the year — and the days give way to a picker: the year between two arrows, rolling a digit at a time as it changes, over the twelve months, where the same red square marks the one you are in. Pick a month and the days come back, turned to it. Page Up and Page Down change the year there, and Escape closes it.",
+        "The little calendar in the corner is a button. Press it and its page tears off — a red leaf flips up and away while the dots ripple back in — and the card turns to the next month, keeping the day number (clamped to the new month's length) with the grid sliding over through a blur. Right-click it to go back. The grid is a keyboard calendar too: the arrows move a day or a week, Page Up and Page Down a month, Home and End to the month's ends.",
+      ],
+    },
+    origin: { label: "calendar" },
+  },
+  {
     slug: "chat-room",
     requestedBy: { handle: "hrstwt", url: "https://x.com/hrstwt" },
     category: "lists",

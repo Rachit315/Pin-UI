@@ -1,0 +1,510 @@
+/* ===========================================================================
+   Calendar.
+
+   A soft double-walled card: a pale shell with a hairline, and the card
+   inside it. Measured off the reference at 300 px wide; everything is themed
+   through the tokens below, and the dark set swaps in on data-theme="dark".
+=========================================================================== */
+
+.pcal {
+  --pcal-shell: #f5f5f5;
+  --pcal-shell-edge: #e6e6e6;
+  --pcal-card: #fbfbfb;
+  --pcal-card-edge: rgb(0 0 0 / 0.035);
+  --pcal-ink: #0d0d0d;
+  --pcal-quiet: #a7a7a7;
+  --pcal-red: #f54a3f;
+  --pcal-red-ink: #ffffff;
+  --pcal-track: #efefef;
+  --pcal-hover: rgb(0 0 0 / 0.05);
+  --pcal-icon: #ececec;
+  --pcal-icon-edge: rgb(0 0 0 / 0.06);
+  --pcal-dot: #b9b9b9;
+  --pcal-shadow:
+    0 1px 1px rgb(0 0 0 / 0.02),
+    0 10px 30px -12px rgb(0 0 0 / 0.12),
+    0 30px 60px -30px rgb(0 0 0 / 0.1);
+
+  display: flex;
+  justify-content: center;
+  color: var(--pcal-ink);
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pcal[data-theme="dark"] {
+  --pcal-shell: #161616;
+  --pcal-shell-edge: #2a2a2a;
+  --pcal-card: #1c1c1d;
+  --pcal-card-edge: rgb(255 255 255 / 0.04);
+  --pcal-ink: #f5f5f5;
+  --pcal-quiet: #7d7d82;
+  --pcal-red: #ff4b40;
+  --pcal-track: #2b2b2d;
+  --pcal-hover: rgb(255 255 255 / 0.07);
+  --pcal-icon: #2a2a2c;
+  --pcal-icon-edge: rgb(255 255 255 / 0.06);
+  --pcal-dot: #5c5c60;
+  --pcal-shadow:
+    0 1px 1px rgb(0 0 0 / 0.3),
+    0 14px 34px -12px rgb(0 0 0 / 0.6),
+    0 30px 60px -30px rgb(0 0 0 / 0.5);
+}
+
+.pcal *,
+.pcal *::before,
+.pcal *::after {
+  box-sizing: border-box;
+}
+
+.pcal button {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* --- the two walls ---------------------------------------------------------- */
+
+.pcal__shell {
+  width: 300px;
+  padding: 8.5px;
+  border-radius: 40px;
+  background: var(--pcal-shell);
+  box-shadow:
+    inset 0 0 0 1px var(--pcal-shell-edge),
+    var(--pcal-shadow);
+  transition: background-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.pcal__card {
+  padding: 27px 20px 22px;
+  border-radius: 32px;
+  background: var(--pcal-card);
+  box-shadow:
+    inset 0 0 0 1px var(--pcal-card-edge),
+    0 1px 2px rgb(0 0 0 / 0.04);
+  transition: background-color 0.35s ease;
+}
+
+/* --- the date and the little calendar --------------------------------------- */
+
+.pcal__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 6px 0 6px;
+}
+
+.pcal__title {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.pcal__day {
+  position: relative;
+  display: inline-flex;
+  overflow: hidden;
+  height: 40px;
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 40px;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.pcal__digit {
+  display: inline-block;
+}
+
+.pcal__month {
+  position: relative;
+  display: block;
+  height: 27px;
+  margin-top: 5px;
+  overflow: hidden;
+  color: var(--pcal-quiet);
+  font-size: 21px;
+  font-weight: 400;
+  line-height: 26px;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.pcal__monthName {
+  display: block;
+}
+
+.pcal__icon {
+  position: relative;
+  flex: none;
+  width: 54px;
+  height: 53px;
+  overflow: hidden;
+  border-radius: 11px;
+  background: var(--pcal-icon);
+  box-shadow:
+    inset 0 0 0 1px var(--pcal-icon-edge),
+    0 2px 6px -2px rgb(0 0 0 / 0.12);
+  perspective: 140px;
+  transition: background-color 0.35s ease;
+}
+
+.pcal__icon:focus-visible,
+.pcal__gridWrap:focus-visible {
+  outline: 2px solid var(--pcal-red);
+  outline-offset: 3px;
+}
+
+.pcal__iconTop {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  right: 3px;
+  height: 15px;
+  border-radius: 8px 8px 2px 2px;
+  background: var(--pcal-red);
+}
+
+/* the leaf that flips away on each turn: a copy of the red top */
+.pcal__leaf {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  right: 3px;
+  height: 15px;
+  border-radius: 8px 8px 2px 2px;
+  background: var(--pcal-red);
+  transform-origin: 50% 0;
+  pointer-events: none;
+}
+
+/* the perforation under the red top, where the pages tear */
+.pcal__icon::after {
+  content: "";
+  position: absolute;
+  top: 20px;
+  left: 6px;
+  right: 6px;
+  border-top: 1px dotted var(--pcal-dot);
+  opacity: 0.8;
+}
+
+.pcal__dots {
+  position: absolute;
+  top: 26px;
+  left: 9px;
+  right: 9px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  row-gap: 4.5px;
+  justify-items: center;
+}
+
+.pcal__dot {
+  display: block;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--pcal-dot);
+}
+
+.pcal__dot[data-on] {
+  background: var(--pcal-red);
+}
+
+/* --- the month's progress ------------------------------------------------------ */
+
+.pcal__progress {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3.5px;
+  margin: 26px 6px 0;
+}
+
+.pcal__seg {
+  position: relative;
+  height: 5px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--pcal-track);
+  transition: background-color 0.35s ease;
+}
+
+.pcal__segFill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--pcal-red);
+  transform-origin: 0 50%;
+}
+
+/* --- the grid ------------------------------------------------------------------- */
+
+.pcal__week,
+.pcal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.pcal__week {
+  margin-top: 30px;
+  color: var(--pcal-quiet);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  text-align: center;
+}
+
+.pcal__gridWrap {
+  position: relative;
+  margin-top: 13px;
+  /* six rows always, so the card never changes height when the month turns */
+  height: 195px;
+  border-radius: 8px;
+  outline: none;
+}
+
+.pcal__grid {
+  row-gap: 0;
+}
+
+.pcal__cell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 32.5px;
+}
+
+.pcal .pcal__date {
+  color: var(--pcal-ink);
+  font-size: 17.5px;
+  font-weight: 450;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.pcal__num {
+  position: relative;
+  z-index: 1;
+  transition: color 0.2s ease;
+}
+
+.pcal__date[data-selected] .pcal__num {
+  color: var(--pcal-red-ink);
+}
+
+/* the selected day: one red square, shared, so it glides from date to date */
+.pcal__selected,
+.pcal__hover {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 32px;
+  height: 25px;
+  margin: -12.5px 0 0 -16px;
+  border-radius: 6px;
+}
+
+.pcal__selected {
+  background: var(--pcal-red);
+  box-shadow: 0 3px 8px -3px rgb(245 74 63 / 0.55);
+}
+
+.pcal__hover {
+  background: var(--pcal-hover);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pcal__shell,
+  .pcal__card,
+  .pcal__num {
+    transition: none;
+  }
+}
+
+/* --- the month line: a button that opens the picker -------------------------------- */
+
+.pcal .pcal__monthBtn {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  max-width: calc(100% + 6px);
+  margin: 5px 0 0 -5px;
+  padding: 0 5px;
+  border-radius: 8px;
+  color: var(--pcal-quiet);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* the month span no longer carries its own top margin: the button does */
+.pcal .pcal__monthBtn .pcal__month {
+  flex: none;
+  margin-top: 0;
+  color: inherit;
+  transition: color 0.2s ease;
+}
+
+/* the year rides beside the month a size down, so the pair fits next to the corner icon */
+.pcal__year {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  height: 22px;
+  overflow: hidden;
+  color: var(--pcal-quiet);
+  opacity: 0.6;
+  font-size: 17px;
+  line-height: 22px;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.pcal__chevron {
+  flex: none;
+  align-self: center;
+  width: 12px;
+  height: 12px;
+  margin-left: -2px;
+  opacity: 0.7;
+}
+
+@media (hover: hover) {
+  .pcal .pcal__monthBtn:hover {
+    background: var(--pcal-hover);
+    color: var(--pcal-ink);
+  }
+}
+
+.pcal .pcal__monthBtn:focus-visible,
+.pcal .pcal__step:focus-visible,
+.pcal .pcal__monthCell:focus-visible {
+  outline: 2px solid var(--pcal-red);
+  outline-offset: 2px;
+}
+
+/* --- the body: the days, or the picker, in the same fixed height --------------------- */
+
+.pcal__body {
+  position: relative;
+  /* weekday row (30 + 20) + the grid (13 + 195) */
+  height: 258px;
+}
+
+/* its own block, so the weekday row's top margin stays inside the body instead of escaping above it */
+.pcal__days {
+  display: flow-root;
+}
+
+.pcal__picker {
+  display: flex;
+  flex-direction: column;
+  padding-top: 22px;
+}
+
+.pcal__yearRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 34px;
+  padding: 0 4px;
+}
+
+.pcal .pcal__step {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--pcal-hover);
+  color: var(--pcal-ink);
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.pcal .pcal__step svg {
+  width: 13px;
+  height: 13px;
+}
+
+@media (hover: hover) {
+  .pcal .pcal__step:not(:disabled):hover {
+    background: var(--pcal-track);
+  }
+}
+
+.pcal .pcal__step:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.pcal__yearBig {
+  position: relative;
+  display: inline-flex;
+  height: 32px;
+  overflow: hidden;
+  color: var(--pcal-ink);
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 32px;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.pcal__months {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 16px;
+}
+
+.pcal .pcal__monthCell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 41px;
+  color: var(--pcal-ink);
+  font-size: 16px;
+  font-weight: 450;
+}
+
+.pcal__monthCell[data-selected] .pcal__num {
+  color: var(--pcal-red-ink);
+}
+
+/* the picked month: the same red square as the picked day, wider for a word */
+.pcal__mSelected,
+.pcal__mHover {
+  position: absolute;
+  inset: 4px 8px;
+  border-radius: 9px;
+}
+
+.pcal__mSelected {
+  background: var(--pcal-red);
+  box-shadow: 0 3px 8px -3px rgb(245 74 63 / 0.55);
+}
+
+.pcal__mHover {
+  background: var(--pcal-hover);
+}
+
+/* --- today -------------------------------------------------------------------------- */
+
+/* the card's footprint while it waits a frame for the visitor's own date */
+.pcal__ghost {
+  width: 300px;
+  height: 427px;
+}
+
+/* today, wherever it is not the picked day: its number in red */
+.pcal__date[data-today]:not([data-selected]) .pcal__num,
+.pcal__monthCell[data-today]:not([data-selected]) .pcal__num {
+  color: var(--pcal-red);
+  font-weight: 600;
+}

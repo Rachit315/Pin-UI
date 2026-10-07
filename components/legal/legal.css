@@ -17,10 +17,21 @@
 }
 
 :root[data-pin-theme="crimson"] .site {
-  --legal-ink: #e60024;
-  --legal-dim: #7a7a7a;
-  --legal-note: #0a0a0a;
-  --legal-edge: rgb(230 0 36 / 0.22);
+  /* the dark face, on the landing page's palette: black paper, white type, red headings */
+  --legal-ink: #f7f7f7;
+  --legal-dim: rgb(255 255 255 / 0.62);
+  --legal-note: #ff3352;
+  --legal-edge: rgb(255 255 255 / 0.14);
+  --legal-paper: #000000;
+  --pin-mark: #ffffff;
+  --pin-mark-star: #e60024;
+}
+
+/* the whole sheet takes the paper, not only the sticky band at the top */
+.site.legal-page {
+  min-height: 100dvh;
+  background: var(--legal-paper);
+  transition: background-color var(--pin-theme-fade) var(--pin-theme-ease);
 }
 
 .legal,

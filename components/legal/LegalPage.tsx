@@ -38,7 +38,7 @@ export default function LegalPage({
   });
 
   return (
-    <div className="site">
+    <div className="site legal-page">
       <main className="legal" id="top">
         {/*
           The way out — and the only navigation on the page. It sticks to the

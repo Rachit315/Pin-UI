@@ -4,7 +4,6 @@ import { motion, useReducedMotion } from "motion/react";
 import { softSpring } from "@/lib/motion";
 import ComponentCard from "../library/ComponentCard";
 import ViewAllCard from "./ViewAllCard";
-import PinterestPeek from "./PinterestPeek";
 import { LIBRARY } from "../library/registry";
 
 /**
@@ -16,10 +15,10 @@ import { LIBRARY } from "../library/registry";
  * scroll up reads as a glitch rather than a flourish. Each card handles its own
  * entrance, because each also owns when its clip is allowed to load.
  *
- * The shelf is a preview: the newest eight, and a ninth cell that opens the
- * whole library, so the grid always closes on a full row of three.
+ * The shelf is a preview — Figma 502:291: the newest five, and a sixth cell
+ * that opens the whole library, so the grid closes on two full rows of three.
  */
-const SHOWN = 8;
+const SHOWN = 5;
 export default function UniqueSection() {
   const reduced = useReducedMotion();
 
@@ -41,12 +40,9 @@ export default function UniqueSection() {
         badly spaced for as long as that lasts.
       */}
       <motion.div className="shelf__head" {...rise()}>
-        <h2 id="components-heading" className="shelf__title">Components that are unique</h2>
-        {/* the mark is set inline in the sentence, the way the hero's claim does */}
+        <h2 id="components-heading" className="shelf__title">Components worth building with</h2>
         <p className="shelf__lead">
-          Every one of them started as a{" "}
-          <PinterestPeek /> pin and ends as something you can paste straight into
-          your project.
+          Thoughtfully crafted UI components designed to give your next project a distinctive edge.
         </p>
       </motion.div>
 
@@ -54,12 +50,9 @@ export default function UniqueSection() {
         {LIBRARY.slice(0, SHOWN).map((entry, i) => (
           <ComponentCard key={entry.slug} entry={entry} index={i} />
         ))}
-        <ViewAllCard index={Math.min(SHOWN, LIBRARY.length)} total={LIBRARY.length} />
+        <ViewAllCard index={Math.min(SHOWN, LIBRARY.length)} total={LIBRARY.length} arrowAtRest />
       </ul>
 
-      <motion.p className="shelf__note" {...rise(0.12)}>
-        3 New components every week…
-      </motion.p>
     </section>
   );
 }
