@@ -28,6 +28,7 @@ export const TESTIMONIALS: Testimonial[] = [
     quote:
       "clean component library with a polished footer is such a good sign. the details at the edges of a site are what separate pro tools from hobby projects",
   },
+  { name: "KASUN", handle: "kasuncfdo", verified: true, quote: "Soo good UIs, crafted so premium 🔥" },
   { name: "OrcDev", handle: "orcdev", verified: true, quote: "looks amazing! well done!" },
   {
     name: "Chakravarthi Chintapatla",
