@@ -1,0 +1,844 @@
+/* ===========================================================================
+   Prompt Composer.
+
+   An assistant's field with five quick actions fanned out behind it. The fan
+   is drawn in container units of the field, so the cards keep their
+   proportions at any width, and it is clipped at the field's middle, so a
+   card rising or sinking seems to come out of the field itself. The pill sits
+   in a box exactly the field's height, so the two share one centre line by
+   construction; send lives inside the field. On a narrow screen the pill
+   drops to a row under the field. Everything is themed through the
+   tokens below; the dark set swaps in on data-theme="dark".
+=========================================================================== */
+
+.pcmp {
+  --pcmp-ink: #141414;
+  --pcmp-quiet: #a3a3a8;
+  --pcmp-bar: #ffffff;
+  --pcmp-bar-h: 50px;
+  --pcmp-bar-edge: rgb(0 0 0 / 0.05);
+  --pcmp-bar-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 4px 12px -6px rgb(0 0 0 / 0.08);
+  --pcmp-tool: #2a2a2c;
+  --pcmp-tool-hover: rgb(0 0 0 / 0.05);
+  --pcmp-card: #ffffff;
+  --pcmp-card-foot: #f4f4f5;
+  --pcmp-card-edge: rgb(0 0 0 / 0.07);
+  --pcmp-card-shine: rgb(255 255 255 / 0.9);
+  --pcmp-card-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+  --pcmp-card-lift: 0 1px 2px rgb(0 0 0 / 0.04), 0 8px 16px -10px rgb(0 0 0 / 0.16);
+  --pcmp-label: #9e9ea4;
+  --pcmp-art: #e6e6e9;
+  --pcmp-art-deep: #d9d9dd;
+  --pcmp-rule: #ebebee;
+  --pcmp-note: linear-gradient(180deg, #ffd978 0%, #f6c13c 100%);
+  --pcmp-event: linear-gradient(180deg, #f48586 0%, #e6555a 100%);
+  --pcmp-band-line: rgb(0 0 0 / 0.08);
+  /* the back of the folded page, darker at the crease */
+  --pcmp-peel-back: linear-gradient(225deg, #d6d6db 0%, #eaeaee 40%, #fbfbfc 100%);
+  --pcmp-peel-shade: rgb(0 0 0 / 0.08);
+  --pcmp-rec: #df5c59;
+  --pcmp-rec-dot: #f6b4b2;
+  --pcmp-pill: #e8e8ea;
+  --pcmp-pill-ink: #86868c;
+  --pcmp-send: #efeff1;
+  --pcmp-send-ink: #b6b6bc;
+  --pcmp-send-ready: #141414;
+  --pcmp-send-ready-ink: #ffffff;
+  --pcmp-menu: #ffffff;
+  --pcmp-menu-shadow: 0 0 0 1px rgb(0 0 0 / 0.05), 0 16px 36px -10px rgb(0 0 0 / 0.22);
+  --pcmp-option-hover: rgb(0 0 0 / 0.05);
+  --pcmp-red: #e5484d;
+  --pcmp-wave: #2a2a2c;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* fluid, never a set width: a fixed one would become its parent's minimum and push a phone's stage wide */
+  width: 100%;
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0 16px;
+  box-sizing: border-box;
+  color: var(--pcmp-ink);
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  container: pcmp / inline-size;
+}
+
+.pcmp[data-theme="dark"] {
+  --pcmp-ink: #f4f4f5;
+  --pcmp-quiet: #74747a;
+  --pcmp-bar: #1b1b1d;
+  --pcmp-bar-edge: rgb(255 255 255 / 0.08);
+  --pcmp-bar-shadow: 0 1px 2px rgb(0 0 0 / 0.35);
+  --pcmp-tool: #e6e6e8;
+  --pcmp-tool-hover: rgb(255 255 255 / 0.07);
+  --pcmp-card: #252527;
+  --pcmp-card-foot: #1d1d1f;
+  --pcmp-card-edge: rgb(255 255 255 / 0.07);
+  --pcmp-card-shine: rgb(255 255 255 / 0.07);
+  --pcmp-card-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+  --pcmp-card-lift: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 16px -10px rgb(0 0 0 / 0.5);
+  --pcmp-label: #7f7f86;
+  --pcmp-art: #353538;
+  --pcmp-art-deep: #2d2d30;
+  --pcmp-rule: #303033;
+  --pcmp-band-line: rgb(0 0 0 / 0.25);
+  --pcmp-peel-back: linear-gradient(225deg, #2c2c2f 0%, #38383c 45%, #444448 100%);
+  --pcmp-peel-shade: rgb(0 0 0 / 0.35);
+  --pcmp-rec: #e5605d;
+  --pcmp-rec-dot: #f3a3a1;
+  --pcmp-pill: #222224;
+  --pcmp-pill-ink: #8e8e94;
+  --pcmp-send: #29292c;
+  --pcmp-send-ink: #66666c;
+  --pcmp-send-ready: #f4f4f5;
+  --pcmp-send-ready-ink: #111111;
+  --pcmp-menu: #1f1f21;
+  --pcmp-menu-shadow: 0 0 0 1px rgb(255 255 255 / 0.08), 0 16px 36px -10px rgb(0 0 0 / 0.8);
+  --pcmp-option-hover: rgb(255 255 255 / 0.07);
+  --pcmp-red: #f0575c;
+  --pcmp-wave: #e6e6e8;
+}
+
+.pcmp *,
+.pcmp *::before,
+.pcmp *::after {
+  box-sizing: border-box;
+}
+
+.pcmp button {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.pcmp button:disabled {
+  cursor: default;
+}
+
+.pcmp button:focus-visible {
+  outline: 2px solid var(--pcmp-ink);
+  outline-offset: 2px;
+}
+
+.pcmp__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* --- the row: pill, field, send, on one centre line --------------------------- */
+
+.pcmp__row {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  width: 100%;
+  margin: 0;
+}
+
+/* a box exactly the field's height, so what is in it centres on the field */
+.pcmp__side {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: var(--pcmp-bar-h);
+}
+
+.pcmp__fieldWrap {
+  flex: 1;
+  min-width: 0;
+  container-type: inline-size;
+}
+
+/* --- the model pill and its list ---------------------------------------------- */
+
+.pcmp__model {
+  position: relative;
+}
+
+.pcmp .pcmp__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: var(--pcmp-pill);
+  color: var(--pcmp-pill-ink);
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  transition: background-color 0.35s ease, color 0.2s ease;
+}
+
+@media (hover: hover) {
+  .pcmp .pcmp__pill:hover {
+    color: var(--pcmp-ink);
+  }
+}
+
+.pcmp__petals {
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+
+.pcmp__pillName {
+  position: relative;
+  display: inline-flex;
+}
+
+.pcmp__pillName > span {
+  display: block;
+}
+
+.pcmp__caret {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  opacity: 0.8;
+}
+
+.pcmp__menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 196px;
+  padding: 5px;
+  border-radius: 14px;
+  background: var(--pcmp-menu);
+  box-shadow: var(--pcmp-menu-shadow);
+  transform-origin: 20px 0;
+}
+
+.pcmp .pcmp__option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 9px;
+  text-align: left;
+}
+
+.pcmp__optionHover {
+  position: absolute;
+  inset: 0;
+  border-radius: 9px;
+  background: var(--pcmp-option-hover);
+}
+
+.pcmp__optionText {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pcmp__optionName {
+  color: var(--pcmp-ink);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.pcmp__optionNote {
+  color: var(--pcmp-quiet);
+  font-size: 11.5px;
+  line-height: 1.2;
+}
+
+.pcmp__check {
+  position: relative;
+  flex: none;
+  width: 14px;
+  height: 14px;
+  color: var(--pcmp-ink);
+}
+
+/* --- the field, and the fan behind it ----------------------------------------- */
+
+.pcmp__field {
+  --pcmp-card-w: 18.6cqw;
+  --pcmp-card-h: 21cqw;
+  /* how much of each card hides behind the field */
+  --pcmp-tuck: 4cqw;
+
+  position: relative;
+  /* room above the field for the part of the fan that shows, and for the lift */
+  padding-top: calc(var(--pcmp-card-h) - var(--pcmp-tuck) + 6px);
+}
+
+.pcmp__fan {
+  position: absolute;
+  top: 6px;
+  right: 0;
+  left: 0;
+  height: var(--pcmp-card-h);
+  /*
+   * Clipped at the field's middle: room above and to the sides for a card to
+   * lift and lean, nothing below. A card sunk past that line is out of sight
+   * inside the field, so rising, it comes up out of the field, not from under it.
+   */
+  clip-path: inset(-90px -60px calc(var(--pcmp-tuck) - var(--pcmp-bar-h) / 2) -60px);
+}
+
+/* the card: the moving part, and its shadow */
+.pcmp .pcmp__card {
+  position: absolute;
+  top: 0;
+  width: var(--pcmp-card-w);
+  height: var(--pcmp-card-h);
+  border-radius: clamp(10px, 2.5cqw, 15px);
+  box-shadow: var(--pcmp-card-shadow);
+  transform-origin: 50% 100%;
+  transition: box-shadow 0.3s ease;
+  will-change: transform;
+}
+
+@media (hover: hover) {
+  .pcmp .pcmp__card:hover {
+    box-shadow: var(--pcmp-card-lift);
+  }
+}
+
+/* its face: the paper, clipped to the corners, with a hairline and a lit top edge */
+.pcmp__cardFace {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  background: linear-gradient(180deg, var(--pcmp-card) 0%, var(--pcmp-card) 45%, var(--pcmp-card-foot) 100%);
+}
+
+.pcmp__cardFace::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 0 1px var(--pcmp-card-edge),
+    inset 0 1px 0 var(--pcmp-card-shine);
+  pointer-events: none;
+}
+
+.pcmp__band {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 15%;
+  box-shadow: inset 0 -1px 0 var(--pcmp-band-line), inset 0 1px 0 rgb(255 255 255 / 0.35);
+}
+
+.pcmp__card--note .pcmp__band {
+  background: var(--pcmp-note);
+}
+
+.pcmp__card--event .pcmp__band {
+  background: var(--pcmp-event);
+}
+
+.pcmp__label {
+  position: absolute;
+  top: 9%;
+  right: 8%;
+  left: 8%;
+  color: var(--pcmp-label);
+  font-size: clamp(9px, 1.75cqw, 12px);
+  font-weight: 450;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* below the coloured top */
+.pcmp__card--note .pcmp__label,
+.pcmp__card--event .pcmp__label {
+  top: 22%;
+}
+
+/* clear of the folded corner, even when a hover folds it further */
+.pcmp__card--docs .pcmp__label {
+  right: 25%;
+  left: 5%;
+}
+
+/* the drawing: centred in the lower part of the card, running on behind the field */
+.pcmp__artBox {
+  position: absolute;
+  top: 34%;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.pcmp__card--note .pcmp__artBox,
+.pcmp__card--event .pcmp__artBox {
+  top: 40%;
+}
+
+.pcmp__art {
+  display: block;
+  width: 64%;
+  height: auto;
+  overflow: visible;
+}
+
+/* the note: ruled lines */
+.pcmp__lines {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, 1.9cqw, 11px);
+  width: 82%;
+  padding-top: 4%;
+}
+
+.pcmp__line {
+  display: block;
+  height: 1.5px;
+  border-radius: 1px;
+  background: var(--pcmp-rule);
+  transform-origin: 0 50%;
+}
+
+/* the event: the big date */
+.pcmp__date {
+  display: block;
+  color: var(--pcmp-art);
+  font-family: "Inter Tight", "Inter", ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(24px, 8cqw, 50px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+
+/*
+ * The documents card: its top-right corner folded down, a dog-ear. The face
+ * is masked so the corner is gone, and the flap — the back of the page — lies
+ * folded over the paper beneath, with a faint shade along it. The size is
+ * --pcmp-peel times a fifth of the card, so a hover folds it further back.
+ */
+.pcmp__card--docs .pcmp__cardFace {
+  --pcmp-peel-size: calc(var(--pcmp-card-w) * 0.2 * var(--pcmp-peel, 1));
+  -webkit-mask-image: linear-gradient(225deg, transparent calc(var(--pcmp-peel-size) * 0.7071), #000 calc(var(--pcmp-peel-size) * 0.7071 + 0.6px));
+  mask-image: linear-gradient(225deg, transparent calc(var(--pcmp-peel-size) * 0.7071), #000 calc(var(--pcmp-peel-size) * 0.7071 + 0.6px));
+}
+
+.pcmp__peel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  width: var(--pcmp-peel-size);
+  height: var(--pcmp-peel-size);
+  pointer-events: none;
+}
+
+.pcmp__peel::before,
+.pcmp__peel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(0 0, 0 100%, 100% 100%);
+}
+
+/* the shade the flap casts on the page */
+.pcmp__peel::before {
+  background: var(--pcmp-peel-shade);
+  transform: translate(-1.5px, 1.5px);
+}
+
+/* the flap */
+.pcmp__peel::after {
+  border-bottom-left-radius: 28%;
+  background: var(--pcmp-peel-back);
+}
+
+/* --- the bar ------------------------------------------------------------------------ */
+
+.pcmp__bar {
+  position: relative;
+  z-index: 20;
+  height: var(--pcmp-bar-h);
+  border-radius: 16px;
+  background: var(--pcmp-bar);
+  box-shadow:
+    inset 0 0 0 1px var(--pcmp-bar-edge),
+    var(--pcmp-bar-shadow);
+  transition: background-color 0.35s ease;
+}
+
+/* the two faces of the bar: typing, and recording */
+.pcmp__typer,
+.pcmp__recorder {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+  padding: 0 9px 0 14px;
+}
+
+.pcmp .pcmp__chip {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 7px 0 8px;
+  border-radius: 9px;
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.pcmp__chipIcon {
+  width: 14px;
+  height: 14px;
+}
+
+.pcmp__chipX {
+  width: 12px;
+  height: 12px;
+  opacity: 0.6;
+}
+
+.pcmp__chip--image {
+  background: #efeff3;
+  color: #4a4a55;
+}
+
+.pcmp__chip--note {
+  background: #fff3d1;
+  color: #9a6d0b;
+}
+
+.pcmp__chip--event {
+  background: #ffe5e5;
+  color: #c43c3f;
+}
+
+.pcmp__chip--docs {
+  background: #e7edff;
+  color: #3d5fc9;
+}
+
+.pcmp[data-theme="dark"] .pcmp__chip--image {
+  background: #2a2a2f;
+  color: #c9c9d2;
+}
+
+.pcmp[data-theme="dark"] .pcmp__chip--note {
+  background: #3a3018;
+  color: #f5cf6c;
+}
+
+.pcmp[data-theme="dark"] .pcmp__chip--event {
+  background: #3d2021;
+  color: #f38a8c;
+}
+
+.pcmp[data-theme="dark"] .pcmp__chip--docs {
+  background: #1f2843;
+  color: #93abf5;
+}
+
+.pcmp__inputWrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+}
+
+.pcmp__input {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--pcmp-ink);
+  font: inherit;
+  font-size: 14.5px;
+  letter-spacing: -0.005em;
+  text-overflow: ellipsis;
+}
+
+.pcmp__placeholder {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  margin-top: -0.6em;
+  overflow: hidden;
+  color: var(--pcmp-quiet);
+  font-size: 14.5px;
+  line-height: 1.2;
+  letter-spacing: -0.005em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.pcmp__tools {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.pcmp .pcmp__tool {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  color: var(--pcmp-tool);
+  transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+}
+
+.pcmp .pcmp__tool svg {
+  position: relative;
+  width: 19px;
+  height: 19px;
+  overflow: visible;
+}
+
+.pcmp .pcmp__tool:disabled {
+  opacity: 0.4;
+}
+
+@media (hover: hover) {
+  .pcmp .pcmp__tool:not(:disabled):hover {
+    background: var(--pcmp-tool-hover);
+  }
+}
+
+/* --- the recorder ------------------------------------------------------------------- */
+
+.pcmp__rec {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 50px;
+}
+
+.pcmp__recDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--pcmp-red);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--pcmp-red) 18%, transparent);
+}
+
+.pcmp__recClock {
+  color: var(--pcmp-ink);
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.pcmp__wave {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2px;
+  height: 26px;
+  padding: 0 4px;
+  /* the oldest bars fade out on the left as they scroll away */
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 18%, #000 100%);
+  mask-image: linear-gradient(to right, transparent 0%, #000 18%, #000 100%);
+}
+
+.pcmp__waveBar {
+  flex: 0 1 3px;
+  min-width: 1.5px;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--pcmp-wave);
+  transform: scaleY(0.08);
+  transition: transform 90ms linear;
+}
+
+.pcmp .pcmp__stop {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-left: 2px;
+  border-radius: 50%;
+  background: var(--pcmp-red);
+  box-shadow: 0 2px 8px -2px color-mix(in srgb, var(--pcmp-red) 60%, transparent);
+}
+
+.pcmp__stopSquare {
+  position: relative;
+  width: 10px;
+  height: 10px;
+  border-radius: 2.5px;
+  background: #ffffff;
+}
+
+.pcmp__ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--pcmp-red);
+  pointer-events: none;
+}
+
+/* --- send, inside the field ----------------------------------------------------- */
+
+.pcmp .pcmp__send {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-left: 4px;
+  border-radius: 50%;
+  background: var(--pcmp-send);
+  color: var(--pcmp-send-ink);
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.pcmp .pcmp__send[data-ready] {
+  background: var(--pcmp-send-ready);
+  color: var(--pcmp-send-ready-ink);
+}
+
+.pcmp__send svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* --- a narrow screen: the pill and send drop under the field ------------------------ */
+
+@container pcmp (max-width: 560px) {
+  .pcmp {
+    --pcmp-bar-h: 46px;
+  }
+
+  .pcmp__row {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "field field"
+      "pill .";
+    row-gap: 10px;
+    column-gap: 0;
+  }
+
+  .pcmp__fieldWrap {
+    grid-area: field;
+  }
+
+  .pcmp__side {
+    grid-area: pill;
+    height: auto;
+  }
+
+  /* opening upward, so it never runs off the bottom */
+  .pcmp__menu {
+    top: auto;
+    bottom: calc(100% + 8px);
+    transform-origin: 20px 100%;
+  }
+
+  .pcmp__typer,
+  .pcmp__recorder {
+    padding-left: 12px;
+    gap: 6px;
+  }
+
+  .pcmp .pcmp__tool {
+    width: 30px;
+    height: 30px;
+  }
+
+  .pcmp .pcmp__send {
+    margin-left: 2px;
+  }
+
+  /* the chip keeps its icon and its ×; the name is still its accessible label */
+  .pcmp .pcmp__chip > span {
+    display: none;
+  }
+
+  .pcmp .pcmp__chip {
+    padding: 0 6px;
+  }
+
+  .pcmp__input,
+  .pcmp__placeholder {
+    font-size: 16px;
+  }
+}
+
+/* small cards: the labels take two lines rather than clip */
+@container (max-width: 420px) {
+  .pcmp__label {
+    top: 7%;
+    font-size: 8.5px;
+    line-height: 1.1;
+    white-space: normal;
+  }
+
+  .pcmp__card--note .pcmp__label,
+  .pcmp__card--event .pcmp__label {
+    top: 20%;
+  }
+
+  .pcmp__card--docs .pcmp__label {
+    right: 25%;
+    left: 4%;
+  }
+
+  .pcmp__artBox {
+    top: 42%;
+  }
+
+  .pcmp__card--note .pcmp__artBox,
+  .pcmp__card--event .pcmp__artBox {
+    top: 46%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pcmp .pcmp__card,
+  .pcmp .pcmp__tool,
+  .pcmp .pcmp__send,
+  .pcmp__waveBar {
+    transition: none;
+  }
+}

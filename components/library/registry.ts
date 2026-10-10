@@ -152,6 +152,50 @@ export type Entry = {
 
 export const LIBRARY: Entry[] = [
   {
+    slug: "prompt-composer",
+    category: "controls",
+    name: "Prompt Composer",
+    isNew: true,
+    tagline: "An assistant's field with its quick actions fanned out behind it.",
+    blurb:
+      "Five tilted cards stand behind an Ask anything field — create an image, add a note, create an event, voice mode, analyse docs. Hover one and it lifts and straightens while its neighbours lean away; pick it and the fan sinks behind the field as the action arrives inside it as a chip. Voice turns the field into a recorder with a live, scrolling waveform.",
+    highlights: ["Fanned quick actions", "Card to chip", "Voice recorder demo", "Gliding model list"],
+    /* recorded in dark, in 4K: a remocn edit of the real component */
+    clip: "/clips/loop/prompt-composer.mp4",
+    poster: "/clips/loop/prompt-composer.jpg",
+    hero: false,
+    sound: false,
+    zoom: 1,
+    stage: "#f3f3f3",
+    /* the loop is the dark face, so its frame is the dark stage */
+    clipStage: "#0b0b0c",
+    stageDark: "#0b0b0c",
+    /* laid out as a wide row — pill, field, send — not a card */
+    wide: true,
+    /* the cards' and the field's soft shadows run past their boxes */
+    spill: true,
+    usage: `import PromptComposer from "@/components/library/PromptComposer";
+
+<PromptComposer theme="light" onSend={({ text, action, model }) => console.log(text, action, model)} />`,
+    props: [
+      { name: "theme", type: "\"light\" | \"dark\"", fallback: "\"light\"", note: "A white field and paper cards on pale grey, or the same in graphite." },
+      { name: "onSend", type: "({ text, action, model }) => void", note: "Fired on Enter or the send button, with the text, the action picked (or null) and the model's name." },
+    ],
+    files: [
+      { name: "PromptComposer.tsx", lang: "tsx" },
+      { name: "prompt-composer.css", lang: "css" },
+    ],
+    info: {
+      paragraphs: [
+        "Five quick actions stand up behind the field, each leaning its own way, the way cards sit when they are pushed into a holder: an image, a note with a yellow top, an event with a red one, voice with its record button, and documents with its corner folded down. Hover one and it lifts and straightens on a spring while the cards either side lean out of its way, and its drawing comes to life — the sparkle turns, the note's lines write themselves in, the date rises, the record button pulses, the dog-ear folds further back.",
+        "The fan rises out of the field itself — below the field's middle it is clipped, so a card is never seen hanging under it. Pick one and the fan sinks back into the field, the picked card last, while the action arrives inside the field as a chip and the placeholder changes to suit through a blur. Tap the chip, press Escape, or Backspace on an empty field to let it go and bring the fan back. The plus folds the fan away and back.",
+        "Voice — the card or the microphone — turns the field into a recorder: a red dot, a running clock and a waveform that scrolls in from the right like a voice memo, syllables swelling and falling with pauses between words. It is a demo, so nothing is listened to: stop it and a sample transcript types itself in, ready to send, or cancel it to go back. Send — Enter, or the arrow inside the field — and the composer starts over: the field clears and the cards come up out of it again.",
+        "The model pill opens a short list: one grey square, shared through a layout id, follows the pointer from row to row, and the check marks the model in use. One spring drives every morph, as in Bencho's SelectionList, so all the pieces land together.",
+      ],
+    },
+    origin: { label: "prompt composer" },
+  },
+  {
     slug: "calendar-card",
     category: "cards",
     name: "Calendar",

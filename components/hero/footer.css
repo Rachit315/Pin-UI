@@ -1,28 +1,31 @@
 /* ===========================================================================
    The footer — Figma 502:1939.
 
-   Drawn at 1280 × 600. Every size is the design's pixel over 16, in `em`, and
+   Drawn at 1280 wide. Every size is the design's pixel over 16, in `em`, and
    the footer sets its own root — 16px at 1280 wide, scaling with the screen
-   between a floor and a ceiling — so it holds its proportions on any page it
+   with a floor but no ceiling — so on any desktop, however wide, the scene,
+   the type and the spacing keep exactly the proportions they were drawn at,
+   instead of the picture outgrowing the footer. It holds them on any page it
    sits under, whatever that page's own type scale is.
 =========================================================================== */
 
 .pfoot {
-  --pfoot-red: #de0120;
+  /* the scene's own red, so the picture and the field are one surface */
+  --pfoot-red: #df0222;
   --pfoot-ink: #ffffff;
   --pfoot-quiet: rgb(247 247 247 / 0.8);
   --pin-mark: #ffffff;
-  --pin-mark-star: #de0120;
+  --pin-mark-star: #df0222;
 
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  height: 37.5em; /* 600 */
+  height: 43em; /* 688: room for the hand above the key, clear of the links */
   border-top: 1px solid #fc6161;
   background: var(--pfoot-red);
   color: var(--pfoot-ink);
   font-family: var(--pin-font);
-  font-size: clamp(11px, 1.25vw, 17px);
+  font-size: max(11px, 1.25vw);
   box-sizing: border-box;
 }
 
@@ -33,8 +36,7 @@
 }
 
 /*
- * The key, as Figma places it: the picture at the footer's full width (a
- * hair over, 100.63%), standing on the strip of red the small print runs
+ * The scene, full width, standing on the strip of red the small print runs
  * along, 40px up from the bottom edge. The window it is seen through stops at
  * that strip, so while the scroll lifts it into place it never slides over
  * the small print.
@@ -42,31 +44,97 @@
 .pfoot__art {
   position: absolute;
   inset: 0 0 2.5em;
-  z-index: -1;
+  z-index: 0;
   overflow: hidden;
 }
 
 .pfoot__artInner {
   position: absolute;
   bottom: 0;
-  left: -0.32%;
-  width: 100.63%;
+  left: 0;
+  width: 100%;
   transform-origin: 50% 100%;
   will-change: transform;
 }
 
-.pfoot__img {
+/* three layers on one 16:9 plate: the key up, the key down, the hand */
+.pfoot__scene {
+  position: relative;
+  aspect-ratio: 1536 / 864;
+  /* the plate's top is plain red; fade it into the field so no edge shows */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 22%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 22%);
+}
+
+.pfoot__layer {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
   user-select: none;
   -webkit-user-drag: none;
+  pointer-events: none;
+}
+
+.pfoot__layer--down {
+  opacity: 0;
+  transition: opacity 50ms linear 30ms;
+}
+
+.pfoot__scene[data-pressed] .pfoot__layer--down {
+  opacity: 1;
+}
+
+/* letting go, the key is back up the moment the finger lifts */
+.pfoot__scene:not([data-pressed]) .pfoot__layer--down {
+  transition-delay: 0ms;
+}
+
+.pfoot__hand {
+  will-change: transform;
+}
+
+/* light off the key on each press, over the key, under the hand */
+.pfoot__glow {
+  position: absolute;
+  top: 58%;
+  left: 49%;
+  width: 36%;
+  height: 34%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 255 255 / 0.85), rgb(255 255 255 / 0) 100%);
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+}
+
+/* the key's footprint on the plate: the only part that presses */
+.pfoot .pfoot__key {
+  position: absolute;
+  top: 58%;
+  left: 45%;
+  width: 43.5%;
+  height: 32%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 2em;
+  background: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pfoot .pfoot__key:focus-visible {
+  outline: 2px solid var(--pfoot-ink);
+  outline-offset: -0.6em;
 }
 
 /* --- the top row: lockup on the left, links and the two ways to reach us on the right --- */
 
 .pfoot__top {
   position: absolute;
+  z-index: 1;
   top: 2.44em; /* 39 */
   left: 2em; /* 32 */
   right: 2em;
@@ -182,6 +250,7 @@
 
 .pfoot__bar {
   position: absolute;
+  z-index: 1;
   left: 2em;
   right: 2em;
   bottom: 0.75em; /* 12 */
@@ -328,17 +397,17 @@
     font-size: 1.9em;
   }
 
-  /* the key: a fixed-height window over the press, the picture larger than it */
+  /* the key: a window over the press, the plate larger than it, the hand reaching in from the left */
   .pfoot__art {
     position: relative;
     inset: auto;
-    height: 17em;
-    margin-top: 1em;
+    height: 21em;
+    margin-top: 0.5em;
   }
 
   .pfoot__artInner {
-    left: -55%;
-    width: 185%;
+    left: -64%;
+    width: 180%;
   }
 
   .pfoot__bar {

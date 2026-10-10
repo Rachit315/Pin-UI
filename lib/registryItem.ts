@@ -61,6 +61,7 @@ const FACES: Record<string, string | null> = {
   "dynamic-drop-zone": "Inter (400 to 600)",
   "swap-card": "Inter (400 and 500)",
   "calendar-card": "Inter (400 to 600)",
+  "prompt-composer": "Inter (400 to 500), with Inter Tight (700) for the date on the event card",
 };
 
 function docsFor(entry: Entry): string {
