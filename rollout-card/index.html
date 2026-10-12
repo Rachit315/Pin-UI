@@ -1,0 +1,886 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Plugin Rollout</title>
+    <script>
+      // Resolve the theme before first paint so there is no flash.
+      (() => {
+        let t = null;
+        try { t = localStorage.getItem("rollout-theme"); } catch {}
+        if (t !== "light" && t !== "dark") t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.dataset.theme = t;
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://picsum.photos" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ['"Space Grotesk"', "ui-sans-serif", "system-ui", "sans-serif"] },
+            colors: {
+              canvas: "var(--canvas)",
+              surface: "var(--surface)",
+              ink: "var(--ink)",
+              muted: "var(--muted)",
+              soft: "var(--soft)",
+              line: "var(--line)",
+              go: "#2563eb",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      :root {
+        --canvas: #f4f4f4;
+        --surface: #f9f9f9;
+        --ink: #1f1f1f;
+        --muted: #5c5c5c;
+        --soft: #8a8a8a;
+        --line: #e7e7e7;
+        --pill: #ffffff;
+        --pill-ink: #3a3a3a;
+        --active-bg: linear-gradient(180deg, #5a5a5a 0%, #2a2a2a 55%, #141414 100%);
+        --active-ink: #ffffff;
+        --track: #ececec;
+        --skeleton: #e6e6e6;
+        --shimmer: rgba(255,255,255,.55);
+        --card-shadow: 0 40px 80px -24px rgba(0,0,0,.10), 0 8px 24px -8px rgba(0,0,0,.06), 0 0 0 1px rgba(0,0,0,.02);
+        --toggle: #ffffff;
+        --toggle-shadow: 4px 4px 0 0 #ebebeb;
+        color-scheme: light;
+      }
+      :root[data-theme="dark"] {
+        --canvas: #0e0e0f;
+        --surface: #18181a;
+        --ink: #f1f1f1;
+        --muted: #a3a3a3;
+        --soft: #8c8c8c;
+        --line: #2c2c2f;
+        --pill: #202023;
+        --pill-ink: #d6d6d6;
+        --active-bg: linear-gradient(180deg, #ffffff 0%, #ececec 55%, #d4d4d4 100%);
+        --active-ink: #141414;
+        --track: #26262a;
+        --skeleton: #222225;
+        --shimmer: rgba(255,255,255,.07);
+        --card-shadow: 0 40px 80px -24px rgba(0,0,0,.7), 0 8px 24px -8px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.05);
+        --toggle: #1c1c1f;
+        --toggle-shadow: 4px 4px 0 0 #050505;
+        color-scheme: dark;
+      }
+      body { background: var(--canvas); }
+
+      /* Hidden until Motion runs the entrance, so nothing flashes. */
+      [data-enter] { opacity: 0; }
+
+      /* ---- Photo: skeleton + shimmer until the image arrives, then a quadtree pixel resolve ---- */
+      .skeleton { background: var(--skeleton); }
+      .shimmer {
+        background: linear-gradient(105deg, transparent 30%, var(--shimmer) 50%, transparent 70%);
+        background-size: 250% 100%;
+        animation: shimmer 1.6s cubic-bezier(.4,0,.2,1) infinite;
+      }
+      @keyframes shimmer { from { background-position: 120% 0; } to { background-position: -20% 0; } }
+
+      .card { background: var(--surface); box-shadow: var(--card-shadow); }
+      .fx-bar { background: var(--toggle); box-shadow: var(--toggle-shadow), inset 0 0 0 1px var(--line); scrollbar-width: none; }
+      .fx-bar::-webkit-scrollbar { display: none; }
+      .fx-btn { color: var(--soft); transition: color .2s ease; }
+      .fx-btn:hover { color: var(--ink); }
+      .fx-btn[aria-checked="true"] { color: var(--active-ink); }
+      .fx-ind { background: var(--active-bg); }
+      .pill {
+        background: var(--pill);
+        color: var(--pill-ink);
+        transition: color .22s ease, background-color .22s ease, border-color .22s ease;
+      }
+      .pill[aria-checked="true"] { color: var(--active-ink); background-color: transparent; border-color: transparent; }
+      .pill-active-bg { background: var(--active-bg); }
+      .track { background: var(--track); }
+      .fill-bg {
+        background: linear-gradient(180deg, #5b9bff 0%, #2f74f5 45%, #1f5fe0 100%);
+        box-shadow: inset 0 0 0 3px #6aa6ff, inset 0 6px 10px -4px rgba(255,255,255,.35);
+        will-change: transform;
+      }
+      .knob {
+        background: #fff;
+        box-shadow: 0 2px 6px rgba(0,0,0,.18), inset 0 -2px 3px rgba(0,0,0,.06);
+      }
+      .toggle { background: var(--toggle); box-shadow: var(--toggle-shadow); }
+
+      /* Theme swap reveals as a circle growing from the toggle (View Transitions). */
+      ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+
+      @media (prefers-reduced-motion: reduce) {
+        [data-enter] { opacity: 1 !important; transform: none !important; filter: none !important; }
+        .shimmer { animation: none; }
+      }
+    </style>
+  </head>
+  <body class="min-h-screen font-sans text-ink antialiased">
+    <!-- Gooey filter: blurs the indicator blobs, then hardens the alpha so they melt together -->
+    <svg class="absolute h-0 w-0" aria-hidden="true">
+      <defs>
+        <filter id="goo">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur" />
+          <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -10" result="goo" />
+          <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+        </filter>
+      </defs>
+    </svg>
+
+    <!-- Theme switch -->
+    <button
+      id="theme"
+      data-enter
+      type="button"
+      class="toggle fixed right-5 top-5 z-20 grid h-11 w-11 place-items-center rounded-full text-ink outline-none focus-visible:ring-4 focus-visible:ring-go/30"
+      aria-label="Switch to dark theme"
+    >
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <mask id="moon-mask">
+          <rect width="24" height="24" fill="#fff" />
+          <circle id="moon-bite" cx="30" cy="4" r="7" fill="#000" />
+        </mask>
+        <circle id="sun-core" cx="12" cy="12" r="4.5" fill="currentColor" stroke="none" mask="url(#moon-mask)" />
+        <g id="sun-rays">
+          <path d="M12 2v2" /><path d="M12 20v2" /><path d="M2 12h2" /><path d="M20 12h2" />
+          <path d="m4.9 4.9 1.4 1.4" /><path d="m17.7 17.7 1.4 1.4" /><path d="m4.9 19.1 1.4-1.4" /><path d="m17.7 6.3 1.4-1.4" />
+        </g>
+      </svg>
+    </button>
+
+    <main class="flex min-h-screen w-full flex-col items-center justify-center px-4 py-10">
+      <!-- Rollout card -->
+      <section id="card" data-enter class="card w-full max-w-[440px] rounded-[22px] p-4">
+        <!-- Photo: the rollout percentage is how far the image has "loaded" -->
+        <div id="scene" class="skeleton relative aspect-[1200/620] w-full overflow-hidden rounded-[11px]">
+          <canvas id="photo" class="absolute inset-0 h-full w-full" style="opacity:0" role="img" aria-label="A deep blue fjord winding between rocky cliffs"></canvas>
+          <div id="shimmer" class="shimmer pointer-events-none absolute inset-0" aria-hidden="true"></div>
+          <div class="pointer-events-none absolute inset-0 rounded-[11px] shadow-[inset_0_0_0_1px_rgba(0,0,0,.06)]" aria-hidden="true"></div>
+        </div>
+
+        <div class="mt-6 flex items-center justify-between">
+          <h1 class="text-[21px] font-semibold tracking-[-0.03em]">Plugin Update Rollout</h1>
+          <div class="relative">
+            <button
+              id="info"
+              type="button"
+              aria-describedby="tip"
+              class="grid h-6 w-6 place-items-center rounded-full text-soft outline-none transition-colors hover:text-ink focus-visible:ring-2 focus-visible:ring-ink/30"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                <circle cx="12" cy="12" r="10" /><path d="M12 7v6" /><path d="M12 16.6v.1" />
+              </svg>
+            </button>
+            <div
+              id="tip"
+              role="tooltip"
+              class="pointer-events-none absolute right-0 top-8 z-10 w-52 origin-top-right rounded-xl bg-ink px-3.5 py-2.5 text-[12px] leading-[18px] text-canvas shadow-xl"
+              style="opacity:0;transform:scale(.85) translateY(-6px)"
+            >
+              Users are bucketed randomly. Raising the percentage adds users; lowering it never removes the update from anyone who already has it.
+            </div>
+          </div>
+        </div>
+
+        <p class="mt-3 text-[13.5px] leading-[21px] tracking-[-0.01em] text-muted">
+          Control how many users get access to the latest plugin update. Use the presets or drag the slider to schedule a safe release.
+        </p>
+
+        <!-- Presets -->
+        <div id="presets" class="relative mt-4 flex flex-wrap gap-[7px]" role="radiogroup" aria-label="Rollout presets">
+          <!-- Indicator layer sits under the labels; the goo filter melts lead + trail blobs together -->
+          <div class="pointer-events-none absolute inset-0" style="filter:url(#goo)" aria-hidden="true">
+            <div id="trail" class="pill-active-bg absolute left-0 top-0 h-10 rounded-full" style="opacity:0"></div>
+            <div id="lead" class="pill-active-bg absolute left-0 top-0 h-10 rounded-full" style="opacity:0"></div>
+          </div>
+        </div>
+
+        <!-- Progress -->
+        <p class="mt-8 text-[13.5px] font-medium tracking-[-0.01em] text-muted" id="progress-label">Deployment progress</p>
+        <div
+          id="track"
+          role="slider"
+          tabindex="0"
+          aria-labelledby="progress-label"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="0"
+          class="track relative mt-3 h-12 w-[calc(100%-10px)] cursor-grab touch-none select-none overflow-hidden rounded-full outline-none focus-visible:ring-4 focus-visible:ring-go/30 active:cursor-grabbing"
+        >
+          <!-- Full-width fill slid with transform only, so dragging never triggers layout -->
+          <div id="fill" class="fill-bg absolute inset-0 rounded-full" style="transform:translate3d(-100%,0,0)">
+            <span id="pct" class="absolute right-[56px] top-1/2 -translate-y-1/2 text-[14.5px] font-medium tracking-[-0.01em] text-white tabular-nums">0%</span>
+            <span id="knob" class="knob absolute right-[5px] top-[5px] h-[38px] w-[38px] rounded-full"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Transition switcher (outside the card) -->
+      <nav
+        id="fx"
+        data-enter
+        class="fx-bar relative mt-6 flex max-w-full gap-0.5 overflow-x-auto rounded-full p-1"
+        role="radiogroup"
+        aria-label="Photo transition"
+      >
+        <div id="fx-ind" class="fx-ind pointer-events-none absolute left-0 top-1 h-9 rounded-full" style="opacity:0" aria-hidden="true"></div>
+      </nav>
+    </main>
+
+    <noscript><style>[data-enter]{opacity:1}</style></noscript>
+
+    <script type="module">
+      import { animate, motionValue, stagger } from "https://cdn.jsdelivr.net/npm/motion@11.18.2/+esm";
+
+      const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const S = (stiffness, damping, mass = 1) =>
+        reduce ? { duration: 0 } : { type: "spring", stiffness, damping, mass };
+      const clamp = (n, a = 0, b = 100) => Math.min(b, Math.max(a, n));
+
+      const PRESETS = [0, 25, 50, 75, 90, 100];
+      const $ = (id) => document.getElementById(id);
+
+      /* ---------- Preset pills ---------- */
+      const presetsEl = $("presets");
+      const pills = PRESETS.map((v) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.setAttribute("role", "radio");
+        b.setAttribute("aria-checked", "false");
+        b.className =
+          "pill relative z-[1] h-10 w-[60px] rounded-full border border-line text-[13.5px] font-medium tracking-[-0.01em] outline-none focus-visible:ring-4 focus-visible:ring-go/25";
+        b.style.opacity = "0";
+        b.textContent = `${v}%`;
+        presetsEl.appendChild(b);
+        return b;
+      });
+
+      // Two blobs: the lead snaps quickly, the trail lags; under the goo filter
+      // they stretch into one liquid drop and re-merge when the trail catches up.
+      const lead = { x: motionValue(0), w: motionValue(60), o: motionValue(0) };
+      const trail = { x: motionValue(0), w: motionValue(60), o: motionValue(0) };
+      let pillTop = 0;
+      const bind = (el, m) => {
+        const paint = () => {
+          el.style.left = `${m.x.get()}px`;
+          el.style.top = `${pillTop}px`;
+          el.style.width = `${m.w.get()}px`;
+          el.style.opacity = m.o.get();
+        };
+        m.x.on("change", paint); m.w.on("change", paint); m.o.on("change", paint);
+        return paint;
+      };
+      const paintLead = bind($("lead"), lead);
+      const paintTrail = bind($("trail"), trail);
+
+      let activePreset = -1;
+      function moveIndicator(index, instant = false) {
+        const prev = activePreset;
+        activePreset = index;
+        pills.forEach((p, i) => {
+          p.setAttribute("aria-checked", i === index);
+          p.tabIndex = i === index || (index === -1 && i === 0) ? 0 : -1;
+        });
+        if (index === -1) {
+          animate(lead.o, 0, { duration: 0.18 });
+          animate(trail.o, 0, { duration: 0.18 });
+          return;
+        }
+        const p = pills[index];
+        pillTop = p.offsetTop;
+        const x = p.offsetLeft, w = p.offsetWidth;
+        if (instant || prev === -1) {
+          // Appear in place with a soft pop instead of sliding from nowhere.
+          [lead, trail].forEach((m) => { m.x.jump(x); m.w.jump(w); });
+          paintLead(); paintTrail();
+          if (instant) { lead.o.jump(1); trail.o.jump(1); paintLead(); paintTrail(); return; }
+          animate(lead.o, 1, { duration: reduce ? 0 : 0.2 });
+          animate(trail.o, 1, { duration: reduce ? 0 : 0.2 });
+          if (!reduce) animate($("lead"), { scale: [0.85, 1] }, S(500, 22));
+          return;
+        }
+        animate(lead.x, x, S(520, 34));
+        animate(lead.w, w, S(520, 34));
+        animate(trail.x, x, S(170, 22, 1.1));
+        animate(trail.w, w, S(170, 22, 1.1));
+        // Squash the travelling drop slightly, then let it settle.
+        if (!reduce) animate($("trail"), { scaleY: [1, 0.72, 1] }, { duration: 0.45, ease: "easeOut" });
+      }
+
+      /* ---------- Photo transitions ----------
+         The rollout % is how far the photo has resolved, and the switcher under the card
+         picks the look of that resolve:
+
+         • Pixel — a quadtree: 48px tiles split into four sharper tiles (24 → 12 → 6px) and
+           then full detail, each at its own seeded threshold, crossfading into its children.
+         • Every other effect is a per-pixel reveal: a "from" image (fog, pencil sketch,
+           halftone print, …) plus a threshold map deciding *when* each pixel becomes the
+           photo. A frame is one pass blending the two through a 256-entry lookup table,
+           so it stays a pure function of the slider and scrubs smoothly both ways. */
+      const SRC = "https://picsum.photos/id/1015/1200/620";
+      const FX = [
+        { id: "pixel", label: "Pixel" },
+        { id: "fog", label: "Fog" },
+        { id: "sketch", label: "Sketch" },
+        { id: "halftone", label: "Halftone" },
+        { id: "dissolve", label: "Dissolve" },
+        { id: "ink", label: "Ink" },
+      ];
+      const photo = $("photo"), shimmer = $("shimmer");
+      const pctx = photo.getContext("2d", { willReadFrequently: true });
+      const img = new Image();
+      img.crossOrigin = "anonymous"; // the host sends CORS headers, so pixels are readable
+      img.decoding = "async";
+      let ready = false, dpr = 1, cssW = 0, cssH = 0, PW = 0, PH = 0, full = null;
+      let fx = "pixel";
+      try { const s = localStorage.getItem("rollout-fx"); if (FX.some((f) => f.id === s)) fx = s; } catch {}
+      // Replays the resolve when the transition changes; the photo shows value × reveal.
+      const reveal = motionValue(1);
+
+      // Deterministic random so every pattern is identical on every load.
+      const rng = (seed) => () => {
+        seed |= 0; seed = (seed + 0x6d2b79f5) | 0;
+        let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+      const canvas = (w, h) => { const c = document.createElement("canvas"); c.width = w; c.height = h; return c; };
+
+      /* ----- Pixel: quadtree ----- */
+      const SIZES = [48, 24, 12, 6];        // tile sizes in CSS px; the level after 6px is full detail
+      const RANGES = [[0, 0.18], [0.1, 0.36], [0.24, 0.52], [0.38, 0.68], [0.52, 0.9]]; // split windows per level
+      const FADE = 0.05;                    // progress span of each split's crossfade
+      let levels = [], roots = [];
+
+      function buildPixel() {
+        // One pixel per tile: downsample once per level, then each tile is a 1×1 blit.
+        levels = SIZES.map((s) => {
+          const c = canvas(Math.ceil(cssW / s), Math.ceil(cssH / s));
+          const x = c.getContext("2d");
+          x.imageSmoothingQuality = "high";
+          // Exact mapping (the last row/column of tiles is only partly covered), laid over a
+          // stretched copy so those partial edge tiles stay opaque instead of half-transparent.
+          x.drawImage(img, 0, 0, c.width, c.height);
+          x.drawImage(img, 0, 0, cssW / s, cssH / s);
+          return c;
+        });
+        const rand = rng(1015);
+        const node = (x, y, level, parentThr) => {
+          const [a, b] = RANGES[level];
+          const s = SIZES[Math.min(level, SIZES.length - 1)];
+          // Distance from centre (0 middle → 1 corner) nudges outer tiles later.
+          const d = Math.hypot((x + s / 2) / cssW - 0.5, (y + s / 2) / cssH - 0.5) / 0.7071;
+          const u = 0.7 * rand() + 0.3 * Math.min(1, d);
+          return { x, y, level, thr: Math.max(a + (b - a) * u, parentThr + FADE * 0.6), kids: null };
+        };
+        const split = (n) => {
+          if (n.level >= SIZES.length) return; // full-detail leaf
+          const s = SIZES[n.level] / 2, L = n.level + 1;
+          n.kids = [];
+          for (const [ox, oy] of [[0, 0], [s, 0], [0, s], [s, s]]) {
+            if (n.x + ox >= cssW || n.y + oy >= cssH) continue;
+            const k = node(n.x + ox, n.y + oy, L, n.thr);
+            split(k);
+            n.kids.push(k);
+          }
+        };
+        roots = [];
+        for (let y = 0; y < cssH; y += SIZES[0]) {
+          for (let x = 0; x < cssW; x += SIZES[0]) { const r = node(x, y, 0, -1); split(r); roots.push(r); }
+        }
+      }
+      // Snap tile edges to device pixels so neighbouring tiles never leave hairline seams.
+      const px = (v) => Math.round(v * dpr);
+      function drawTile(n) {
+        const dx = px(n.x), dy = px(n.y);
+        const s = SIZES[Math.min(n.level, SIZES.length - 1)];
+        const dw = px(Math.min(n.x + s, cssW)) - dx, dh = px(Math.min(n.y + s, cssH)) - dy;
+        if (n.level >= SIZES.length) pctx.drawImage(full, dx, dy, dw, dh, dx, dy, dw, dh);
+        else pctx.drawImage(levels[n.level], n.x / s, n.y / s, 1, 1, dx, dy, dw, dh);
+      }
+      function drawNode(n, p, alpha) {
+        if (!n.kids || p < n.thr) { pctx.globalAlpha = alpha; drawTile(n); return; }
+        const k = (p - n.thr) / FADE;
+        if (k < 1) { pctx.globalAlpha = alpha; drawTile(n); }
+        // Children fade in over their parent; once fully in, the parent is skipped.
+        const a = alpha * Math.min(1, k);
+        for (const c of n.kids) drawNode(c, p, a);
+      }
+
+      /* ----- Per-pixel reveal effects ----- */
+      let photoPx = null, lum = null, outImg = null;
+      const cache = new Map(); // fx id → { from, T, soft, edge, ink }
+
+      // Smooth multi-octave value noise, built by letting the GPU bilinearly upscale tiny
+      // random grids. Returns a Uint8Array threshold map, contrast-stretched to 0..255.
+      function fbm(seed, octaves) {
+        const rand = rng(seed), c = canvas(PW, PH), x = c.getContext("2d", { willReadFrequently: true });
+        x.imageSmoothingEnabled = true;
+        x.imageSmoothingQuality = "high";
+        octaves.forEach(([gw, gh, alpha], i) => {
+          const g = canvas(gw, gh), gx = g.getContext("2d"), d = gx.createImageData(gw, gh);
+          for (let k = 0; k < gw * gh; k++) { const v = (rand() * 255) | 0; d.data.set([v, v, v, 255], k * 4); }
+          gx.putImageData(d, 0, 0);
+          x.globalAlpha = i === 0 ? 1 : alpha;
+          x.drawImage(g, 0, 0, PW, PH);
+        });
+        const src = x.getImageData(0, 0, PW, PH).data, out = new Uint8Array(PW * PH);
+        let lo = 255, hi = 0;
+        for (let i = 0; i < out.length; i++) { const v = src[i * 4]; if (v < lo) lo = v; if (v > hi) hi = v; }
+        const k = 255 / Math.max(1, hi - lo);
+        for (let i = 0; i < out.length; i++) out[i] = (src[i * 4] - lo) * k;
+        return out;
+      }
+      const mixT = (a, b, wb) => { const o = new Uint8Array(a.length); for (let i = 0; i < a.length; i++) o[i] = a[i] * (1 - wb) + b[i] * wb; return o; };
+      const solid = (r, g, b) => { const o = new Uint8ClampedArray(PW * PH * 4); for (let i = 0; i < PW * PH; i++) o.set([r, g, b, 255], i * 4); return o; };
+
+      const builders = {
+        // Haze that clears in soft drifting patches.
+        fog() {
+          const a = canvas(Math.max(2, PW >> 4), Math.max(2, PH >> 4)), b = canvas(Math.max(2, PW >> 5), Math.max(2, PH >> 5));
+          a.getContext("2d").drawImage(full, 0, 0, a.width, a.height);
+          b.getContext("2d").drawImage(a, 0, 0, b.width, b.height);
+          const c = canvas(PW, PH), cx = c.getContext("2d", { willReadFrequently: true });
+          cx.imageSmoothingQuality = "high";
+          cx.drawImage(b, 0, 0, PW, PH);
+          const from = cx.getImageData(0, 0, PW, PH).data;
+          for (let i = 0; i < from.length; i += 4) {
+            const g = from[i] * 0.3 + from[i + 1] * 0.59 + from[i + 2] * 0.11;
+            from[i] = (g * 0.5 + from[i] * 0.5) * 0.45 + 232 * 0.55;
+            from[i + 1] = (g * 0.5 + from[i + 1] * 0.5) * 0.45 + 236 * 0.55;
+            from[i + 2] = (g * 0.5 + from[i + 2] * 0.5) * 0.45 + 241 * 0.55;
+          }
+          return { from, T: fbm(11, [[6, 3, 1], [12, 6, 0.5], [26, 13, 0.3]]), soft: 0.24 };
+        },
+        // Pencil drawing on paper; colour paints in from the shadows up.
+        sketch() {
+          const from = new Uint8ClampedArray(PW * PH * 4), rand = rng(7);
+          const at = (x, y) => lum[Math.min(PH - 1, Math.max(0, y)) * PW + Math.min(PW - 1, Math.max(0, x))];
+          for (let y = 0; y < PH; y++) {
+            for (let x = 0; x < PW; x++) {
+              const gx = at(x + 1, y - 1) + 2 * at(x + 1, y) + at(x + 1, y + 1) - at(x - 1, y - 1) - 2 * at(x - 1, y) - at(x - 1, y + 1);
+              const gy = at(x - 1, y + 1) + 2 * at(x, y + 1) + at(x + 1, y + 1) - at(x - 1, y - 1) - 2 * at(x, y - 1) - at(x + 1, y - 1);
+              const edge = Math.min(255, (Math.abs(gx) + Math.abs(gy)) * 0.38);
+              const shade = 255 - (255 - at(x, y)) * 0.28;
+              const v = Math.min(255 - edge, shade) - rand() * 10;
+              const i = (y * PW + x) * 4;
+              from[i] = (247 * v) / 255; from[i + 1] = (244 * v) / 255; from[i + 2] = (237 * v) / 255; from[i + 3] = 255;
+            }
+          }
+          return { from, T: mixT(lum, fbm(17, [[10, 5, 1], [30, 15, 0.4]]), 0.4), soft: 0.14 };
+        },
+        // Print-style ink dots, resolving outward from the centre.
+        halftone() {
+          const cell = Math.max(4, Math.round(6 * dpr));
+          const sw = Math.ceil(PW / cell) + 1, sh = Math.ceil(PH / cell) + 1;
+          const s = canvas(sw, sh), sx = s.getContext("2d", { willReadFrequently: true });
+          sx.drawImage(full, 0, 0, sw * cell, sh * cell, 0, 0, sw, sh);
+          const avg = sx.getImageData(0, 0, sw, sh).data;
+          const c = canvas(PW, PH), cx = c.getContext("2d", { willReadFrequently: true });
+          cx.fillStyle = "#f6f3ec"; cx.fillRect(0, 0, PW, PH);
+          cx.fillStyle = "#1f2c4a";
+          for (let gy = 0; gy < sh; gy++) {
+            for (let gx = 0; gx < sw; gx++) {
+              const i = (gy * sw + gx) * 4;
+              const l = (avg[i] * 0.3 + avg[i + 1] * 0.59 + avg[i + 2] * 0.11) / 255;
+              const r = cell * 0.6 * Math.sqrt(1 - l);
+              if (r < 0.4) continue;
+              // Alternate rows offset by half a cell for a classic diagonal screen.
+              cx.beginPath();
+              cx.arc(gx * cell + (gy % 2 ? cell / 2 : 0), gy * cell + cell / 2, r, 0, Math.PI * 2);
+              cx.fill();
+            }
+          }
+          const radial = new Uint8Array(PW * PH);
+          for (let y = 0; y < PH; y++) for (let x = 0; x < PW; x++) radial[y * PW + x] = Math.min(255, (Math.hypot(x / PW - 0.5, (y / PH - 0.5) * (PH / PW)) / 0.56) * 255);
+          return { from: cx.getImageData(0, 0, PW, PH).data, T: mixT(radial, fbm(23, [[14, 7, 1]]), 0.3), soft: 0.1 };
+        },
+        // Random 2px grains snap in one by one.
+        dissolve() {
+          const from = new Uint8ClampedArray(PW * PH * 4);
+          for (let i = 0; i < PW * PH; i++) { const g = lum[i] * 0.55 + 30; from.set([g * 0.92, g * 0.96, g * 1.06, 255], i * 4); }
+          const b = Math.max(1, Math.round(2 * dpr)), rand = rng(31), T = new Uint8Array(PW * PH);
+          const bw = Math.ceil(PW / b), cells = new Uint8Array(bw * Math.ceil(PH / b));
+          for (let i = 0; i < cells.length; i++) cells[i] = rand() * 255;
+          for (let y = 0; y < PH; y++) for (let x = 0; x < PW; x++) T[y * PW + x] = cells[((y / b) | 0) * bw + ((x / b) | 0)];
+          return { from, T, soft: 0.03 };
+        },
+        // Ink blots bleed across paper, with a dark wet edge on the spreading front.
+        ink() {
+          return { from: solid(246, 243, 236), T: fbm(41, [[7, 4, 1], [18, 9, 0.5], [44, 22, 0.28], [96, 48, 0.14]]), soft: 0.05, edge: 0.7, ink: [24, 34, 62] };
+        },
+      };
+
+      // Build the remaining effects one per idle slot, so switching later is instant.
+      function prewarm() {
+        const idle = window.requestIdleCallback ?? ((cb) => setTimeout(cb, 60));
+        const next = () => {
+          const id = FX.map((f) => f.id).find((f) => f !== "pixel" && !cache.has(f));
+          if (!id || !photoPx) return;
+          ensureFx(id);
+          if (cache.has(id)) idle(next);
+        };
+        idle(next);
+      }
+      function ensureFx(id) {
+        if (id === "pixel" || cache.has(id) || !photoPx) return;
+        try { cache.set(id, builders[id]()); } catch (err) { console.warn(`Transition "${id}" unavailable`, err); }
+      }
+
+      // One blend pass: alpha per pixel comes from its threshold via a 256-entry LUT.
+      const lut = new Uint8Array(256), edgeLut = new Uint8Array(256);
+      function drawBlend(c, p) {
+        const s = c.soft, q = p * (1 + s);
+        for (let t = 0; t < 256; t++) {
+          let a = (q - t / 255) / s;
+          a = a <= 0 ? 0 : a >= 1 ? 1 : a * a * (3 - 2 * a);
+          lut[t] = a * 255;
+          edgeLut[t] = c.edge ? 4 * a * (1 - a) * c.edge * 255 : 0;
+        }
+        const out = outImg.data, from = c.from, T = c.T, ink = c.ink;
+        for (let i = 0, o = 0; i < T.length; i++, o += 4) {
+          const a = lut[T[i]];
+          if (a === 0) { out[o] = from[o]; out[o + 1] = from[o + 1]; out[o + 2] = from[o + 2]; }
+          else if (a === 255) { out[o] = photoPx[o]; out[o + 1] = photoPx[o + 1]; out[o + 2] = photoPx[o + 2]; }
+          else {
+            const k = a / 255;
+            out[o] = from[o] + (photoPx[o] - from[o]) * k;
+            out[o + 1] = from[o + 1] + (photoPx[o + 1] - from[o + 1]) * k;
+            out[o + 2] = from[o + 2] + (photoPx[o + 2] - from[o + 2]) * k;
+            const e = edgeLut[T[i]];
+            if (e) {
+              const m = e / 255;
+              out[o] += (ink[0] - out[o]) * m; out[o + 1] += (ink[1] - out[o + 1]) * m; out[o + 2] += (ink[2] - out[o + 2]) * m;
+            }
+          }
+          out[o + 3] = 255;
+        }
+        pctx.putImageData(outImg, 0, 0);
+      }
+
+      /* ----- Build + render ----- */
+      function build() {
+        dpr = Math.min(2, devicePixelRatio || 1);
+        cssW = photo.clientWidth; cssH = photo.clientHeight;
+        if (!cssW || !cssH) return;
+        PW = photo.width = Math.round(cssW * dpr);
+        PH = photo.height = Math.round(cssH * dpr);
+        full = canvas(PW, PH);
+        const f = full.getContext("2d", { willReadFrequently: true });
+        f.imageSmoothingQuality = "high";
+        f.drawImage(img, 0, 0, PW, PH);
+        buildPixel();
+        cache.clear();
+        try {
+          photoPx = f.getImageData(0, 0, PW, PH).data;
+          lum = new Uint8Array(PW * PH);
+          for (let i = 0; i < lum.length; i++) lum[i] = photoPx[i * 4] * 0.3 + photoPx[i * 4 + 1] * 0.59 + photoPx[i * 4 + 2] * 0.11;
+          outImg = pctx.createImageData(PW, PH);
+        } catch {
+          photoPx = null; // pixels unreadable (no CORS): only Pixel is available
+        }
+        ensureFx(fx);
+        prewarm();
+        lastSize = `${cssW}x${cssH}`;
+      }
+
+      let queued = false;
+      const progress = () => (clamp(value.get()) / 100) * clamp(reveal.get(), 0, 1);
+      function paintPhoto() {
+        const t = progress();
+        // Pixel blooms its colour in with the detail; the other effects carry their own palette.
+        photo.style.filter = fx === "pixel" ? `saturate(${(0.35 + 0.65 * Math.pow(t, 0.6)).toFixed(3)})` : "";
+        shimmer.style.opacity = ready ? clamp(1 - t / 0.3, 0, 1) * 0.6 : 1;
+        if (!ready || queued) return;
+        queued = true;
+        requestAnimationFrame(() => {
+          queued = false;
+          const p = progress();
+          pctx.globalAlpha = 1;
+          pctx.imageSmoothingEnabled = false;
+          const c = cache.get(fx);
+          if (p >= 0.999) pctx.drawImage(full, 0, 0);
+          else if (fx !== "pixel" && c) drawBlend(c, p);
+          else for (const r of roots) drawNode(r, p, 1);
+          pctx.globalAlpha = 1;
+        });
+      }
+      reveal.on("change", paintPhoto);
+
+      const imageReady = new Promise((resolve) => {
+        img.onload = async () => {
+          try { await img.decode(); } catch {}
+          build();
+          ready = true;
+          paintPhoto();
+          animate(photo, { opacity: 1 }, { duration: reduce ? 0 : 0.5, ease: "easeOut" });
+          resolve();
+        };
+        img.onerror = () => resolve(); // keep the skeleton; the card still works
+      });
+      img.src = SRC;
+      let lastSize = "";
+      new ResizeObserver(() => {
+        const size = `${photo.clientWidth}x${photo.clientHeight}`;
+        if (!ready || size === lastSize) return;
+        lastSize = size;
+        build();
+        paintPhoto();
+      }).observe(photo);
+
+      /* ---------- Slider ---------- */
+      const track = $("track"), fill = $("fill"), pct = $("pct"), knob = $("knob");
+      const value = motionValue(0); // displayed (fractional) value
+      let target = 0;               // committed whole-number value
+      const H = 48;
+      let trackW = track.clientWidth;
+
+      let shownPct = -1;
+      function paintFill() {
+        const v = clamp(value.get());
+        // Transform-only: the full-width fill slides so its right end sits at x.
+        const x = H + (trackW - H) * (v / 100);
+        fill.style.transform = `translate3d(${x - trackW}px,0,0)`;
+        const r = Math.round(v);
+        if (r !== shownPct) { shownPct = r; pct.textContent = `${r}%`; }
+        pct.style.opacity = clamp((v - 8) / 8, 0, 1);
+        paintPhoto();
+      }
+      value.on("change", paintFill);
+      new ResizeObserver(() => {
+        trackW = track.clientWidth;
+        paintFill();
+        if (activePreset >= 0) moveIndicator(activePreset, true);
+      }).observe(track);
+
+      // Commit the whole-number value (aria + preset pill) only when it changes.
+      function commit(v) {
+        const next = Math.round(clamp(v));
+        if (next !== target || track.getAttribute("aria-valuenow") !== String(next)) {
+          target = next;
+          track.setAttribute("aria-valuenow", target);
+          track.setAttribute("aria-valuetext", `${target}% of users`);
+        }
+        const idx = PRESETS.indexOf(target);
+        if (idx !== activePreset) moveIndicator(idx);
+      }
+      function setValue(v, { spring } = {}) {
+        commit(v);
+        animate(value, target, spring ?? S(170, 26));
+      }
+
+      pills.forEach((p, i) => {
+        p.addEventListener("click", () => setValue(PRESETS[i]));
+        p.addEventListener("pointerdown", () => !reduce && animate(p, { scale: 0.94 }, S(600, 30)));
+        const up = () => !reduce && animate(p, { scale: 1 }, S(500, 18));
+        p.addEventListener("pointerup", up);
+        p.addEventListener("pointerleave", up);
+        p.addEventListener("keydown", (e) => {
+          const d = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+          if (!d) return;
+          e.preventDefault();
+          const next = (Math.max(0, activePreset) + d + pills.length) % pills.length;
+          setValue(PRESETS[next]);
+          pills[next].focus();
+        });
+      });
+
+      // Dragging is 1:1 — the value jumps straight to the pointer on every event with no
+      // spring in the loop, so there is zero lag. Grabbing the knob keeps the grab offset;
+      // pressing the bare track glides there first, then hands over to direct tracking.
+      let drag = null;
+      const valueAtX = (clientX) => clamp(((clientX - drag.left - drag.offset - H / 2) / (trackW - H)) * 100);
+      const glideTo = (v, spring) => {
+        const g = (drag.glide = animate(value, v, spring));
+        g.then(() => { if (drag && drag.glide === g) drag.glide = null; });
+      };
+      track.addEventListener("pointerdown", (e) => {
+        if (e.button !== 0) return;
+        const r = track.getBoundingClientRect();
+        const k = knob.getBoundingClientRect();
+        const onKnob = e.clientX >= k.left - 6 && e.clientX <= k.right + 6;
+        drag = { left: r.left, offset: onKnob ? e.clientX - (k.left + k.width / 2) : 0, glide: null };
+        track.setPointerCapture(e.pointerId);
+        if (!reduce) animate(knob, { scale: 0.88 }, S(600, 30));
+        const v = valueAtX(e.clientX);
+        commit(v);
+        if (onKnob || reduce) value.jump(v);
+        else glideTo(v, S(520, 42));
+      });
+      track.addEventListener("pointermove", (e) => {
+        if (!drag) return;
+        // Newest coalesced sample, so fast flicks never trail behind the cursor.
+        const last = e.getCoalescedEvents?.().at(-1) ?? e;
+        const v = valueAtX(last.clientX);
+        commit(v);
+        if (drag.glide) glideTo(v, S(900, 60));
+        else value.jump(v);
+      });
+      const release = () => {
+        if (!drag) return;
+        drag = null;
+        if (!reduce) animate(knob, { scale: 1 }, S(500, 16));
+        // Settle on the whole number — or a preset when it lands close to one.
+        const near = PRESETS.find((p) => Math.abs(p - target) <= 2);
+        setValue(near ?? target, { spring: S(420, 34) });
+      };
+      track.addEventListener("pointerup", release);
+      track.addEventListener("pointercancel", release);
+      track.addEventListener("lostpointercapture", release);
+      track.addEventListener("keydown", (e) => {
+        const step = e.shiftKey ? 10 : 1;
+        const map = { ArrowRight: target + step, ArrowUp: target + step, ArrowLeft: target - step, ArrowDown: target - step, Home: 0, End: 100, PageUp: target + 10, PageDown: target - 10 };
+        if (!(e.key in map)) return;
+        e.preventDefault();
+        setValue(map[e.key], { spring: S(500, 40) });
+      });
+
+      /* ---------- Info tooltip ---------- */
+      const info = $("info"), tip = $("tip");
+      let tipOpen = false;
+      const showTip = (open) => {
+        if (open === tipOpen) return;
+        tipOpen = open;
+        animate(tip, open ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.85, y: -6 }, open ? S(500, 30) : { duration: 0.14 });
+        if (!reduce) animate(info, { rotate: open ? 12 : 0, scale: open ? 1.08 : 1 }, S(400, 18));
+      };
+      info.addEventListener("pointerenter", () => showTip(true));
+      info.addEventListener("pointerleave", () => showTip(false));
+      info.addEventListener("focus", () => showTip(true));
+      info.addEventListener("blur", () => showTip(false));
+      info.addEventListener("click", () => showTip(!tipOpen));
+
+      /* ---------- Theme switch ---------- */
+      const themeBtn = $("theme");
+      const root = document.documentElement;
+      // Sun → moon: rays spin away, core grows, and a mask "bite" slides in to carve the crescent.
+      function paintIcon(dark, instant) {
+        const o = instant || reduce ? { duration: 0 } : S(300, 20);
+        animate("#sun-rays", { opacity: dark ? 0 : 1, rotate: dark ? -90 : 0, scale: dark ? 0.5 : 1 }, o);
+        animate("#sun-core", { r: dark ? 8 : 4.5 }, o);
+        animate("#moon-bite", { cx: dark ? 17 : 30, cy: dark ? 7 : 4 }, o);
+        themeBtn.setAttribute("aria-label", `Switch to ${dark ? "light" : "dark"} theme`);
+      }
+      // SVG transforms need an explicit origin to spin around the icon centre.
+      $("sun-rays").style.transformOrigin = "12px 12px";
+      $("sun-rays").style.transformBox = "view-box";
+      paintIcon(root.dataset.theme === "dark", true);
+
+      themeBtn.addEventListener("click", async () => {
+        const next = root.dataset.theme === "dark" ? "light" : "dark";
+        try { localStorage.setItem("rollout-theme", next); } catch {}
+        paintIcon(next === "dark");
+        if (!reduce) animate(themeBtn, { scale: [0.88, 1] }, S(500, 15));
+
+        const apply = () => { root.dataset.theme = next; };
+        if (reduce || !document.startViewTransition) return apply();
+
+        const r = themeBtn.getBoundingClientRect();
+        const x = r.left + r.width / 2, y = r.top + r.height / 2;
+        const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+        const vt = document.startViewTransition(apply);
+        try { await vt.ready; } catch { return; }
+        document.documentElement.animate(
+          { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+          { duration: 600, easing: "cubic-bezier(.22,1,.36,1)", pseudoElement: "::view-transition-new(root)" },
+        );
+      });
+
+      /* ---------- Transition switcher ---------- */
+      const fxNav = $("fx"), fxInd = $("fx-ind");
+      const ind = { x: motionValue(0), w: motionValue(0) };
+      const paintInd = () => {
+        fxInd.style.transform = `translateX(${ind.x.get()}px)`;
+        fxInd.style.width = `${ind.w.get()}px`;
+      };
+      ind.x.on("change", paintInd);
+      ind.w.on("change", paintInd);
+      const fxBtns = FX.map(({ id, label }) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.dataset.fx = id;
+        b.setAttribute("role", "radio");
+        b.className = "fx-btn relative z-[1] h-9 shrink-0 whitespace-nowrap rounded-full px-3.5 text-[13px] font-medium tracking-[-0.01em] outline-none focus-visible:ring-2 focus-visible:ring-go/40";
+        b.textContent = label;
+        fxNav.appendChild(b);
+        return b;
+      });
+      function selectFx(id, instant = false) {
+        const b = fxBtns.find((x) => x.dataset.fx === id);
+        fxBtns.forEach((x) => { x.setAttribute("aria-checked", x === b); x.tabIndex = x === b ? 0 : -1; });
+        if (instant || reduce) {
+          ind.x.jump(b.offsetLeft); ind.w.jump(b.offsetWidth);
+          paintInd();
+          fxInd.style.opacity = 1;
+        } else {
+          animate(ind.x, b.offsetLeft, S(520, 40));
+          animate(ind.w, b.offsetWidth, S(520, 40));
+        }
+        // Keep the active option visible when the bar scrolls on narrow screens.
+        const l = b.offsetLeft - fxNav.scrollLeft, r = l + b.offsetWidth;
+        if (l < 0 || r > fxNav.clientWidth) fxNav.scrollTo({ left: b.offsetLeft - 8, behavior: reduce ? "auto" : "smooth" });
+      }
+      function chooseFx(id) {
+        if (id === fx) return;
+        fx = id;
+        try { localStorage.setItem("rollout-fx", id); } catch {}
+        ensureFx(id);
+        selectFx(id);
+        // Replay the resolve in the new style, up to the current rollout value.
+        if (reduce) return paintPhoto();
+        reveal.jump(0);
+        animate(reveal, 1, { duration: 1.8, ease: [0.32, 0.72, 0, 1] });
+      }
+      fxBtns.forEach((b, i) => {
+        b.addEventListener("click", () => chooseFx(b.dataset.fx));
+        b.addEventListener("pointerdown", () => !reduce && animate(b, { scale: 0.94 }, S(600, 30)));
+        const up = () => !reduce && animate(b, { scale: 1 }, S(500, 18));
+        b.addEventListener("pointerup", up);
+        b.addEventListener("pointerleave", up);
+        b.addEventListener("keydown", (e) => {
+          const d = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+          if (!d) return;
+          e.preventDefault();
+          const next = fxBtns[(i + d + fxBtns.length) % fxBtns.length];
+          chooseFx(next.dataset.fx);
+          next.focus();
+        });
+      });
+      new ResizeObserver(() => selectFx(fx, true)).observe(fxNav);
+
+      /* ---------- Entrance ---------- */
+      async function enter() {
+        await document.fonts.ready;
+        selectFx(fx, true); // button widths depend on the loaded font
+        const blocks = document.querySelectorAll("[data-enter]");
+        if (reduce) {
+          blocks.forEach((b) => (b.style.opacity = 1));
+          pills.forEach((p) => (p.style.opacity = 1));
+          await imageReady;
+          setValue(75);
+          return;
+        }
+        animate(blocks, { opacity: [0, 1], y: [24, 0] }, { type: "spring", stiffness: 160, damping: 22, delay: stagger(0.12) });
+        // Blur is tweened: a spring would overshoot into an invalid negative blur.
+        animate(blocks, { filter: ["blur(10px)", "blur(0px)"] }, { duration: 0.55, ease: "easeOut", delay: stagger(0.12) });
+        await animate(pills, { opacity: [0, 1], y: [10, 0], scale: [0.9, 1] }, { type: "spring", stiffness: 380, damping: 24, delay: stagger(0.05, { startDelay: 0.3 }) });
+        // The photo "loads" up to 75% once its bytes arrive (or after 4s, whichever first).
+        await Promise.race([imageReady, new Promise((r) => setTimeout(r, 4000))]);
+        setValue(75, { spring: { duration: 2.6, ease: [0.22, 1, 0.36, 1] } });
+      }
+      enter();
+    </script>
+  </body>
+</html>

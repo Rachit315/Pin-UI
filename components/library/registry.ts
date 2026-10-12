@@ -152,6 +152,50 @@ export type Entry = {
 
 export const LIBRARY: Entry[] = [
   {
+    slug: "progress-image",
+    category: "controls",
+    name: "Progress Image",
+    isNew: true,
+    tagline: "A rollout card whose photograph is the progress bar.",
+    blurb:
+      "The rollout percentage is how far the picture has resolved: drag the slider and the photograph builds itself up — or falls back apart — under your finger. Pick the look of the resolve from the bar under the card: a pixel quadtree, fog, a pencil sketch, a halftone print, a grain dissolve or bleeding ink. The presets share one liquid indicator that stretches into a drop between them.",
+    highlights: ["Photo as progress bar", "Six resolve looks", "Liquid preset pill", "1:1 drag, full keyboard"],
+    /* a remocn edit of the real component, rendered from the same reveal engine */
+    clip: "/clips/loop/progress-image.mp4",
+    poster: "/clips/loop/progress-image.jpg",
+    hero: false,
+    sound: false,
+    zoom: 1,
+    stage: "#f4f4f4",
+    clipStage: "#f4f4f4",
+    stageDark: "#0e0e0f",
+    /* the card's long soft shadow and the switcher's offset shadow run past their boxes */
+    spill: true,
+    usage: `import ProgressImage from "@/components/library/ProgressImage";
+
+<ProgressImage theme="light" src="/your-photo.jpg" onChange={(value) => console.log(value)} />`,
+    props: [
+      { name: "theme", type: "\"light\" | \"dark\"", fallback: "\"light\"", note: "A pale card with a graphite active pill, or graphite with a white one." },
+      { name: "src", type: "string", fallback: "a picsum fjord", note: "The photograph that resolves. Serve it with CORS headers: every look but Pixel reads its pixels." },
+      { name: "alt", type: "string", note: "What the photograph shows, for screen readers." },
+      { name: "defaultValue", type: "number", fallback: "75", note: "Where the rollout lands once the photograph has loaded." },
+      { name: "defaultTransition", type: "\"pixel\" | \"fog\" | \"sketch\" | \"halftone\" | \"dissolve\" | \"ink\"", fallback: "\"pixel\"", note: "The look it opens in; the bar under the card changes it." },
+      { name: "onChange", type: "(value) => void", note: "Fired with the committed whole-number percentage whenever it changes." },
+    ],
+    files: [
+      { name: "ProgressImage.tsx", lang: "tsx" },
+      { name: "progress-image.css", lang: "css" },
+    ],
+    info: {
+      paragraphs: [
+        "The slider and the photograph are one value. At 0% there is only a skeleton with a shimmer passing over it; as the rollout rises the picture arrives, and at 100% it is whole. Every look is a pure function of that value, so dragging back down takes the picture apart again the same way, frame for frame. The drag is 1:1 — no spring between the pointer and the fill — and on release it settles on the whole number, or snaps to a preset when it lands within two of one.",
+        "Pixel is a quadtree: 48px tiles split into four sharper tiles, then 24, 12 and 6px and finally full detail, each split at its own seeded threshold with outer tiles a little later than the middle, while the colour blooms in with the detail. The other five are per-pixel reveals — a fog that clears in drifting patches, a pencil sketch coloured in from the shadows up, a halftone print resolving outward from the centre, 2px grains snapping in one by one, and ink blots spreading across paper with a dark wet edge. Each is one pass through a 256-entry table, and they are built in idle time, so switching is instant and replays the resolve in the new look.",
+        "The presets share one indicator drawn as two blobs under a goo filter: the lead snaps to the new pill while the trail lags behind on a softer spring, so the two stretch into a single liquid drop and merge again when the trail lands. The fill slides by transform alone, the percentage fades in once there is room for it, and the track is a full keyboard slider — arrows, Shift for steps of ten, Page Up and Down, Home and End.",
+      ],
+    },
+    origin: { label: "rollout-card" },
+  },
+  {
     slug: "prompt-composer",
     category: "controls",
     name: "Prompt Composer",

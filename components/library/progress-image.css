@@ -1,0 +1,417 @@
+/* ===========================================================================
+   Progress Image.
+
+   A rollout card whose photograph resolves as far as the rollout has gone:
+   the percentage on the slider is how much of the picture has arrived. The
+   look of that resolve is picked from the bar under the card. Everything is
+   themed through the tokens below, and the dark set swaps in on
+   data-theme="dark".
+=========================================================================== */
+
+.ppimg {
+  --ppimg-surface: #f9f9f9;
+  --ppimg-ink: #1f1f1f;
+  --ppimg-muted: #5c5c5c;
+  --ppimg-soft: #8a8a8a;
+  --ppimg-line: #e7e7e7;
+  --ppimg-pill: #ffffff;
+  --ppimg-pill-ink: #3a3a3a;
+  --ppimg-active: linear-gradient(180deg, #5a5a5a 0%, #2a2a2a 55%, #141414 100%);
+  --ppimg-active-ink: #ffffff;
+  --ppimg-track: #ececec;
+  --ppimg-skeleton: #e6e6e6;
+  --ppimg-shimmer: rgb(255 255 255 / 0.55);
+  --ppimg-tip: #1f1f1f;
+  --ppimg-tip-ink: #f4f4f4;
+  --ppimg-bar: #ffffff;
+  --ppimg-bar-shadow: 4px 4px 0 0 #ebebeb;
+  --ppimg-go: 37 99 235;
+  --ppimg-shadow:
+    0 40px 80px -24px rgb(0 0 0 / 0.1),
+    0 8px 24px -8px rgb(0 0 0 / 0.06),
+    0 0 0 1px rgb(0 0 0 / 0.02);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
+  /* as a flex item, never wider than its slot: the switcher scrolls instead */
+  min-width: 0;
+  color: var(--ppimg-ink);
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ppimg[data-theme="dark"] {
+  --ppimg-surface: #18181a;
+  --ppimg-ink: #f1f1f1;
+  --ppimg-muted: #a3a3a3;
+  --ppimg-soft: #8c8c8c;
+  --ppimg-line: #2c2c2f;
+  --ppimg-pill: #202023;
+  --ppimg-pill-ink: #d6d6d6;
+  --ppimg-active: linear-gradient(180deg, #ffffff 0%, #ececec 55%, #d4d4d4 100%);
+  --ppimg-active-ink: #141414;
+  --ppimg-track: #26262a;
+  --ppimg-skeleton: #222225;
+  --ppimg-shimmer: rgb(255 255 255 / 0.07);
+  --ppimg-tip: #f1f1f1;
+  --ppimg-tip-ink: #0e0e0f;
+  --ppimg-bar: #1c1c1f;
+  --ppimg-bar-shadow: 4px 4px 0 0 #050505;
+  --ppimg-shadow:
+    0 40px 80px -24px rgb(0 0 0 / 0.7),
+    0 8px 24px -8px rgb(0 0 0 / 0.5),
+    0 0 0 1px rgb(255 255 255 / 0.05);
+}
+
+.ppimg *,
+.ppimg *::before,
+.ppimg *::after {
+  box-sizing: border-box;
+}
+
+.ppimg button {
+  font: inherit;
+  margin: 0;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* the goo filter's host: takes no room */
+.ppimg__defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+/* ---- Card ---- */
+
+.ppimg__card {
+  width: 100%;
+  padding: 14px;
+  border-radius: 20px;
+  background: var(--ppimg-surface);
+  box-shadow: var(--ppimg-shadow);
+}
+
+/* ---- Photo: skeleton and shimmer until the image arrives ---- */
+
+.ppimg__scene {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1200 / 620;
+  overflow: hidden;
+  border-radius: 11px;
+  background: var(--ppimg-skeleton);
+}
+
+.ppimg__photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+
+.ppimg__shimmer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 30%, var(--ppimg-shimmer) 50%, transparent 70%);
+  background-size: 250% 100%;
+  animation: ppimg-shimmer 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes ppimg-shimmer {
+  from {
+    background-position: 120% 0;
+  }
+  to {
+    background-position: -20% 0;
+  }
+}
+
+.ppimg__edge {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: 11px;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.06);
+}
+
+/* ---- Heading ---- */
+
+.ppimg__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 18px;
+}
+
+.ppimg__title {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.03em;
+}
+
+.ppimg__info-wrap {
+  position: relative;
+}
+
+.ppimg__info {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--ppimg-soft);
+  cursor: pointer;
+  outline: none;
+  transition: color 0.2s ease;
+}
+
+.ppimg__info:hover {
+  color: var(--ppimg-ink);
+}
+
+.ppimg__info:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ppimg-ink) 30%, transparent);
+}
+
+.ppimg__tip {
+  position: absolute;
+  right: 0;
+  top: 32px;
+  z-index: 10;
+  width: 208px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--ppimg-tip);
+  color: var(--ppimg-tip-ink);
+  font-size: 12px;
+  line-height: 18px;
+  pointer-events: none;
+  transform-origin: top right;
+  opacity: 0;
+  transform: scale(0.85) translateY(-6px);
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+.ppimg__copy {
+  margin: 8px 0 0;
+  color: var(--ppimg-muted);
+  font-size: 13px;
+  line-height: 20px;
+  letter-spacing: -0.01em;
+}
+
+/* ---- Presets ---- */
+
+.ppimg__presets {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+/* under the labels; the goo filter melts the lead and trail blobs together */
+.ppimg__blobs {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  filter: url(#ppimg-goo);
+}
+
+.ppimg__blob {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 36px;
+  border-radius: 999px;
+  background: var(--ppimg-active);
+  opacity: 0;
+}
+
+.ppimg__pill {
+  position: relative;
+  z-index: 1;
+  /* share the row, up to the 60px they were drawn at; wrap only when that is under 48 */
+  flex: 1 1 0;
+  min-width: 48px;
+  max-width: 60px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--ppimg-line);
+  border-radius: 999px;
+  background: var(--ppimg-pill);
+  color: var(--ppimg-pill-ink);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  outline: none;
+  transition: color 0.22s ease, background-color 0.22s ease, border-color 0.22s ease;
+}
+
+.ppimg__pill[aria-checked="true"] {
+  color: var(--ppimg-active-ink);
+  background-color: transparent;
+  border-color: transparent;
+}
+
+.ppimg__pill:focus-visible {
+  box-shadow: 0 0 0 4px rgb(var(--ppimg-go) / 0.25);
+}
+
+/* ---- Slider ---- */
+
+.ppimg__label {
+  margin: 22px 0 0;
+  color: var(--ppimg-muted);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.ppimg__track {
+  position: relative;
+  width: calc(100% - 10px);
+  height: 44px;
+  margin-top: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--ppimg-track);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  outline: none;
+}
+
+.ppimg__track:active {
+  cursor: grabbing;
+}
+
+.ppimg__track:focus-visible {
+  box-shadow: 0 0 0 4px rgb(var(--ppimg-go) / 0.3);
+}
+
+/* the full-width fill is slid with transform only, so dragging never lays out */
+.ppimg__fill {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #5b9bff 0%, #2f74f5 45%, #1f5fe0 100%);
+  box-shadow: inset 0 0 0 3px #6aa6ff, inset 0 6px 10px -4px rgb(255 255 255 / 0.35);
+  transform: translate3d(-100%, 0, 0);
+  will-change: transform;
+}
+
+.ppimg__pct {
+  position: absolute;
+  right: 50px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.ppimg__knob {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.18), inset 0 -2px 3px rgb(0 0 0 / 0.06);
+}
+
+/* ---- Transition switcher, under the card ---- */
+
+.ppimg__fx {
+  position: relative;
+  display: flex;
+  gap: 2px;
+  max-width: 100%;
+  margin-top: 16px;
+  padding: 4px;
+  overflow-x: auto;
+  border-radius: 999px;
+  background: var(--ppimg-bar);
+  box-shadow: var(--ppimg-bar-shadow), inset 0 0 0 1px var(--ppimg-line);
+  scrollbar-width: none;
+}
+
+.ppimg__fx::-webkit-scrollbar {
+  display: none;
+}
+
+.ppimg__fx-ind {
+  position: absolute;
+  left: 0;
+  top: 4px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--ppimg-active);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.ppimg__fx-btn {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--ppimg-soft);
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+  outline: none;
+  transition: color 0.2s ease;
+}
+
+.ppimg__fx-btn:hover {
+  color: var(--ppimg-ink);
+}
+
+.ppimg__fx-btn[aria-checked="true"] {
+  color: var(--ppimg-active-ink);
+}
+
+.ppimg__fx-btn:focus-visible {
+  box-shadow: 0 0 0 2px rgb(var(--ppimg-go) / 0.4);
+}
+
+/* hidden until the entrance runs, so nothing flashes */
+.ppimg [data-enter] {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ppimg [data-enter] {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+  .ppimg__shimmer {
+    animation: none;
+  }
+}

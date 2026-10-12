@@ -62,6 +62,7 @@ const FACES: Record<string, string | null> = {
   "swap-card": "Inter (400 and 500)",
   "calendar-card": "Inter (400 to 600)",
   "prompt-composer": "Inter (400 to 500), with Inter Tight (700) for the date on the event card",
+  "progress-image": "Inter (500 and 600)",
 };
 
 function docsFor(entry: Entry): string {
@@ -129,6 +130,13 @@ function docsFor(entry: Entry): string {
     lines.push(
       "",
       "The photograph is not part of this package: `image` defaults to /library/shoe.jpg. Point it at your own product shot, or drop one at that path. It is multiplied onto the tile, so a plain white backdrop melts away on its own.",
+    );
+  }
+
+  if (entry.slug === "progress-image") {
+    lines.push(
+      "",
+      "The default photograph is loaded from picsum.photos. Pass your own `src` before shipping it — and serve it with CORS headers: every look but Pixel reads the image's pixels, and a picture without them falls back to Pixel only.",
     );
   }
 
