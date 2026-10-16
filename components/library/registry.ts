@@ -152,6 +152,55 @@ export type Entry = {
 
 export const LIBRARY: Entry[] = [
   {
+    slug: "magnify",
+    category: "cards",
+    name: "Magnify",
+    isNew: true,
+    tagline: "A type specimen you inspect with a real magnifying glass.",
+    blurb:
+      "One huge letter on a paper poster — and under the glass it turns out to be printed from rows of tiny characters. The lens carries its own copy of the poster at the zoom you set, so the magnification is real, not a blurred scale. It tilts with its own speed, floats at rest, and its shadow lifts when you hold it; click to push the zoom further.",
+    highlights: ["Real magnification", "Micro-type letter", "Outline-trace intro", "Light and dark"],
+    /* recorded in dark: a remocn edit of the real component, its springs replayed frame by frame */
+    clip: "/clips/loop/magnify.mp4",
+    poster: "/clips/loop/magnify.jpg",
+    hero: false,
+    sound: false,
+    zoom: 1,
+    stage: "#ffffff",
+    /* the loop is the dark face, so its frame is the dark field */
+    clipStage: "#0b0b0c",
+    stageDark: "#0b0b0c",
+    /* the poster's long shadow and the lens's handle run past the paper */
+    spill: true,
+    usage: `import Magnify from "@/components/library/Magnify";
+
+<Magnify theme="light" glyph="A" micro="a" onZoomChange={(zoomed) => console.log(zoomed)} />`,
+    props: [
+      { name: "theme", type: "\"light\" | \"dark\"", fallback: "\"light\"", note: "Cream paper with black ink, or graphite with cream; the colours cross-fade when it changes." },
+      { name: "glyph", type: "string", fallback: "\"A\"", note: "The big letter on the poster." },
+      { name: "micro", type: "string", fallback: "\"a\"", note: "The tiny characters it is printed from, seen through the lens." },
+      { name: "zoom", type: "number", fallback: "2.6", note: "Magnification at rest." },
+      { name: "zoomMax", type: "number", fallback: "4.2", note: "Magnification after a click or Enter." },
+      { name: "lensRadius", type: "number", fallback: "50", note: "The glass's radius, in poster units (the poster is 500 wide)." },
+      { name: "size", type: "number", fallback: "380", note: "The poster's width in px; it never grows past its container." },
+      { name: "intro", type: "boolean", fallback: "true", note: "The outline trace and the lens dropping in on arrival." },
+      { name: "hint", type: "boolean", fallback: "true", note: "The \"Move to inspect · Click to zoom\" line under the poster." },
+      { name: "onZoomChange", type: "(zoomed) => void", note: "Fired when the zoom toggles." },
+    ],
+    files: [
+      { name: "Magnify.tsx", lang: "tsx" },
+      { name: "magnify.css", lang: "css" },
+    ],
+    info: {
+      paragraphs: [
+        "The poster is drawn in a fixed 500 × 680 space and scaled to its width, so the letter, the lens and the micro-type keep their proportions at any size. Up close the letter is not ink at all: it is rows of tiny characters, each row nudged a fraction so the texture never lines up into stripes, clipped to the letter's own shape.",
+        "The glass carries its own copy of that micro-type at the zoom you ask for, positioned so the point under the centre of the lens is exactly the point on the poster below it — so what you see is a true magnification, sharp at any zoom, rather than a blurred enlargement. The lens drawing scales by its radius and the inner zoom is divided by the same amount, so the magnification you set is the one you get.",
+        "The lens follows the pointer on a spring, tilts with its own sideways speed, floats very slightly at rest, and its cast shadow drifts further and softens when it is held, as if lifted off the paper. Click or press Enter to push the zoom further; the arrow keys move it (Shift for bigger steps) and Escape puts it back. On arrival the letter's outline traces itself, the ink floods in, and the glass drops into place.",
+      ],
+    },
+    origin: { label: "magnify-a" },
+  },
+  {
     slug: "progress-image",
     category: "controls",
     name: "Progress Image",

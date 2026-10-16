@@ -1,0 +1,215 @@
+/* ===========================================================================
+   Magnify.
+
+   A paper poster drawn in a fixed 500 × 680 space and scaled to its width,
+   with one huge letter and a magnifying glass over it. The paper, ink and
+   shadow cross-fade when the theme switches, rather than snapping.
+=========================================================================== */
+
+.pmag {
+  --pmag-hint: #a3a3a3;
+  --pmag-ring: rgb(115 115 115 / 0.6);
+  --pmag-shadow:
+    0 1px 0 rgb(0 0 0 / 0.04),
+    6px 10px 22px -10px rgb(0 0 0 / 0.28),
+    1px 2px 4px rgb(0 0 0 / 0.08);
+  --pmag-grain-blend: multiply;
+  --pmag-glass-blend: multiply;
+  --pmag-sheen:
+    radial-gradient(120% 90% at 30% 20%, rgb(255 255 255 / 0.25), transparent 60%),
+    linear-gradient(180deg, transparent 70%, rgb(0 0 0 / 0.035));
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pmag[data-theme="dark"] {
+  --pmag-hint: #737373;
+  --pmag-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.05),
+    0 24px 60px -20px rgb(0 0 0 / 0.8);
+  --pmag-grain-blend: overlay;
+  --pmag-glass-blend: soft-light;
+  --pmag-sheen: radial-gradient(120% 90% at 30% 15%, rgb(255 255 255 / 0.05), transparent 60%);
+}
+
+.pmag *,
+.pmag *::before,
+.pmag *::after {
+  box-sizing: border-box;
+}
+
+/* the poster: its own width, never wider than its container, at the paper's proportions */
+.pmag__frame {
+  position: relative;
+  width: min(var(--pmag-size, 380px), 100%);
+  aspect-ratio: 500 / 680;
+  border-radius: 2px;
+  outline: none;
+  cursor: none;
+  touch-action: none;
+  user-select: none;
+}
+
+.pmag__frame:focus-visible {
+  box-shadow: 0 0 0 2px var(--pmag-ring);
+  outline-offset: 8px;
+}
+
+.pmag__canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 500px;
+  height: 680px;
+  transform-origin: 0 0;
+}
+
+.pmag__abs {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* the theme cross-fade, on every surface that takes a colour */
+.pmag__fade {
+  transition:
+    fill 0.45s ease,
+    stroke 0.45s ease,
+    background-color 0.45s ease,
+    box-shadow 0.45s ease;
+}
+
+.pmag__paper {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 2px;
+  box-shadow: var(--pmag-shadow);
+}
+
+.pmag__grain {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.16;
+  mix-blend-mode: var(--pmag-grain-blend);
+}
+
+.pmag__sheen {
+  position: absolute;
+  inset: 0;
+  background: var(--pmag-sheen);
+}
+
+.pmag__letter {
+  position: absolute;
+  inset: 0;
+}
+
+/* the big letter, and the clip the micro-type is cut to: one shape, set once */
+.pmag__glyph-shape {
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+  font-size: 500px;
+  font-weight: 700;
+}
+
+.pmag__micro {
+  display: block;
+}
+
+.pmag__microText {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 5.6px;
+}
+
+/* ---------- the lens ---------- */
+
+.pmag__lens {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.pmag__shadow {
+  background: #000000;
+}
+
+.pmag__collar {
+  border-radius: 2px;
+  background: linear-gradient(180deg, #f4f4f4 0%, #9a9a9a 45%, #5e5e5e 55%, #d0d0d0 100%);
+}
+
+.pmag__ferrule {
+  border-radius: 2px;
+  background: linear-gradient(180deg, #fafafa 0%, #a8a8a8 45%, #626262 58%, #cfcfcf 100%);
+}
+
+.pmag__grip {
+  border-radius: 3px 9px 9px 3px;
+  background: linear-gradient(180deg, #5a5a5a 0%, #1d1d1d 30%, #050505 60%, #2b2b2b 100%);
+}
+
+.pmag[data-theme="dark"] .pmag__grip {
+  box-shadow: 0 0 0 0.5px rgb(255 255 255 / 0.12);
+}
+
+.pmag__rim {
+  border-radius: 50%;
+  background: conic-gradient(from 210deg, #f7f7f7, #8e8e8e 18%, #ececec 32%, #6c6c6c 50%, #dedede 66%, #9a9a9a 82%, #f7f7f7);
+  box-shadow: 0 0 0 0.75px rgb(0 0 0 / 0.35), inset 0 0 1.5px rgb(0 0 0 / 0.5);
+}
+
+.pmag__glass {
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.pmag__tint {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  mix-blend-mode: var(--pmag-glass-blend);
+}
+
+.pmag__glint {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse 40% 22% at 36% 24%, rgb(255 255 255 / 0.45), transparent 70%);
+}
+
+.pmag__hint {
+  margin: 0;
+  color: var(--pmag-hint);
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-align: center;
+  text-transform: uppercase;
+  user-select: none;
+  transition: color 0.45s ease;
+}
+
+/* on a touch screen there is no pointer to hide */
+@media (hover: none) {
+  .pmag__frame {
+    cursor: default;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pmag__fade,
+  .pmag__hint {
+    transition: none;
+  }
+}

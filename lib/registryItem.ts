@@ -63,6 +63,7 @@ const FACES: Record<string, string | null> = {
   "calendar-card": "Inter (400 to 600)",
   "prompt-composer": "Inter (400 to 500), with Inter Tight (700) for the date on the event card",
   "progress-image": "Inter (500 and 600)",
+  magnify: "Inter (700) for the letter, with Helvetica Neue for the micro-type (Arial where it is missing)",
 };
 
 function docsFor(entry: Entry): string {

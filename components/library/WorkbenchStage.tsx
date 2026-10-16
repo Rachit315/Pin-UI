@@ -24,6 +24,7 @@ import RequestChip from "./RequestChip";
 import CalendarCard from "./CalendarCard";
 import PromptComposer from "./PromptComposer";
 import ProgressImage from "./ProgressImage";
+import Magnify from "./Magnify";
 import type { Entry } from "./registry";
 import { LINKS } from "@/lib/links";
 import { usePinTheme } from "@/lib/theme";
@@ -120,6 +121,7 @@ export default function WorkbenchStage({
           {entry.slug === "calendar-card" && <CalendarCard theme={theme} />}
           {entry.slug === "prompt-composer" && <PromptComposer theme={theme} />}
           {entry.slug === "progress-image" && <ProgressImage theme={theme} />}
+          {entry.slug === "magnify" && <Magnify theme={theme} />}
         </div>
 
         {entry.slug === "chips" && <ChipsEditor value={chips} onChange={setChips} />}
