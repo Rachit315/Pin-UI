@@ -1,0 +1,531 @@
+/* Contact Form — from the Figma frame "Contact", re-proportioned for a bigger form.
+   The frame is drawn in its own units, N × --u, where --u fits both the window's width and height, so the
+   block always sits in one viewport, centred. On the 1440 × 1024 frame: a 60 headline 50 from the top, the
+   guides at 150 down and 40 in from either side (or 6% in from the window's edges, whichever is further out), and a 1056-wide row 262 down — a 520 × 650 black photo
+   panel and, 16 to its right, a 520-wide column of four black tiles. The guides run on to the window's edges.
+   A portrait tablet gets a tighter frame; at 760px wide and below it stacks and scrolls instead. */
+
+.cf-page {
+  --cf-paper: #ffffff;
+  --cf-ink: #000000;
+  --cf-white-50: rgba(255, 255, 255, 0.5);
+  --cf-white-60: rgba(255, 255, 255, 0.6);
+  --cf-error: #ff8a80;
+  --cf-guide: rgba(0, 0, 0, 0.16);
+  --cf-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --cf-family: var(--cf-font), "Neue Montreal", "Inter Tight", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* the frame, in its own units: its size, where the row sits, and where the guides run */
+  --fw: 1440;
+  --fh: 1024;
+  --row-x: 192;
+  --row-y: 262;
+  --guide-y: 150;
+  --guide-x: 40;
+  /* 1 unit, fitting the frame to both the window's width and height */
+  --u: min(calc(100vw / var(--fw)), calc(100svh / var(--fh)));
+  /* the vertical guides frame the window: 6% in from each edge, never closer to the form than the frame has them */
+  --rail-x: min(6vw, calc(50vw + (var(--guide-x) - var(--fw) / 2) * var(--u)));
+  --rail-y: calc(50% + (var(--guide-y) - var(--fh) / 2) * var(--u));
+
+  color-scheme: light;
+  margin: 0;
+  overflow: hidden;
+  overflow: clip;
+  background: var(--cf-paper);
+  color: var(--cf-ink);
+  font-family: var(--cf-family);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.cf-page *,
+.cf-page *::before,
+.cf-page *::after {
+  box-sizing: border-box;
+}
+
+.cf {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  overflow: clip;
+}
+
+.cf__stage {
+  position: relative;
+  width: calc(var(--fw) * var(--u));
+  height: calc(var(--fh) * var(--u));
+}
+
+/* ---------- guides ---------- */
+
+/* Figma's dashes: 8 on, 8 off, 16% black, running to the window's edges */
+.cf__rail {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+}
+.cf__rail--h {
+  left: 0;
+  right: 0;
+  top: var(--rail-y);
+  height: 1px;
+  background: repeating-linear-gradient(90deg, var(--cf-guide) 0 8px, transparent 8px 16px);
+}
+.cf__rail--l,
+.cf__rail--r {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: repeating-linear-gradient(180deg, var(--cf-guide) 0 8px, transparent 8px 16px);
+  transform-origin: 50% 0;
+}
+.cf__rail--l {
+  left: var(--rail-x);
+}
+.cf__rail--r {
+  right: var(--rail-x);
+}
+
+/* the raised pins where they cross: Figma's white disc with a drop and an inner shadow, and a grey bead */
+.cf__pin {
+  --pin: max(14px, calc(20.85 * var(--u)));
+  position: absolute;
+  z-index: -1;
+  top: var(--rail-y);
+  width: var(--pin);
+  height: var(--pin);
+  margin-top: calc(var(--pin) / -2);
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.15), inset 0 -1px 4px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+.cf__pin::after {
+  content: "";
+  position: absolute;
+  inset: 25%;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #dcdcdc, #8f8f8f);
+}
+.cf__pin--l {
+  left: calc(var(--rail-x) - var(--pin) / 2 + 0.5px);
+}
+.cf__pin--r {
+  right: calc(var(--rail-x) - var(--pin) / 2 + 0.5px);
+}
+
+/* ---------- headline ---------- */
+
+.cf__title {
+  position: absolute;
+  top: calc(50 * var(--u));
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: 0.25em;
+  margin: 0;
+  font-size: calc(60 * var(--u));
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-align: center;
+}
+/* each word rises out of its own mask */
+.cf__word-mask {
+  display: inline-block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.cf__word {
+  display: inline-block;
+}
+
+.cf__row {
+  position: absolute;
+  top: calc(var(--row-y) * var(--u));
+  left: calc(var(--row-x) * var(--u));
+  display: flex;
+  align-items: stretch;
+  gap: calc(16 * var(--u));
+}
+
+/* ---------- photo ---------- */
+
+.cf__photo {
+  position: relative;
+  isolation: isolate;
+  width: calc(520 * var(--u));
+  aspect-ratio: 400 / 500;
+  margin: 0;
+  overflow: hidden;
+  background: var(--cf-ink);
+}
+/* Figma: a 675 × 723 box (on a 400 × 500 panel) centred 56.42 left of and 91.42 below the panel's middle,
+   blended as luminosity so the hand turns grey on the black, holding the photo turned −31.93°. In %, so it
+   scales with the panel; Motion owns its transform (the −50% centring and the settle). */
+.cf__hand {
+  position: absolute;
+  left: calc(50% - 14.105%);
+  top: calc(50% + 18.284%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 168.789%;
+  height: 144.568%;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: luminosity;
+}
+.cf__hand-crop {
+  position: relative;
+  flex: none;
+  width: 64.113%;
+  height: 80.511%;
+  overflow: hidden;
+  transform: rotate(-31.93deg);
+}
+/* twice the box wide and as tall as it, from its left edge: only the left-hand arm shows */
+.cf__hand-crop img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 201.67%;
+  max-width: none;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ---------- form ---------- */
+
+.cf__form {
+  display: flex;
+  flex-direction: column;
+  gap: calc(16 * var(--u));
+  width: calc(520 * var(--u));
+  margin: 0;
+}
+.cf__tile {
+  position: relative;
+  flex: 1 1 0;
+  overflow: hidden;
+  background: var(--cf-ink);
+  color: #ffffff;
+}
+.cf__label {
+  position: absolute;
+  top: calc(24 * var(--u));
+  left: calc(28 * var(--u));
+  color: rgba(255, 255, 255, 0.78);
+  font-size: calc(22 * var(--u));
+  line-height: normal;
+  cursor: text;
+  transition: color 0.3s ease, transform 0.4s var(--cf-ease);
+}
+.cf__tile:focus-within .cf__label {
+  color: #ffffff;
+  transform: translateX(calc(4 * var(--u)));
+}
+.cf__input {
+  position: absolute;
+  left: calc(28 * var(--u));
+  right: calc(28 * var(--u));
+  bottom: calc(24 * var(--u));
+  height: calc(62 * var(--u));
+  margin: 0;
+  /* no top padding: placeholder and typed text sit in the middle of the box */
+  padding: 0 calc(18 * var(--u));
+  border: 1px solid var(--cf-white-50);
+  border-radius: 0;
+  background: transparent;
+  color: #ffffff;
+  font: inherit;
+  /* typed text stays readable however small the frame is drawn */
+  font-size: max(13px, calc(18 * var(--u)));
+  line-height: normal;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.cf__input::placeholder {
+  color: var(--cf-white-60);
+  font-size: max(11px, calc(14 * var(--u)));
+  opacity: 1;
+  transition: opacity 0.25s ease, transform 0.35s var(--cf-ease);
+}
+.cf__input:hover {
+  border-color: rgba(255, 255, 255, 0.75);
+}
+.cf__input:focus {
+  border-color: #ffffff;
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 0 0 calc(3 * var(--u)) rgba(255, 255, 255, 0.12);
+}
+.cf__input:focus::placeholder {
+  opacity: 0.45;
+}
+.cf__tile.is-invalid .cf__input {
+  border-color: var(--cf-error);
+}
+.cf__error {
+  position: absolute;
+  top: calc(28 * var(--u));
+  right: calc(28 * var(--u));
+  color: var(--cf-error);
+  font-size: max(11px, calc(15 * var(--u)));
+  line-height: normal;
+}
+/* autofill keeps the black tile */
+.cf__input:-webkit-autofill {
+  -webkit-text-fill-color: #ffffff;
+  -webkit-box-shadow: 0 0 0 100px var(--cf-ink) inset;
+  caret-color: #ffffff;
+}
+
+/* ---------- the button ---------- */
+
+.cf__submit {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  flex: 1 1 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--cf-ink);
+  color: #ffffff;
+  font: inherit;
+  font-size: calc(52 * var(--u));
+  line-height: 1.15;
+  cursor: pointer;
+  overflow: visible;
+  transition: color 0.45s var(--cf-ease);
+}
+.cf__submit[aria-disabled="true"] {
+  cursor: default;
+}
+.cf__submit:focus-visible {
+  outline: 2px solid var(--cf-ink);
+  outline-offset: calc(8 * var(--u));
+}
+/* white fills the tile from the bottom; the label turns black with it */
+.cf__fill {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1px var(--cf-ink);
+  clip-path: inset(100% 0 0 0);
+  transition: clip-path 0.6s var(--cf-ease);
+}
+.cf__submit-face {
+  display: block;
+  grid-area: 1 / 1;
+}
+/* the label rolls up and a twin rises behind it, an arrow sliding in */
+.cf__roll {
+  display: grid;
+  height: 1.15em;
+  overflow: hidden;
+}
+.cf__roll-line {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3em;
+  grid-area: 1 / 1;
+  transition: transform 0.6s var(--cf-ease);
+}
+.cf__roll-line + .cf__roll-line {
+  transform: translateY(110%);
+}
+.cf__arrow {
+  width: 0.7em;
+  height: 0.7em;
+  opacity: 0;
+  transform: translateX(-0.3em);
+  transition: transform 0.6s var(--cf-ease) 0.08s, opacity 0.35s ease 0.08s;
+}
+.cf__sending,
+.cf__sent {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25em;
+}
+.cf__dots {
+  display: inline-flex;
+  gap: 0.12em;
+  margin-left: 0.05em;
+}
+.cf__dots span {
+  display: block;
+  width: 0.12em;
+  height: 0.12em;
+  border-radius: 50%;
+  background: currentColor;
+}
+.cf__check {
+  width: 0.8em;
+  height: 0.8em;
+}
+
+/* the corner marks: small selection handles that spread on hover */
+.cf__corner {
+  position: absolute;
+  width: max(6px, calc(11 * var(--u)));
+  height: max(6px, calc(11 * var(--u)));
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  background: #ffffff;
+  transition: transform 0.5s var(--cf-ease);
+}
+.cf__corner--tl { top: calc(-5.5 * var(--u)); left: calc(-5.5 * var(--u)); }
+.cf__corner--tr { top: calc(-5.5 * var(--u)); right: calc(-5.5 * var(--u)); }
+.cf__corner--bl { bottom: calc(-5.5 * var(--u)); left: calc(-5.5 * var(--u)); }
+.cf__corner--br { bottom: calc(-5.5 * var(--u)); right: calc(-5.5 * var(--u)); }
+
+@media (hover: hover) {
+  .cf__submit.is-idle:hover {
+    color: var(--cf-ink);
+  }
+  .cf__submit.is-idle:hover .cf__fill {
+    clip-path: inset(0 0 0 0);
+  }
+  .cf__submit.is-idle:hover .cf__roll-line:first-child {
+    transform: translateY(-110%);
+  }
+  .cf__submit.is-idle:hover .cf__roll-line + .cf__roll-line {
+    transform: translateY(0);
+  }
+  .cf__submit.is-idle:hover .cf__arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .cf__submit.is-idle:hover .cf__corner--tl { transform: translate(-5px, -5px); }
+  .cf__submit.is-idle:hover .cf__corner--tr { transform: translate(5px, -5px); }
+  .cf__submit.is-idle:hover .cf__corner--bl { transform: translate(-5px, 5px); }
+  .cf__submit.is-idle:hover .cf__corner--br { transform: translate(5px, 5px); }
+}
+
+.cf__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------- portrait tablet: the same design, framed tight ---------- */
+
+@media (min-width: 761px) and (max-aspect-ratio: 1 / 1) {
+  .cf-page {
+    --fw: 1136;
+    --fh: 960;
+    --row-x: 40;
+    --row-y: 232;
+    --guide-y: 150;
+    --guide-x: 20;
+  }
+}
+
+/* ---------- phone: stack and scroll ---------- */
+
+@media (max-width: 760px) {
+  .cf-page {
+    --u: 1px;
+    overflow: visible;
+  }
+  .cf {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: auto;
+    min-height: 100svh;
+    padding: 40px 20px 64px;
+  }
+  .cf__rail,
+  .cf__pin {
+    display: none;
+  }
+  .cf__stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: auto;
+  }
+  .cf__title,
+  .cf__row {
+    position: static;
+  }
+  .cf__title {
+    font-size: clamp(32px, 9.5vw, 52px);
+  }
+  .cf__row {
+    flex-direction: column;
+    gap: 13px;
+    width: min(440px, 100%);
+    margin-top: 32px;
+  }
+  .cf__photo,
+  .cf__form {
+    width: 100%;
+  }
+  .cf__form {
+    gap: 13px;
+  }
+  .cf__tile {
+    flex: none;
+    height: 124px;
+  }
+  .cf__label {
+    top: 18px;
+    left: 20px;
+    font-size: 18px;
+  }
+  .cf__input {
+    left: 20px;
+    right: 20px;
+    bottom: 18px;
+    height: 54px;
+    padding: 0 14px;
+    /* 16px keeps iOS from zooming in on focus */
+    font-size: 16px;
+  }
+  .cf__input::placeholder {
+    font-size: 13px;
+  }
+  .cf__error {
+    top: 21px;
+    right: 20px;
+    font-size: 12px;
+  }
+  .cf__submit {
+    flex: none;
+    height: 104px;
+    font-size: 36px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cf__label,
+  .cf__input,
+  .cf__input::placeholder,
+  .cf__submit,
+  .cf__fill,
+  .cf__roll-line,
+  .cf__arrow,
+  .cf__corner {
+    transition: none;
+  }
+}

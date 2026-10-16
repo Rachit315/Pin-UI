@@ -9,6 +9,8 @@ import GitHubStars from "../hero/GitHubStars";
 import CodeBlock, { type CodePane } from "../library/CodeBlock";
 import { useCopy } from "../library/useCopy";
 import { useSaved } from "./useSaved";
+import BlockDocs, { InstallPill, type BlockDocsMeta } from "./BlockDocs";
+import type { BlockDocs as Docs } from "@/lib/blockDocs";
 import {
   IconArrowLeft,
   IconArrowUpRight,
@@ -27,6 +29,7 @@ import {
   IconTablet,
 } from "./icons";
 import { SHELF_ORDER, blocksIn, categoryName, type Block } from "@/lib/blocks";
+import { LINKS } from "@/lib/links";
 import "./blocks.css";
 
 /* the same motion vocabulary as the rest of Pin UI: one spring for every morph */
@@ -52,7 +55,20 @@ const DEVICES: { id: Device; label: string; Icon: typeof IconMonitor }[] = [
  * assistant; the bookmark keeps it on your shelf; the frame can fill the
  * screen; and refresh plays the block's entrance again.
  */
-export default function BlockView({ block, panes }: { block: Block; panes: CodePane[] }) {
+export default function BlockView({
+  block,
+  panes,
+  docs,
+  meta,
+  stats,
+}: {
+  block: Block;
+  panes: CodePane[];
+  /** Left out for a block whose docs have not been written: the page is then the preview alone. */
+  docs?: Docs;
+  meta: BlockDocsMeta;
+  stats: { blocks: number; sections: number };
+}) {
   const reduced = useReducedMotion();
   const group = useId();
   const [tab, setTab] = useState<"preview" | "code">("preview");
@@ -128,6 +144,33 @@ export default function BlockView({ block, panes }: { block: Block; panes: CodeP
             </Link>
             <GitHubStars />
           </div>
+
+          {/* --- the head: where it sits, what it is, and the one line that installs it --- */}
+          <header className="blx-pagehead">
+            <nav className="blx-crumbs" aria-label="Breadcrumb">
+              <ol>
+                <li>
+                  <Link href="/blocx">Blocx</Link>
+                </li>
+                <li aria-hidden="true" className="blx-crumbs__sep">
+                  <Chevron />
+                </li>
+                <li>
+                  <span>{categoryName(block.category)}</span>
+                </li>
+                <li aria-hidden="true" className="blx-crumbs__sep">
+                  <Chevron />
+                </li>
+                <li aria-current="page">{block.name}</li>
+              </ol>
+            </nav>
+            <h1 className="blx-pagehead__title">
+              {block.name}
+              {block.isNew && <span className="blx-pagehead__new">New</span>}
+            </h1>
+            <p className="blx-pagehead__lead">{block.summary}</p>
+            <InstallPill url={meta.registryUrl} />
+          </header>
 
           <div
             className="blx-frameHold"
@@ -347,6 +390,8 @@ export default function BlockView({ block, panes }: { block: Block; panes: CodeP
               </div>
             </motion.section>
           </div>
+
+          {docs && <BlockDocs block={block} docs={docs} meta={meta} panes={panes} stats={stats} />}
         </main>
       </LayoutGroup>
 
@@ -487,6 +532,16 @@ function InfoPanel({ open, block, onClose }: { open: boolean; block: Block; onCl
                 <dd>{v}</dd>
               </div>
             ))}
+            {/* where it came from: its own pin when one was recorded, the Pin UI board otherwise */}
+            <div>
+              <dt>Inspiration</dt>
+              <dd>
+                <a className="blx-infoPanel__link" href={block.pin ?? LINKS.pinterest} target="_blank" rel="noopener noreferrer">
+                  Pinterest
+                  <IconArrowUpRight />
+                </a>
+              </dd>
+            </div>
           </dl>
         </motion.div>
       )}

@@ -1,0 +1,225 @@
+/* Fōrah Hero — every class prefixed fh- so the block can sit on any page. */
+
+.fh-page {
+  --fh-bg: #161618;
+  --fh-ink: #f2f2f4;
+  --fh-soft: rgb(242 242 244 / 0.62);
+  --fh-violet: #8b8ff5;
+  --fh-violet-hi: #a4a7ff;
+  --fh-font-family: var(--fh-font), "Inter Tight", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  color-scheme: dark;
+  margin: 0;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: var(--fh-bg);
+  color: var(--fh-ink);
+  font-family: var(--fh-font-family);
+  -webkit-font-smoothing: antialiased;
+}
+
+.fh-page *,
+.fh-page *::before,
+.fh-page *::after {
+  box-sizing: border-box;
+}
+
+.fh {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  min-height: max(100dvh, 640px);
+  overflow: hidden;
+}
+
+/* a faint dot grid over the whole field */
+.fh__grid {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-image: radial-gradient(circle at 1px 1px, rgb(255 255 255 / 0.09) 1px, transparent 0);
+  background-size: 22px 22px;
+  mask-image: radial-gradient(120% 90% at 50% 40%, #000 40%, transparent 100%);
+}
+
+.fh__field {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- nav ---------- */
+
+.fh-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  padding: 18px 24px 0;
+  font-size: 13px;
+}
+
+.fh-nav__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--fh-ink);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+
+.fh-nav__mark {
+  display: grid;
+  grid-template-columns: 6px 6px;
+  gap: 2px;
+}
+
+.fh-nav__mark i {
+  width: 6px;
+  height: 12px;
+  background: var(--fh-violet);
+}
+
+.fh-nav__mark i + i {
+  height: 6px;
+  align-self: end;
+  background: var(--fh-ink);
+}
+
+.fh-nav__links {
+  display: flex;
+  gap: 28px;
+}
+
+.fh-nav__links a {
+  color: var(--fh-soft);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.fh-nav__links a:hover {
+  color: var(--fh-ink);
+}
+
+.fh-nav__ctas {
+  display: flex;
+  gap: 8px;
+}
+
+/* ---------- buttons ---------- */
+
+.fh-btn {
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+}
+
+.fh-btn:active {
+  transform: scale(0.97);
+}
+
+.fh-btn:focus-visible {
+  outline: 2px solid var(--fh-violet-hi);
+  outline-offset: 3px;
+}
+
+.fh-btn--sm {
+  height: 28px;
+  padding: 0 12px;
+  font-size: 12px;
+}
+
+.fh-btn--solid {
+  background: var(--fh-violet);
+  color: #0d0d16;
+}
+
+.fh-btn--solid:hover {
+  background: var(--fh-violet-hi);
+  box-shadow: 0 0 24px -4px rgb(139 143 245 / 0.7);
+}
+
+.fh-btn--line {
+  border: 1px solid rgb(242 242 244 / 0.55);
+  border-radius: 999px;
+  color: var(--fh-ink);
+}
+
+.fh-btn--line:hover {
+  background: rgb(255 255 255 / 0.08);
+  border-color: var(--fh-ink);
+}
+
+/* ---------- copy ---------- */
+
+.fh__copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px 22vh;
+  text-align: center;
+}
+
+.fh__title {
+  margin: 0;
+  font-size: clamp(40px, 5.6vw, 80px);
+  font-weight: 600;
+  line-height: 1.04;
+  letter-spacing: -0.032em;
+}
+
+.fh__line {
+  display: block;
+}
+
+.fh__accent {
+  color: var(--fh-violet);
+  font-style: normal;
+}
+
+.fh__lede {
+  margin: 22px 0 0;
+  color: var(--fh-soft);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.fh__ctas {
+  display: flex;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+@media (max-width: 760px) {
+  .fh-nav {
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .fh-nav__links {
+    display: none;
+  }
+
+  .fh__copy {
+    padding-bottom: 30vh;
+  }
+}
+
+@media (max-width: 420px) {
+  .fh-nav__ctas .fh-btn--line {
+    display: none;
+  }
+}

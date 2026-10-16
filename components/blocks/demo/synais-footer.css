@@ -1,0 +1,319 @@
+/* Synais Footer — near-black, laid out on a 1200-wide column (120 in from each edge at 1440):
+   brand + newsletter, four link columns, a fine-print row, then a cream "synais." set at ~30vw that bleeds
+   off the bottom. The footer fills the window: links at the top, the wordmark pinned to the bottom edge.
+   Four columns → two below 900px; the newsletter drops under the brand below 720px. */
+
+.sy-page {
+  --sy-bg: #0b0b0b;
+  --sy-ink: #ffffff;
+  --sy-muted: #8c8c8c;
+  --sy-faint: #5e5e5e;
+  --sy-line: #232323;
+  --sy-field: #171717;
+  --sy-cream: #ebe6d6;
+  --sy-error: #ff8a80;
+  --sy-family: var(--sy-font), "Inter Tight", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  color-scheme: dark;
+  min-height: 100svh;
+  margin: 0;
+  overflow-x: clip;
+  background: var(--sy-bg);
+  color: var(--sy-muted);
+  font-family: var(--sy-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.sy-page *,
+.sy-page *::before,
+.sy-page *::after {
+  box-sizing: border-box;
+}
+
+.sy {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  width: 100%;
+  padding: 96px max(24px, (100% - 1200px) / 2) 0;
+  overflow: hidden;
+  overflow: clip;
+}
+
+.sy a {
+  color: inherit;
+  text-decoration: none;
+}
+.sy a:focus-visible,
+.sy button:focus-visible {
+  outline: 2px solid var(--sy-cream);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ---------- brand + newsletter ---------- */
+
+.sy__top {
+  display: flex;
+  justify-content: space-between;
+  gap: 48px;
+}
+.sy__brand {
+  max-width: 300px;
+}
+.sy__logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--sy-ink) !important;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.sy__mark {
+  display: block;
+  width: 22px;
+  height: 22px;
+  color: var(--sy-ink);
+}
+.sy__about {
+  margin: 14px 0 0;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.sy__socials {
+  display: flex;
+  gap: 16px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.sy__socials a {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  color: var(--sy-faint);
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+.sy__socials a:hover {
+  color: var(--sy-ink);
+  transform: translateY(-2px);
+}
+.sy__socials svg {
+  width: 16px;
+  height: 16px;
+}
+
+.sy__news {
+  width: min(384px, 100%);
+}
+.sy__heading {
+  margin: 0;
+  color: var(--sy-ink);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.sy__field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 16px 0 0;
+  padding: 5px 5px 5px 14px;
+  border: 1px solid var(--sy-line);
+  border-radius: 10px;
+  background: var(--sy-field);
+  transition: border-color 0.2s ease;
+}
+.sy__field:focus-within {
+  border-color: #3a3a3a;
+}
+.sy__field.is-invalid {
+  border-color: var(--sy-error);
+}
+.sy__field input {
+  flex: 1;
+  min-width: 0;
+  height: 34px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--sy-ink);
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+}
+.sy__field input::placeholder {
+  color: var(--sy-faint);
+}
+.sy__field button {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: var(--sy-ink);
+  color: var(--sy-bg);
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+.sy__field button:hover {
+  background: var(--sy-cream);
+}
+.sy__field button:active {
+  transform: scale(0.94);
+}
+.sy__field button:disabled {
+  cursor: progress;
+}
+.sy__field button svg {
+  width: 16px;
+  height: 16px;
+}
+.sy__note {
+  min-height: 2lh;
+  margin: 14px 0 0;
+  font-size: 12px;
+  line-height: 1.55;
+}
+.sy__note.is-error {
+  color: var(--sy-error);
+}
+
+/* ---------- columns ---------- */
+
+.sy__cols {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 40px 24px;
+  margin-top: 64px;
+}
+.sy__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+}
+.sy__link {
+  position: relative;
+  transition: color 0.2s ease;
+}
+.sy__link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.sy__link:hover {
+  color: var(--sy-ink);
+}
+.sy__link:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* ---------- fine print ---------- */
+
+.sy__fine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  margin-top: 64px;
+  font-size: 12px;
+  color: var(--sy-faint);
+}
+.sy__fine p {
+  margin: 0;
+}
+.sy__fine ul {
+  display: flex;
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sy__fine a:hover {
+  color: var(--sy-ink);
+}
+
+/* ---------- wordmark ---------- */
+
+.sy__word {
+  display: flex;
+  justify-content: center;
+  margin: auto 0 0;
+  padding-top: clamp(24px, 4vw, 56px);
+  color: var(--sy-cream);
+  /* sized so "synais." spans the 1200 content column at 1440 */
+  font-size: clamp(96px, 30.4vw, 560px);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.055em;
+  white-space: nowrap;
+  user-select: none;
+  /* only the descender of the "y" runs off the bottom edge */
+  margin-bottom: -0.1em;
+}
+.sy__word span {
+  display: inline-block;
+}
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 900px) {
+  .sy {
+    padding-top: 72px;
+  }
+  .sy__cols {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 56px;
+  }
+}
+
+@media (max-width: 720px) {
+  .sy__top {
+    flex-direction: column;
+    gap: 40px;
+  }
+  .sy__brand,
+  .sy__news {
+    max-width: none;
+    width: 100%;
+  }
+  .sy__field input {
+    /* 16px keeps iOS from zooming in on focus */
+    font-size: 16px;
+  }
+  .sy__fine {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sy__socials a,
+  .sy__link,
+  .sy__link::after,
+  .sy__field,
+  .sy__field button {
+    transition: none;
+  }
+}

@@ -1,0 +1,407 @@
+/* Smart Pricing — from the Figma frame "Pricing" (1440 wide).
+   A centred 1188-wide column: headline, the billing switch, then three 380 × 550 lime cards 24 apart.
+   Below 1240px the cards share the row; below 900px they stack into one centred column. */
+
+.sp-page {
+  --sp-paper: #ffffff;
+  --sp-ink: #000000;
+  --sp-lime: #dcf75e;
+  --sp-forest: #325832;
+  --sp-deep: #102d16;
+  --sp-ink-80: rgba(0, 0, 0, 0.8);
+  --sp-ink-60: rgba(0, 0, 0, 0.6);
+  --sp-display: var(--sp-bricolage), "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --sp-label: var(--sp-urbanist), "Urbanist", ui-sans-serif, system-ui, sans-serif;
+  --sp-text: var(--sp-inter), "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  color-scheme: light;
+  min-height: 100svh;
+  margin: 0;
+  overflow-x: clip;
+  background: var(--sp-paper);
+  color: var(--sp-ink);
+  font-family: var(--sp-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.sp-page *,
+.sp-page *::before,
+.sp-page *::after {
+  box-sizing: border-box;
+}
+
+.sp {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 60px;
+  width: min(1188px, 100% - 48px);
+  margin: 0 auto;
+  padding: 55px 0 96px;
+}
+
+/* ---------- head ---------- */
+
+.sp__head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  max-width: 885px;
+  text-align: center;
+}
+.sp__title {
+  margin: 0;
+  font-family: var(--sp-display);
+  font-size: 60px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -1.2px;
+  font-variation-settings: "opsz" 14, "wdth" 100;
+  text-wrap: balance;
+}
+
+/* ---------- billing switch ---------- */
+
+.sp__billing {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* room for the sale tag riding above "Yearly" */
+  padding-top: 5px;
+}
+.sp__period {
+  margin: 0;
+  padding: 0 1px;
+  border: 0;
+  background: none;
+  color: var(--sp-ink-60);
+  font: 500 18px/normal var(--sp-text);
+  letter-spacing: -0.36px;
+  cursor: pointer;
+  transition: color 0.25s ease;
+}
+.sp__period.is-on {
+  color: var(--sp-ink);
+}
+.sp__period:first-child {
+  margin-right: 1px;
+}
+.sp__switch {
+  position: relative;
+  flex: none;
+  width: 64px;
+  height: 32px;
+  margin: 0;
+  padding: 4px;
+  border: 0;
+  border-radius: 40px;
+  background: var(--sp-lime);
+  cursor: pointer;
+}
+.sp__knob {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+.sp__sale {
+  position: absolute;
+  top: -5px;
+  right: -14px;
+  padding: 4px 6px;
+  border-radius: 10px;
+  background: var(--sp-lime);
+  font: 600 6px/normal var(--sp-text);
+  letter-spacing: -0.12px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.sp__period:focus-visible,
+.sp__switch:focus-visible,
+.sp__cta:focus-visible {
+  outline: 2px solid var(--sp-forest);
+  outline-offset: 3px;
+}
+
+/* ---------- plans ---------- */
+
+.sp__plans {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 380px));
+  justify-content: center;
+  gap: 24px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sp__card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 550px;
+  padding: 74px 27px 24px 26px;
+  border-radius: 16px;
+  background: var(--sp-lime);
+}
+.sp__shape {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+}
+.sp__shape--flip {
+  right: 7.7px;
+  transform: scaleX(-1);
+}
+
+.sp__popular {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1.8px solid var(--sp-lime);
+  border-radius: 20px;
+  background: var(--sp-forest);
+  color: var(--sp-lime);
+  font: 600 14px/normal var(--sp-text);
+  letter-spacing: -0.28px;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 2px 16px rgba(255, 255, 255, 0.8));
+}
+.sp__popular img {
+  display: block;
+}
+
+.sp__top {
+  position: relative;
+  max-width: 274px;
+}
+.sp__name {
+  margin: 0;
+  font-family: var(--sp-display);
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 30px;
+  letter-spacing: -0.8px;
+  font-variation-settings: "opsz" 14, "wdth" 100;
+}
+.sp__price {
+  display: flex;
+  align-items: baseline;
+  margin: 2px 0 0;
+  font-family: var(--sp-display);
+  font-variation-settings: "opsz" 14, "wdth" 100;
+  letter-spacing: -1.2px;
+}
+.sp__amount {
+  position: relative;
+  display: inline-flex;
+  overflow: hidden;
+  color: var(--sp-deep);
+  font-size: 64px;
+  font-weight: 600;
+  line-height: normal;
+  font-variant-numeric: tabular-nums;
+}
+.sp__digits {
+  display: inline-block;
+}
+.sp__per {
+  color: var(--sp-ink-80);
+  font-size: 16px;
+  font-weight: 500;
+}
+.sp__blurb {
+  width: max-content;
+  max-width: calc(100% + 60px);
+  margin: 0;
+  color: var(--sp-ink-80);
+  font-size: 12px;
+  line-height: normal;
+  letter-spacing: -0.12px;
+}
+
+.sp__features {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 40px 0 35px;
+  padding: 0;
+  list-style: none;
+  color: var(--sp-deep);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.28px;
+}
+
+.sp__cta {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: min(322px, 100%);
+  height: 50px;
+  margin-top: auto;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 40px;
+  background: var(--sp-forest);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.28px;
+  text-decoration: none;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+/* a deeper green swells up from the bottom edge on hover */
+.sp__cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--sp-deep);
+  transform: translateY(101%);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.sp__cta-roll {
+  display: grid;
+  height: 1.3em;
+  overflow: hidden;
+  line-height: 1.3;
+}
+.sp__cta-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  grid-area: 1 / 1;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.sp__cta-label + .sp__cta-label {
+  transform: translateY(110%);
+}
+.sp__cta-arrow {
+  width: 14px;
+  height: 14px;
+  transform: translateX(-6px);
+  opacity: 0;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.06s, opacity 0.3s ease 0.06s;
+}
+@media (hover: hover) {
+  .sp__cta:hover::before {
+    transform: translateY(0);
+  }
+  .sp__cta:hover .sp__cta-label:first-child {
+    transform: translateY(-110%);
+  }
+  .sp__cta:hover .sp__cta-label + .sp__cta-label {
+    transform: translateY(0);
+  }
+  .sp__cta:hover .sp__cta-arrow {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+.sp__cta:active {
+  transform: scale(0.97);
+}
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 1240px) {
+  .sp__shape {
+    /* the shapes keep their size; at narrower cards they tuck a little further into the corner */
+    top: 6px;
+    right: 6px;
+  }
+  .sp__blurb {
+    width: auto;
+    max-width: none;
+  }
+}
+
+@media (max-width: 1080px) {
+  .sp__name {
+    font-size: 34px;
+  }
+  .sp__amount {
+    font-size: 52px;
+  }
+  .sp__shape {
+    width: 96px;
+    height: auto;
+  }
+  .sp__card {
+    padding: 64px 20px 20px;
+  }
+}
+
+@media (max-width: 900px) {
+  .sp {
+    gap: 44px;
+    padding: 48px 0 72px;
+  }
+  .sp__title {
+    font-size: clamp(34px, 8vw, 52px);
+  }
+  .sp__break {
+    display: none;
+  }
+  .sp__plans {
+    grid-template-columns: minmax(0, 400px);
+    gap: 36px;
+  }
+  .sp__card {
+    min-height: 0;
+    padding: 74px 26px 24px;
+  }
+  .sp__name {
+    font-size: 40px;
+  }
+  .sp__amount {
+    font-size: 64px;
+  }
+  .sp__shape {
+    width: auto;
+    top: 8px;
+    right: 8px;
+  }
+  .sp__shape--flip {
+    right: 7.7px;
+  }
+}
+
+@media (max-width: 420px) {
+  .sp {
+    width: calc(100% - 32px);
+  }
+  .sp__card {
+    padding: 64px 20px 20px;
+  }
+  .sp__shape {
+    width: 92px;
+    height: auto;
+  }
+  .sp__amount {
+    font-size: 56px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp__period,
+  .sp__cta,
+  .sp__cta::before,
+  .sp__cta-label,
+  .sp__cta-arrow {
+    transition: none;
+  }
+}

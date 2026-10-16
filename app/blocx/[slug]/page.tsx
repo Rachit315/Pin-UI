@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import BlockView from "@/components/blocks/BlockView";
 import { type CodePane } from "@/components/library/CodeBlock";
-import { BLOCKS, blockBySlug, categoryName, type Block } from "@/lib/blocks";
+import { BLOCKS, SHELF_ORDER, blockBySlug, blocksIn, categoryName, type Block } from "@/lib/blocks";
+import { BLOCK_DOCS } from "@/lib/blockDocs";
+import { BLOCK_INSTALL_DIR, blockMeta } from "@/lib/blockMeta";
 import { readBlockSource } from "@/lib/source";
+import { SITE_URL } from "@/lib/site";
 
 /* every block page is known up front, so all of them are prerendered */
 export function generateStaticParams() {
@@ -38,5 +41,14 @@ export default async function BlockPage({ params }: { params: Promise<{ slug: st
   const { slug } = await params;
   const block = blockBySlug(slug);
   if (!block) notFound();
-  return <BlockView block={block} panes={await sourceFor(block)} />;
+  const [panes, meta] = await Promise.all([sourceFor(block), blockMeta(block)]);
+  return (
+    <BlockView
+      block={block}
+      panes={panes}
+      docs={BLOCK_DOCS[block.slug]}
+      meta={{ ...meta, registryUrl: `${SITE_URL}/r/blocx/${block.slug}.json`, installDir: BLOCK_INSTALL_DIR }}
+      stats={{ blocks: BLOCKS.length, sections: SHELF_ORDER.filter((id) => blocksIn(id).length).length }}
+    />
+  );
 }

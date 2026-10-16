@@ -20,10 +20,17 @@ export const metadata: Metadata = {
  * block it shows.
  */
 const PREVIEWS: Record<string, ComponentType> = {
+  "partylabs-hero": dynamic(() => import("@/components/blocks/demo/PartylabsHero")),
   "luna-hero": dynamic(() => import("@/components/blocks/demo/LunaHeroPreview")),
   "orbit-hero": dynamic(() => import("@/components/blocks/demo/OrbitHero")),
   "odometer-pricing": dynamic(() => import("@/components/blocks/demo/OdometerPricing")),
   "caremetric-footer": dynamic(() => import("@/components/blocks/demo/CaremetricFooter")),
+  "smart-pricing": dynamic(() => import("@/components/blocks/demo/SmartPricing")),
+  "contact-form": dynamic(() => import("@/components/blocks/demo/ContactForm")),
+  "synais-footer": dynamic(() => import("@/components/blocks/demo/SynaisFooter")),
+  /* parked until their files arrive — see lib/blocks.ts */
+  // "quantro-hero": dynamic(() => import("@/components/blocks/demo/QuantroHero")),
+  // "forah-hero": dynamic(() => import("@/components/blocks/demo/ForahHero")),
   /* blocks-vault: previews */
 };
 
