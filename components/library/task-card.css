@@ -1,0 +1,487 @@
+/* ===========================================================================
+   Task Card.
+
+   A 400-wide card: header, progress pill, subtasks on a connector tree,
+   Priority and Status pills, and assignees. Every colour is a token, and
+   the dark set swaps in on data-theme="dark" with a short cross-fade.
+=========================================================================== */
+
+.ptask {
+  --ptask-surface: #ffffff;
+  --ptask-hover: #f4f4f5;
+  --ptask-border: rgb(9 9 11 / 0.08);
+  --ptask-line: #d9d9de;
+  --ptask-track: #e8e8eb;
+  --ptask-text: #18181b;
+  --ptask-text-2: #52525b;
+  --ptask-text-3: #a1a1aa;
+  --ptask-icon-fill: #e4e4e7;
+  --ptask-check-ring: #b4b4bb;
+  --ptask-check-fill: #27272a;
+  --ptask-check-tick: #ffffff;
+  --ptask-bar: #22c55e;
+  --ptask-ring: rgb(24 24 27 / 0.25);
+  --ptask-shadow-hair: 0 1px 1px rgb(9 9 11 / 0.04);
+  --ptask-shadow-card: 0 1px 1px rgb(9 9 11 / 0.03), 0 2px 4px -1px rgb(9 9 11 / 0.03), 0 6px 12px -6px rgb(9 9 11 / 0.05);
+  --ptask-shadow-pop: 0 1px 2px rgb(9 9 11 / 0.04), 0 4px 8px -2px rgb(9 9 11 / 0.05), 0 12px 20px -8px rgb(9 9 11 / 0.08);
+
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  color: var(--ptask-text);
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-feature-settings: "cv11", "ss01", "ss03";
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ptask[data-theme="dark"] {
+  --ptask-surface: #141416;
+  --ptask-hover: #1e1e21;
+  --ptask-border: rgb(255 255 255 / 0.08);
+  --ptask-line: #34343a;
+  --ptask-track: #26262b;
+  --ptask-text: #f4f4f5;
+  --ptask-text-2: #a1a1aa;
+  --ptask-text-3: #6b6b74;
+  --ptask-icon-fill: #2a2a2f;
+  --ptask-check-ring: #4d4d55;
+  --ptask-check-fill: #e4e4e7;
+  --ptask-check-tick: #141416;
+  --ptask-ring: rgb(244 244 245 / 0.3);
+  --ptask-shadow-hair: 0 0 0 0 transparent;
+  /* on dark, depth comes from a top highlight and the border; shadows stay short */
+  --ptask-shadow-card: inset 0 1px 0 rgb(255 255 255 / 0.03), 0 1px 2px rgb(0 0 0 / 0.3), 0 6px 14px -8px rgb(0 0 0 / 0.45);
+  --ptask-shadow-pop: inset 0 1px 0 rgb(255 255 255 / 0.04), 0 2px 4px rgb(0 0 0 / 0.3), 0 12px 24px -10px rgb(0 0 0 / 0.6);
+}
+
+.ptask *,
+.ptask *::before,
+.ptask *::after {
+  box-sizing: border-box;
+}
+
+.ptask button {
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* the theme cross-fade, on every surface that takes a colour. Shadows are left out on purpose:
+   repainting a blurred shadow on every frame of a fade is what makes a theme change stutter */
+.ptask__card,
+.ptask__card * {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 0.3s;
+  transition-timing-function: ease;
+}
+
+/* status and priority tones */
+.ptask [data-tone="red"] { --t-bg: #fee2e2; --t-border: #fecaca; --t-text: #b91c1c; --t-dot: #ef4444; }
+.ptask [data-tone="orange"] { --t-bg: #ffedd5; --t-border: #fed7aa; --t-text: #c2410c; --t-dot: #f97316; }
+.ptask [data-tone="blue"] { --t-bg: #dbeafe; --t-border: #bfdbfe; --t-text: #1d4ed8; --t-dot: #3b82f6; }
+.ptask [data-tone="gray"] { --t-bg: #f4f4f5; --t-border: #e4e4e7; --t-text: #52525b; --t-dot: #a1a1aa; }
+.ptask [data-tone="amber"] { --t-bg: #fef3c7; --t-border: #fde68a; --t-text: #92400e; --t-dot: #f59e0b; }
+.ptask [data-tone="violet"] { --t-bg: #ede9fe; --t-border: #ddd6fe; --t-text: #6d28d9; --t-dot: #8b5cf6; }
+.ptask [data-tone="green"] { --t-bg: #dcfce7; --t-border: #bbf7d0; --t-text: #15803d; --t-dot: #22c55e; }
+.ptask[data-theme="dark"] [data-tone="red"] { --t-bg: rgb(239 68 68 / 0.14); --t-border: rgb(239 68 68 / 0.28); --t-text: #fca5a5; }
+.ptask[data-theme="dark"] [data-tone="orange"] { --t-bg: rgb(249 115 22 / 0.14); --t-border: rgb(249 115 22 / 0.28); --t-text: #fdba74; }
+.ptask[data-theme="dark"] [data-tone="blue"] { --t-bg: rgb(59 130 246 / 0.15); --t-border: rgb(59 130 246 / 0.3); --t-text: #93c5fd; }
+.ptask[data-theme="dark"] [data-tone="gray"] { --t-bg: rgb(255 255 255 / 0.06); --t-border: rgb(255 255 255 / 0.1); --t-text: #d4d4d8; }
+.ptask[data-theme="dark"] [data-tone="amber"] { --t-bg: rgb(245 158 11 / 0.14); --t-border: rgb(245 158 11 / 0.28); --t-text: #fcd34d; }
+.ptask[data-theme="dark"] [data-tone="violet"] { --t-bg: rgb(139 92 246 / 0.16); --t-border: rgb(139 92 246 / 0.3); --t-text: #c4b5fd; }
+.ptask[data-theme="dark"] [data-tone="green"] { --t-bg: rgb(34 197 94 / 0.14); --t-border: rgb(34 197 94 / 0.28); --t-text: #86efac; }
+
+/* ---------- card ---------- */
+
+.ptask__card {
+  width: 100%;
+  max-width: 400px;
+  padding: 16px;
+  border: 1px solid var(--ptask-border);
+  border-radius: 18px;
+  background: var(--ptask-surface);
+  box-shadow: var(--ptask-shadow-card);
+}
+
+.ptask__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ptask__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ptask__logo {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--ptask-border);
+  border-radius: 10px;
+  background: var(--ptask-surface);
+  box-shadow: var(--ptask-shadow-hair);
+  color: var(--ptask-text-2);
+}
+
+.ptask__logo svg {
+  width: 22px;
+  height: 22px;
+}
+
+.ptask__title {
+  margin: 0;
+  color: var(--ptask-text);
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.ptask__icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--ptask-border);
+  border-radius: 9px;
+  background: var(--ptask-surface);
+  box-shadow: var(--ptask-shadow-hair);
+  color: var(--ptask-text-2);
+  cursor: pointer;
+  outline: none;
+}
+
+.ptask__icon:hover {
+  background: var(--ptask-hover);
+  color: var(--ptask-text);
+}
+
+.ptask__icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.ptask button:focus-visible {
+  box-shadow: 0 0 0 2px var(--ptask-ring);
+}
+
+/* ---------- progress ---------- */
+
+.ptask__progressRow {
+  margin-top: 12px;
+}
+
+.ptask__progress {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 30px;
+  padding: 0 10px 0 8px;
+  border: 1px solid var(--ptask-border);
+  border-radius: 999px;
+  background: var(--ptask-surface);
+  box-shadow: var(--ptask-shadow-hair);
+}
+
+.ptask__progressIcon {
+  width: 15px;
+  height: 15px;
+  color: var(--ptask-text-3);
+}
+
+.ptask__progressIcon[data-done] {
+  color: var(--ptask-bar);
+}
+
+.ptask__count,
+.ptask__pct {
+  color: var(--ptask-text-2);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.ptask__pct {
+  min-width: 34px;
+  text-align: right;
+}
+
+.ptask__track {
+  position: relative;
+  width: 110px;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--ptask-track);
+}
+
+.ptask__bar {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 999px;
+  background: var(--ptask-bar);
+}
+
+/* ---------- subtasks ---------- */
+
+.ptask__tasks {
+  position: relative;
+  margin: 0 0 0 21px;
+  padding: 10px 0 0;
+  list-style: none;
+}
+
+.ptask__tree {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.ptask__line {
+  fill: none;
+  stroke: var(--ptask-line);
+}
+
+.ptask__task {
+  position: relative;
+  height: 36px;
+}
+
+.ptask__row {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 8px 0 0;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--ptask-text-2) !important;
+  font-size: 14.5px;
+  cursor: pointer;
+  outline: none;
+}
+
+.ptask__row:hover {
+  color: var(--ptask-text) !important;
+}
+
+.ptask__check {
+  flex: none;
+}
+
+.ptask__ring {
+  stroke: var(--ptask-check-ring);
+}
+
+.ptask__fill {
+  fill: var(--ptask-check-fill);
+}
+
+.ptask__tick {
+  stroke: var(--ptask-check-tick);
+}
+
+.ptask__label {
+  user-select: none;
+}
+
+/* ---------- properties ---------- */
+
+.ptask__props {
+  margin-top: 8px;
+}
+
+.ptask__prop {
+  display: flex;
+  align-items: center;
+  height: 40px;
+}
+
+.ptask__propName {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 108px;
+  color: var(--ptask-text-2);
+  font-size: 14.5px;
+}
+
+.ptask__propName svg {
+  width: 17px;
+  height: 17px;
+  color: var(--ptask-text-3);
+}
+
+.ptask__iconFill {
+  fill: var(--ptask-icon-fill);
+}
+
+.ptask__dd {
+  position: relative;
+}
+
+.ptask__pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 26px;
+  padding: 0 4px 0 8px;
+  overflow: hidden;
+  border: 1px solid var(--t-border);
+  border-radius: 7px;
+  background: var(--t-bg);
+  color: var(--t-text) !important;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  outline: none;
+}
+
+.ptask__pillLabel {
+  display: inline-flex;
+  overflow: hidden;
+}
+
+.ptask__pillLabel > span {
+  display: inline-block;
+}
+
+.ptask__chev {
+  width: 14px;
+  height: 14px;
+  opacity: 0.8;
+}
+
+.ptask__menu {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  z-index: 30;
+  width: 160px;
+  margin-top: 6px;
+  padding: 4px;
+  border: 1px solid var(--ptask-border);
+  border-radius: 11px;
+  background: var(--ptask-surface);
+  box-shadow: var(--ptask-shadow-pop);
+  transform-origin: top left;
+}
+
+.ptask__menu--right {
+  left: auto;
+  right: 0;
+  width: 184px;
+  transform-origin: top right;
+}
+
+.ptask__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--ptask-text) !important;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+}
+
+.ptask__item:hover,
+.ptask__item:focus-visible {
+  background: var(--ptask-hover);
+  box-shadow: none !important;
+}
+
+.ptask__itemIcon {
+  width: 15px;
+  height: 15px;
+  color: var(--ptask-text-3);
+}
+
+.ptask__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--t-dot);
+}
+
+.ptask__itemName {
+  flex: 1;
+}
+
+.ptask__tickmark {
+  width: 14px;
+  height: 14px;
+  color: var(--ptask-text-2);
+  opacity: 0;
+}
+
+.ptask__tickmark[data-on] {
+  opacity: 1;
+}
+
+/* ---------- assignees ---------- */
+
+.ptask__people {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ptask__person {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px 0 4px;
+  border: 1px solid var(--ptask-border);
+  border-radius: 999px;
+  background: var(--ptask-surface);
+  box-shadow: var(--ptask-shadow-hair);
+  color: var(--ptask-text-2);
+  font-size: 14.5px;
+}
+
+.ptask__avatar {
+  display: grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  overflow: hidden;
+  border-radius: 50%;
+  color: #3f3f46;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ptask__avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ptask__card,
+  .ptask__card * {
+    transition: none;
+  }
+}

@@ -21,7 +21,9 @@ npx shadcn@latest add "https://pinui.xyz/r/<slug>.json"
 ```
 
 Every component's page has its exact command, ready to copy. The only dependency
-is [Motion](https://motion.dev).
+is [Motion](https://motion.dev) — except Copy Paste Pad, a live 3-D render that
+uses [three.js](https://threejs.org) instead; the CLI installs whichever one a
+component needs.
 
 ## Run locally
 

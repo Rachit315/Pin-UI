@@ -105,6 +105,11 @@ export type Entry = {
    */
   wide?: boolean;
   /**
+   * A scene rather than an object: it fills the whole stage, edge to edge, with
+   * no padding or width cap — the 3-D pad is drawn into the frame itself.
+   */
+  fill?: boolean;
+  /**
    * Its animation runs past its own box — the Egg OTP's eggs break and fall. The
    * stage lets that spill show instead of scrolling to it; the frame around
    * the stage still clips it. Only for components too short to ever need to
@@ -133,6 +138,8 @@ export type Entry = {
   requestedBy?: { handle: string; url: string };
   /** The import used on the page and in the copy button. */
   usage: string;
+  /** npm packages it needs at runtime, when that is more than Motion. */
+  dependencies?: string[];
   props: PropSpec[];
   files: SourceFile[];
   /** Where the original standalone project came from. */
@@ -151,6 +158,93 @@ export type Entry = {
 };
 
 export const LIBRARY: Entry[] = [
+  {
+    slug: "copy-paste-pad",
+    category: "controls",
+    name: "Copy Paste Pad",
+    isNew: true,
+    tagline: "A 3-D aluminium macro pad whose ⌘C and ⌘V copy and paste the theme.",
+    blurb:
+      "Three keys — cmd, C and V — on a machined aluminium plate, rendered live with three.js's WebGPU renderer. ⌘C copies the current theme; switch it, and ⌘V pastes the copied one back. The keys travel on springs and click, and when the theme flips the one key light sweeps across the back of the pad from a warm sun to a cool moon, dragging the shadow with it.",
+    highlights: ["Live WebGPU render", "Copy and paste the theme", "Spring key travel", "Sun-to-moon light sweep"],
+    /* a remocn edit of a frame-exact recording of the live pad: ⌘C, flip to dark, ⌘V back to light */
+    clip: "/clips/loop/copy-paste-pad.mp4",
+    poster: "/clips/loop/copy-paste-pad.jpg",
+    hero: false,
+    sound: true,
+    zoom: 1,
+    stage: "#f2c300",
+    clipStage: "#f2c300",
+    stageDark: "#0f0f11",
+    /* a scene, not a card: it fills the stage edge to edge */
+    fill: true,
+    dependencies: ["three@^0.186.1"],
+    usage: `import CopyPastePad from "@/components/library/CopyPastePad";
+
+<CopyPastePad theme={theme} onThemeChange={setTheme} sound />`,
+    props: [
+      { name: "theme", type: "\"light\" | \"dark\"", fallback: "\"light\"", note: "Lights the scene: a warm sun on yellow paper, or a cool moon on graphite. Changing it sweeps the key light across." },
+      { name: "onThemeChange", type: "(theme) => void", note: "Called by ⌘V with the copied theme. Wire it to your theme switch so pasting actually changes it." },
+      { name: "sound", type: "boolean", fallback: "true", note: "The key clicks and the theme switch's tick-tock, synthesised at play time." },
+    ],
+    files: [
+      { name: "CopyPastePad.tsx", lang: "tsx" },
+      { name: "copy-paste-pad.css", lang: "css" },
+    ],
+    info: {
+      paragraphs: [
+        "The pad is modelled in centimetres: a white wedge raised at the back, an aluminium top plate with three openings milled through it, a dark well under each, and ⌘ · C · V keycaps whose legends are painted onto canvases in a rounded face. A braided cable leaves the back-left and runs off across the paper, and a blurred contact shadow sits under the base. It renders with three.js's WebGPU renderer and falls back to WebGL 2 by itself.",
+        "⌘C copies the current theme and ⌘V pastes the copied one — so copy, flip the theme with your switch, and paste to flip it back. The keys work from the keyboard or the pointer (tap cmd, then C or V within a moment), travel on stiff springs and click with synthesised sound. ⌘C and ⌘V are only taken while the pad is hovered or focused, so copying text anywhere else on the page still works.",
+        "Light and shadow are one key light that moves with the theme rather than two lights crossfading: from a broad warm sun at the back-right to a narrow cool moon at the back-left, rising a little mid-arc so it passes over the pad, while the paper, sky and contact shadow ease across with it. three.js is imported when the pad mounts, so it never lands in a page's first bundle.",
+      ],
+    },
+    origin: { label: "keyboard" },
+  },
+  {
+    slug: "task-card",
+    category: "cards",
+    name: "Task Card",
+    isNew: true,
+    tagline: "A task with subtasks on a connector tree, progress, priority and status.",
+    blurb:
+      "A task card with its subtasks hung off one pixel-crisp connector tree. Tick one and its ring fills on a spring while the progress pill counts up and its bar fills; finish them all and the status turns to Done by itself. Priority and Status are coloured pills whose labels roll over as their width follows, and the ⋯ menu completes or resets everything.",
+    highlights: ["Pixel-crisp connector tree", "Spring checkboxes", "Status follows progress", "Rolling pill labels"],
+    /* recorded in dark: a remocn edit of a frame-exact recording of the live card */
+    clip: "/clips/loop/task-card.mp4",
+    poster: "/clips/loop/task-card.jpg",
+    hero: false,
+    sound: false,
+    zoom: 1.3,
+    stage: "#f6f6f7",
+    clipStage: "#0a0a0b",
+    stageDark: "#0a0a0b",
+    /* the menus open past the card's edge */
+    spill: true,
+    usage: `import TaskCard from "@/components/library/TaskCard";
+
+<TaskCard theme="light" onChange={({ subtasks, priority, status }) => console.log(subtasks, priority, status)} />`,
+    props: [
+      { name: "theme", type: "\"light\" | \"dark\"", fallback: "\"light\"", note: "A white card on soft grey, or graphite on near-black; every surface cross-fades when it changes." },
+      { name: "title", type: "string", fallback: "\"Design System\"", note: "The task's name in the header." },
+      { name: "subtasks", type: "{ label, done }[]", fallback: "four design tasks", note: "The subtasks; Reset in the ⋯ menu returns to these." },
+      { name: "priority", type: "string", fallback: "\"Urgent\"", note: "Urgent, High, Medium or Low." },
+      { name: "status", type: "string", fallback: "\"In Progress\"", note: "To Do, In Progress, In Review or Done; it follows the subtasks as they are ticked." },
+      { name: "people", type: "{ name, avatar?, color? }[]", fallback: "three people", note: "The assignees; without an avatar, or if it fails to load, the initial shows." },
+      { name: "onChange", type: "({ subtasks, priority, status }) => void", note: "Fired whenever anything on the card changes." },
+    ],
+    files: [
+      { name: "TaskCard.tsx", lang: "tsx" },
+      { name: "task-card.css", lang: "css" },
+    ],
+    info: {
+      paragraphs: [
+        "The subtasks hang off a single SVG tree — a trunk that curves into the last row and a branch to every checkbox — drawn from the same geometry as the checkboxes, so each branch ends exactly under its ring's stroke and the join is seamless. Every stroke is snapped to whole device pixels and re-snapped when the window or the display's scaling changes, so at 125% or 150% no segment paints heavier than the others. On arrival the trunk draws down and the branches reach out on a stagger.",
+        "Ticking a subtask fills its ring on a spring and draws the tick; the progress pill counts up a number at a time, its bar fills, and its icon turns green once everything is done. Status follows along: complete every subtask and it becomes Done; reopen one and it goes back to In Progress.",
+        "Priority and Status are pills tinted by their value, with their own light and dark tones. Each opens a small menu that takes the arrow keys and Escape and closes on a press outside; picking an option slides the old label up and out and the new one in while the pill's width follows on the same spring. The ⋯ menu marks every subtask complete or resets them.",
+      ],
+    },
+    origin: { label: "tab" },
+  },
   {
     slug: "magnify",
     category: "cards",

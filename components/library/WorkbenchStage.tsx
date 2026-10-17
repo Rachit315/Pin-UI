@@ -21,13 +21,16 @@ import ChatRoom from "./ChatRoom";
 import DynamicDropZone from "./DynamicDropZone";
 import SwapCard from "./SwapCard";
 import RequestChip from "./RequestChip";
+import StageBar from "./StageBar";
 import CalendarCard from "./CalendarCard";
 import PromptComposer from "./PromptComposer";
 import ProgressImage from "./ProgressImage";
 import Magnify from "./Magnify";
+import TaskCard from "./TaskCard";
+import CopyPastePad from "./CopyPastePad";
 import type { Entry } from "./registry";
 import { LINKS } from "@/lib/links";
-import { usePinTheme } from "@/lib/theme";
+import { setTheme as setSiteTheme, usePinTheme } from "@/lib/theme";
 
 /**
  * The stage — Figma 345:21.
@@ -88,7 +91,7 @@ export default function WorkbenchStage({
         <div className="wbstage__field" style={{ background: field }} aria-hidden="true" />
 
         <div
-          className={`wbstage__hold${entry.wide ? " wbstage__hold--wide" : ""}${
+          className={`wbstage__hold${entry.fill ? " wbstage__hold--fill" : ""}${entry.wide ? " wbstage__hold--wide" : ""}${
             entry.spill ? " wbstage__hold--spill" : ""
           }`}
         >
@@ -122,111 +125,84 @@ export default function WorkbenchStage({
           {entry.slug === "prompt-composer" && <PromptComposer theme={theme} />}
           {entry.slug === "progress-image" && <ProgressImage theme={theme} />}
           {entry.slug === "magnify" && <Magnify theme={theme} />}
+          {entry.slug === "task-card" && <TaskCard theme={theme} />}
+          {/* ⌘V on the pad pastes the copied theme into the site's own switch */}
+          {entry.slug === "copy-paste-pad" && (
+            <CopyPastePad
+              fill
+              theme={theme}
+              sound={sound}
+              onThemeChange={(next) => setSiteTheme(next === "dark" ? "crimson" : "light")}
+            />
+          )}
         </div>
 
         {entry.slug === "chips" && <ChipsEditor value={chips} onChange={setChips} />}
 
         {entry.requestedBy && <RequestChip handle={entry.requestedBy.handle} url={entry.requestedBy.url} />}
 
-        <div className="wbbar" role="toolbar" aria-label="Stage">
-          <button
-            type="button"
-            className="wbbar__button"
-            aria-pressed={about}
-            aria-label={about ? "Close the write-up" : "Read about this component"}
-            title={about ? "Close the write-up" : "Read about this component"}
-            onClick={() => setAbout((on) => !on)}
-          >
-            {about ? (
-              /* lucide: maximize */
-              <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                <path
-                  d="M2.5 6.66667V5C2.5 4.55797 2.6756 4.13405 2.98816 3.82149C3.30072 3.50893 3.72464 3.33333 4.16667 3.33333H6.66667M13.3333 3.33333H15.8333C16.2754 3.33333 16.6993 3.50893 17.0118 3.82149C17.3244 4.13405 17.5 4.55797 17.5 5V6.66667M17.5 13.3333V15C17.5 15.442 17.3244 15.866 17.0118 16.1785C16.6993 16.4911 16.2754 16.6667 15.8333 16.6667H13.3333M6.66667 16.6667H4.16667C3.72464 16.6667 3.30072 16.4911 2.98816 16.1785C2.6756 15.866 2.5 15.442 2.5 15V13.3333"
-                  stroke="currentColor"
-                  strokeWidth="1.66667"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            ) : (
-              /* lucide: minimize */
-              <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                <path
-                  d="M6.66667 2.5V5C6.66667 5.44203 6.49107 5.86595 6.17851 6.17851C5.86595 6.49107 5.44203 6.66667 5 6.66667H2.5"
-                  stroke="currentColor"
-                  strokeWidth="1.66667"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M17.5 6.66667H15C14.558 6.66667 14.134 6.49107 13.8215 6.17851C13.5089 5.86595 13.3333 5.44203 13.3333 5V2.5"
-                  stroke="currentColor"
-                  strokeWidth="1.66667"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M2.5 13.3333H5C5.44203 13.3333 5.86595 13.5089 6.17851 13.8215C6.49107 14.134 6.66667 14.558 6.66667 15V17.5"
-                  stroke="currentColor"
-                  strokeWidth="1.66667"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M13.3333 17.5V15C13.3333 14.558 13.5089 14.134 13.8215 13.8215C14.134 13.5089 14.558 13.3333 15 13.3333H17.5"
-                  stroke="currentColor"
-                  strokeWidth="1.66667"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            )}
-          </button>
-
-          <button
-            type="button"
-            className="wbbar__button"
-            aria-pressed={showCode}
-            aria-label={showCode ? "Hide the code" : "Show the code"}
-            title={showCode ? "Hide the code" : "Show the code"}
-            onClick={() => setShowCode((on) => !on)}
-          >
-            {/* lucide: code-xml */}
-            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path d="M15 13.3333L18.3333 10L15 6.66667" stroke="currentColor" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M5 6.66667L1.66667 10L5 13.3333" stroke="currentColor" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M12.0833 3.33333L7.91667 16.6667" stroke="currentColor" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-
-          {/* only a component that makes sound gets a speaker */}
-          {entry.sound && (
-            <button
-              type="button"
-              className="wbbar__button"
-              aria-pressed={sound}
-              aria-label={sound ? "Turn the sound off" : "Turn the sound on"}
-              title={sound ? "Turn the sound off" : "Turn the sound on"}
-              onClick={() => setSound((on) => !on)}
-            >
-              {/* lucide: volume-2 / volume-x */}
-              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M9.16667 4.16667 5.41667 7.5H2.5v5h2.91667l3.75 3.33333V4.16667z" />
-                {sound ? (
-                  <>
-                    <path d="M12.9167 7.08333a3.75 3.75 0 0 1 0 5.83334" />
-                    <path d="M15.25 5a7.5 7.5 0 0 1 0 10" />
-                  </>
-                ) : (
-                  <>
-                    <path d="m13.3333 7.91667 3.75 4.16666" />
-                    <path d="m17.0833 7.91667-3.75 4.16666" />
-                  </>
-                )}
-              </svg>
-            </button>
-          )}
-        </div>
+        <StageBar
+          items={[
+            {
+              id: "about",
+              kind: "panel",
+              pressed: about,
+              label: about ? "Close the write-up" : "Read about this component",
+              onClick: () => setAbout((on) => !on),
+              iconKey: about ? "open" : "closed",
+              icon: about ? (
+                /* lucide: maximize — the stage grows back */
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M2.5 6.667V5a1.667 1.667 0 0 1 1.667-1.667h2.5M13.333 3.333h2.5A1.667 1.667 0 0 1 17.5 5v1.667M17.5 13.333V15a1.667 1.667 0 0 1-1.667 1.667h-2.5M6.667 16.667h-2.5A1.667 1.667 0 0 1 2.5 15v-1.667" />
+                </svg>
+              ) : (
+                /* lucide: minimize — the stage shrinks for the write-up */
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M6.667 2.5V5A1.667 1.667 0 0 1 5 6.667H2.5M17.5 6.667H15A1.667 1.667 0 0 1 13.333 5V2.5M2.5 13.333H5A1.667 1.667 0 0 1 6.667 15v2.5M13.333 17.5V15A1.667 1.667 0 0 1 15 13.333h2.5" />
+                </svg>
+              ),
+            },
+            {
+              id: "code",
+              kind: "panel",
+              pressed: showCode,
+              label: showCode ? "Hide the code" : "Show the code",
+              onClick: () => setShowCode((on) => !on),
+              iconKey: "code",
+              icon: (
+                /* lucide: code-xml */
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M15 13.333 18.333 10 15 6.667M5 6.667 1.667 10 5 13.333M12.083 3.333 7.917 16.667" />
+                </svg>
+              ),
+            },
+            /* only a component that makes sound gets a speaker */
+            ...(entry.sound
+              ? [
+                  {
+                    id: "sound",
+                    kind: "toggle" as const,
+                    divided: true,
+                    pressed: sound,
+                    label: sound ? "Mute the sound" : "Turn the sound on",
+                    onClick: () => setSound((on) => !on),
+                    iconKey: sound ? "on" : "off",
+                    icon: (
+                      /* lucide: volume-2 / volume-x */
+                      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.66667" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="M9.167 4.167 5.417 7.5H2.5v5h2.917l3.75 3.333V4.167z" />
+                        {sound ? (
+                          <path d="M12.917 7.083a3.75 3.75 0 0 1 0 5.834M15.25 5a7.5 7.5 0 0 1 0 10" />
+                        ) : (
+                          <path d="m13.333 7.917 3.75 4.166M17.083 7.917l-3.75 4.166" />
+                        )}
+                      </svg>
+                    ),
+                  },
+                ]
+              : []),
+          ]}
+        />
       </div>
 
       {/*

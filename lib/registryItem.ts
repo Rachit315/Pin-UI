@@ -64,6 +64,8 @@ const FACES: Record<string, string | null> = {
   "prompt-composer": "Inter (400 to 500), with Inter Tight (700) for the date on the event card",
   "progress-image": "Inter (500 and 600)",
   magnify: "Inter (700) for the letter, with Helvetica Neue for the micro-type (Arial where it is missing)",
+  "task-card": "Inter (400 to 600)",
+  "copy-paste-pad": "Inter (400 and 500) for the overlays, with Varela Round for the keycap legends (Arial Rounded where it is missing)",
 };
 
 function docsFor(entry: Entry): string {
@@ -134,6 +136,20 @@ function docsFor(entry: Entry): string {
     );
   }
 
+  if (entry.slug === "copy-paste-pad") {
+    lines.push(
+      "",
+      "It renders with three.js's WebGPU renderer (three 0.186 or newer — earlier WebGPU builds can leave a keycap on stale lighting after the theme changes), falling back to WebGL 2 on its own, and imports three when it mounts. Pass onThemeChange so ⌘V can change your theme. ⌘C and ⌘V are only taken while the pad is hovered or focused.",
+    );
+  }
+
+  if (entry.slug === "task-card") {
+    lines.push(
+      "",
+      "The default assignees' portraits come from api.dicebear.com. Pass your own `people` — a name, an avatar URL and a background colour — before shipping it; without an avatar the initial shows.",
+    );
+  }
+
   if (entry.slug === "progress-image") {
     lines.push(
       "",
@@ -164,8 +180,8 @@ export async function buildRegistryItem(entry: Entry): Promise<RegistryItem> {
     type: "registry:component",
     title: entry.name,
     description: entry.tagline,
-    /* the only thing any of them needs at runtime */
-    dependencies: ["motion"],
+    /* Motion, unless the component says otherwise */
+    dependencies: entry.dependencies ?? ["motion"],
     files,
     docs: docsFor(entry),
   };

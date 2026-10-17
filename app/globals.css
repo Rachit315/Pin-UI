@@ -23,6 +23,15 @@
   src: url("/fonts/inter-tight-var-latin.woff2") format("woff2");
 }
 
+/* Copy Paste Pad's keycap legends: a rounded face, after Apple's VAG Rounded. */
+@font-face {
+  font-family: "Varela Round";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/varela-round-400-latin.woff2") format("woff2");
+}
+
 /* Chips is drawn in Poppins, at the three weights it uses. */
 @font-face {
   font-family: "Poppins";

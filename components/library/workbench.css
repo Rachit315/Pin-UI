@@ -87,7 +87,6 @@
 }
 
 .wbnav :focus-visible,
-.wbbar :focus-visible,
 .wbstage__expand:focus-visible {
   outline: 2px solid var(--wb-pin);
   outline-offset: 3px;
@@ -556,6 +555,22 @@
   overflow: visible;
 }
 
+/*
+ * A scene fills the whole frame, edge to edge: no padding, no width cap, no
+ * scrolling. Its overlays sit above the stage's own toolbar, which floats over
+ * the bottom of the frame.
+ */
+.wbstage__hold.wbstage__hold--fill {
+  position: absolute;
+  inset: 0;
+  display: block;
+  max-width: none;
+  max-height: none;
+  padding: 0;
+  overflow: hidden;
+  --pcpp-overlay-bottom: calc(0.8em + 2.857em + 14px);
+}
+
 /* the chips are laid out as a wide list, not a card */
 .wbstage__hold.wbstage__hold--wide {
   max-width: 64em;
@@ -588,6 +603,8 @@
 /* --- the toolbar ---------------------------------------------------------- */
 
 .wbbar {
+  /* one inset everywhere — the bar's padding and the gap between slots — so a highlight sits exactly in its slot */
+  --wbbar-inset: 3px;
   position: absolute;
   left: 50%;
   bottom: 0.8em;
@@ -600,9 +617,8 @@
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 0.43em;
-  height: 2.857em;
-  padding: 0 0.5em;
+  gap: var(--wbbar-inset);
+  padding: var(--wbbar-inset);
   border-radius: 0;
   background: var(--wb-bar);
   color: var(--wb-bar-ink);
@@ -614,6 +630,9 @@
   box-shadow:
     0 0 0 1px var(--wb-bar-edge),
     0 0.35em 0.9em rgb(0 0 0 / 0.14);
+  transition:
+    background-color var(--pin-theme-fade, 0.5s) var(--pin-theme-ease, ease),
+    color var(--pin-theme-fade, 0.5s) var(--pin-theme-ease, ease);
 }
 
 /*
@@ -816,10 +835,25 @@
 }
 
 /*
- * The hit area is the whole square, not just the 20px glyph — the icon
- * keeps the size the design draws while the target stays a comfortable 34px,
- * and that square is what carries the hover.
+ * A slot holds a button, and optionally the hairline that sets it apart from
+ * the ones before. The button is a 34px square — the icon keeps the size the
+ * design draws while the target stays comfortable — layered bottom to top:
+ * an open panel's red chip, the gliding highlight, then the icon.
  */
+.wbbar__slot {
+  display: flex;
+  align-items: center;
+  gap: var(--wbbar-inset);
+}
+
+.wbbar__rule {
+  width: 1px;
+  height: 1.43em;
+  margin: 0 var(--wbbar-inset);
+  background: currentColor;
+  opacity: 0.14;
+}
+
 .wbbar__button {
   position: relative;
   display: grid;
@@ -828,33 +862,84 @@
   height: 2.43em;
   border-radius: 0;
   color: inherit;
-  opacity: 0.75;
+  opacity: 0.72;
   transition:
     opacity 0.2s ease,
-    background-color 0.2s ease,
-    transform 0.2s cubic-bezier(0.22, 0.68, 0.16, 1);
-}
-
-.wbbar__button svg {
-  display: block;
-  width: 1.429em;
-  height: 1.429em;
+    color 0.25s ease;
 }
 
 .wbbar__button[aria-pressed="true"] {
   opacity: 1;
+}
+
+/* an open panel: the pin's red, on a faint red chip */
+.wbbar__button[data-kind="panel"][aria-pressed="true"] {
   color: var(--wb-pin);
 }
 
-.wbbar__button:active {
-  transform: scale(0.92);
+.wbbar__on {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--wb-pin) 13%, transparent);
+  opacity: 0;
+  transition: opacity 0.25s ease;
 }
+
+.wbbar__on[data-on] {
+  opacity: 1;
+}
+
+.wbbar__hover {
+  position: absolute;
+  inset: 0;
+  background: var(--wb-bar-hover);
+}
+
+.wbbar__icon,
+.wbbar__glyph {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.wbbar__button svg {
+  display: block;
+  width: 1.36em;
+  height: 1.36em;
+}
+
+/* the focus ring sits inside the square, so it never collides with its neighbours */
+.wbbar .wbbar__button:focus-visible {
+  outline: 2px solid var(--wb-pin);
+  outline-offset: -2px;
+}
+
+/* one tooltip in the bar's inverted ink, riding above whichever button it names */
+.wbbar__tip {
+  position: absolute;
+  bottom: calc(100% + 0.6em);
+  z-index: 1;
+  display: grid;
+  padding: 0.38em 0.64em;
+  background: var(--wb-bar-ink);
+  color: var(--wb-bar);
+  font-size: 0.8em;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  line-height: 1.2;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 0.35em 0.9em rgb(0 0 0 / 0.18);
+}
+
+.wbbar__tip > span {
+  grid-area: 1 / 1;
+}
+
 
 @media (hover: hover) {
   .wbbar__button:hover {
     opacity: 1;
-    background: var(--wb-bar-hover);
-    transform: translateY(-0.1em);
   }
 
   .wbnav__link:hover .wbnav__text {
