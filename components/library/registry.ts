@@ -159,6 +159,87 @@ export type Entry = {
 
 export const LIBRARY: Entry[] = [
   {
+    slug: "liquid-voice",
+    category: "media",
+    name: "Liquid Voice",
+    isNew: true,
+    tagline: "A voice-input pill of real liquid glass that stretches into a recorder.",
+    blurb:
+      "A drop of glass on a moving sky. Tap the mic and it stretches into a recording bar — cancel, a live waveform, send — then gathers the waveform up, spins while it sends, ticks and melts back into a drop. The glass is drawn in WebGL 2: it bends, blurs and splits the sky behind it, and night spreads out from the pill when the theme changes.",
+    highlights: ["WebGL 2 liquid glass", "Jelly stretch", "Record, send, done", "Night spreads from the pill"],
+    /* a remocn edit of a frame-exact recording of the live pill: record and send by day, night spreads from the pill, record and cancel, day comes back */
+    clip: "/clips/loop/liquid-voice.mp4",
+    poster: "/clips/loop/liquid-voice.jpg",
+    sound: false,
+    zoom: 1,
+    stage: "#0d5bb5",
+    clipStage: "#0d5bb5",
+    stageDark: "#060b1c",
+    /* a scene, not a card: the sky fills the stage edge to edge */
+    fill: true,
+    usage: `import LiquidVoice from "@/components/library/LiquidVoice";
+
+<LiquidVoice theme={theme} onSend={(ms) => console.log("sent", ms)} onCancel={() => console.log("cancelled")} />`,
+    props: [
+      { name: "theme", type: "\"light\" | \"dark\"", fallback: "\"light\"", note: "A blue day sky with a dark ink waveform, or a night sky with a pale one. Changing it spreads the new sky out from the pill." },
+      { name: "fill", type: "boolean", fallback: "false", note: "Take the container's whole box. Without it the scene is a 16:10 box with rounded corners." },
+      { name: "onSend", type: "(durationMs) => void", note: "Called when a take is sent, with how long it was recorded for." },
+      { name: "onCancel", type: "() => void", note: "Called when a take is cancelled, or stopped while it is sending." },
+    ],
+    files: [
+      { name: "LiquidVoice.tsx", lang: "tsx" },
+      { name: "liquid-voice.css", lang: "css" },
+    ],
+    info: {
+      paragraphs: [
+        "The glass is drawn in two WebGL 2 passes: the sky at a quarter of the resolution into a texture, since it is a soft gradient, then the glass at full resolution — a rounded box's signed distance field with a circular bevel that bends, blurs and splits that texture channel by channel, with a fresnel edge, a two-sided glare, a hairline and a soft drop shadow. The look is an exported liquid-glass preset, scaled with the pill.",
+        "The pill's width and height are Motion values, read in Motion's render step by both the shader and the HTML controls laid over it, so the buttons and the glass can never drift apart; while it changes width it trades a little height for it, like a liquid. Send gathers the waveform into the middle, a three-dot spinner takes over, a tick draws itself and the pill melts back into a drop. Escape cancels, and focus follows the controls when you use the keyboard.",
+        "A theme change does not cross-fade: night spreads across the sky from the pill. The loop only runs while the scene is on screen, and without WebGL 2 it falls back to a CSS gradient and a backdrop-filter glass by itself. There is no microphone — the waveform is generated, so it works anywhere.",
+      ],
+    },
+    origin: { label: "Folder · voice-record" },
+  },
+  {
+    slug: "file-box",
+    category: "cards",
+    name: "File Box",
+    isNew: true,
+    tagline: "A cardboard file box whose folders lift out by their tabs.",
+    blurb:
+      "Five colourful folders standing in a cardboard file box, drawn as one SVG. Hover one and it is pulled up by its tab, the flap falls open a beat later and its sheets of paper trail behind on looser springs while its neighbours give way; click for a tug. The whole scene tilts with the pointer, and a theme change cross-fades every face and shadow.",
+    highlights: ["Pulled up by the tab", "Trailing paper springs", "Neighbours give way", "Cross-fading theme"],
+    /* a remocn edit of a frame-exact recording of the live box: the folders file in, lift one by one, and the pink one is tugged */
+    clip: "/clips/loop/file-box.mp4",
+    poster: "/clips/loop/file-box.jpg",
+    sound: false,
+    zoom: 1,
+    stage: "#fbe9d2",
+    clipStage: "#fbe9d2",
+    stageDark: "#17130f",
+    /* a scene on its own grained paper: it fills the stage and centres itself */
+    fill: true,
+    usage: `import FileBox from "@/components/library/FileBox";
+
+<FileBox theme="light" onPull={({ color, position }) => console.log(color, position)} />`,
+    props: [
+      { name: "theme", type: "\"light\" | \"dark\"", fallback: "\"light\"", note: "Warm cardboard on cream paper, or the same box in a dim room. Every colour cross-fades when it changes." },
+      { name: "fill", type: "boolean", fallback: "false", note: "Take the container's whole box, with the scene centred in the largest square that fits. Without it the box is square." },
+      { name: "onPull", type: "({ color, position }) => void", note: "Called when a folder is tugged, with its colour and its place counted from the front (1–5)." },
+    ],
+    files: [
+      { name: "FileBox.tsx", lang: "tsx" },
+      { name: "file-box.css", lang: "css" },
+    ],
+    info: {
+      paragraphs: [
+        "The box is drawn in an oblique projection as a single SVG: its hollow back, then the folders standing in it back to front, then the front and side faces over them, so a lifted folder rises out of the box rather than through it. Each folder is a back panel with its tab, three sheets of paper and a front flap, and the rim's shadow is fixed to the box, so a folder slides out of it as it lifts.",
+        "Hover or focus a folder and it is pulled up by its tab, tipping a hair toward that side; the flap swings open a beat later and the sheets trail behind on lighter, underdamped springs, while the neighbours give way a little — less the further away they are. Click, Enter or Space gives it a tug. Every transform is a Motion value, so sweeping across the folders hands one target to the next with its velocity intact rather than restarting from rest.",
+        "On arrival the box settles onto the table, the folders are filed in back to front and the box gives a little as the last one lands. The scene tilts a few degrees with the pointer and its shadow answers it. Its colours are typed custom properties, so a theme change cross-fades every face, gradient and shadow together; R replays the arrival while it has focus.",
+      ],
+    },
+    origin: { label: "Folder · file box" },
+  },
+  {
     slug: "copy-paste-pad",
     category: "controls",
     name: "Copy Paste Pad",

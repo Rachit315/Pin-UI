@@ -1,0 +1,207 @@
+/* ===========================================================================
+   File Box.
+
+   A cardboard file box of five folders, drawn as one SVG in a square that
+   centres itself in its box, on a grained paper field. Every colour is a
+   token; the dark set swaps in on data-theme="dark". The tokens are
+   registered as typed properties, so a theme change cross-fades every face,
+   folder, gradient and shadow together rather than snapping.
+=========================================================================== */
+
+@property --pfbox-bg { syntax: "<color>"; inherits: true; initial-value: #fbe9d2; }
+@property --pfbox-ink { syntax: "<color>"; inherits: true; initial-value: #1e1e1e; }
+@property --pfbox-face-front-1 { syntax: "<color>"; inherits: true; initial-value: #fbf2e3; }
+@property --pfbox-face-front-2 { syntax: "<color>"; inherits: true; initial-value: #f1e3cb; }
+@property --pfbox-face-side-1 { syntax: "<color>"; inherits: true; initial-value: #ebdabd; }
+@property --pfbox-face-side-2 { syntax: "<color>"; inherits: true; initial-value: #dfcba8; }
+@property --pfbox-rim { syntax: "<color>"; inherits: true; initial-value: #fff7ea; }
+@property --pfbox-hollow-1 { syntax: "<color>"; inherits: true; initial-value: #3b322a; }
+@property --pfbox-hollow-2 { syntax: "<color>"; inherits: true; initial-value: #16120f; }
+@property --pfbox-hollow-side-1 { syntax: "<color>"; inherits: true; initial-value: #181410; }
+@property --pfbox-hollow-side-2 { syntax: "<color>"; inherits: true; initial-value: #2c251f; }
+@property --pfbox-hole { syntax: "<color>"; inherits: true; initial-value: #2b2219; }
+@property --pfbox-shadow-wide { syntax: "<color>"; inherits: true; initial-value: #5b3a17; }
+@property --pfbox-shadow-wide-o { syntax: "<number>"; inherits: true; initial-value: 0.26; }
+@property --pfbox-shadow-tight { syntax: "<color>"; inherits: true; initial-value: #3a240c; }
+@property --pfbox-shadow-tight-o { syntax: "<number>"; inherits: true; initial-value: 0.3; }
+@property --pfbox-occ { syntax: "<color>"; inherits: true; initial-value: #1b120a; }
+@property --pfbox-occ-o { syntax: "<number>"; inherits: true; initial-value: 0.42; }
+@property --pfbox-green-f { syntax: "<color>"; inherits: true; initial-value: #22a862; }
+@property --pfbox-green-b { syntax: "<color>"; inherits: true; initial-value: #167f46; }
+@property --pfbox-beige-f { syntax: "<color>"; inherits: true; initial-value: #fbe6c5; }
+@property --pfbox-beige-b { syntax: "<color>"; inherits: true; initial-value: #e9cc9a; }
+@property --pfbox-pink-f { syntax: "<color>"; inherits: true; initial-value: #f4b6f6; }
+@property --pfbox-pink-b { syntax: "<color>"; inherits: true; initial-value: #dc94e0; }
+@property --pfbox-orange-f { syntax: "<color>"; inherits: true; initial-value: #f8b02a; }
+@property --pfbox-orange-b { syntax: "<color>"; inherits: true; initial-value: #de930c; }
+@property --pfbox-paper-1 { syntax: "<color>"; inherits: true; initial-value: #fffdf8; }
+@property --pfbox-paper-2 { syntax: "<color>"; inherits: true; initial-value: #f3eee4; }
+@property --pfbox-paper-3 { syntax: "<color>"; inherits: true; initial-value: #ffffff; }
+@property --pfbox-paper-line { syntax: "<color>"; inherits: true; initial-value: #cbbfa9; }
+@property --pfbox-flap-hi { syntax: "<color>"; inherits: true; initial-value: rgb(255 255 255 / 0.35); }
+@property --pfbox-crease { syntax: "<color>"; inherits: true; initial-value: rgb(0 0 0 / 0.12); }
+@property --pfbox-grain-o { syntax: "<number>"; inherits: true; initial-value: 0.16; }
+
+.pfbox {
+  --pfbox-bg: #fbe9d2;
+  --pfbox-ink: #1e1e1e;
+  --pfbox-focus: #1e1e1e;
+  --pfbox-grain-blend: multiply;
+  --pfbox-grain-o: 0.16;
+
+  --pfbox-face-front-1: #fbf2e3;
+  --pfbox-face-front-2: #f1e3cb;
+  --pfbox-face-side-1: #ebdabd;
+  --pfbox-face-side-2: #dfcba8;
+  --pfbox-rim: #fff7ea;
+  --pfbox-hollow-1: #3b322a;
+  --pfbox-hollow-2: #16120f;
+  --pfbox-hollow-side-1: #181410;
+  --pfbox-hollow-side-2: #2c251f;
+  --pfbox-hole: #2b2219;
+  --pfbox-shadow-wide: #5b3a17;
+  --pfbox-shadow-wide-o: 0.26;
+  --pfbox-shadow-tight: #3a240c;
+  --pfbox-shadow-tight-o: 0.3;
+  --pfbox-occ: #1b120a;
+  --pfbox-occ-o: 0.42;
+
+  --pfbox-green-f: #22a862;
+  --pfbox-green-b: #167f46;
+  --pfbox-beige-f: #fbe6c5;
+  --pfbox-beige-b: #e9cc9a;
+  --pfbox-pink-f: #f4b6f6;
+  --pfbox-pink-b: #dc94e0;
+  --pfbox-orange-f: #f8b02a;
+  --pfbox-orange-b: #de930c;
+  --pfbox-paper-1: #fffdf8;
+  --pfbox-paper-2: #f3eee4;
+  --pfbox-paper-3: #ffffff;
+  --pfbox-paper-line: #cbbfa9;
+  --pfbox-flap-hi: rgb(255 255 255 / 0.35);
+  --pfbox-crease: rgb(0 0 0 / 0.12);
+
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  /* the box sizes itself to the largest square that fits */
+  container-type: size;
+  perspective: 1600px;
+  background: var(--pfbox-bg);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  outline: none;
+
+  transition-duration: 0.5s;
+  transition-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+  transition-property:
+    --pfbox-bg, --pfbox-ink, --pfbox-grain-o,
+    --pfbox-face-front-1, --pfbox-face-front-2, --pfbox-face-side-1, --pfbox-face-side-2, --pfbox-rim,
+    --pfbox-hollow-1, --pfbox-hollow-2, --pfbox-hollow-side-1, --pfbox-hollow-side-2, --pfbox-hole,
+    --pfbox-shadow-wide, --pfbox-shadow-wide-o, --pfbox-shadow-tight, --pfbox-shadow-tight-o, --pfbox-occ, --pfbox-occ-o,
+    --pfbox-green-f, --pfbox-green-b, --pfbox-beige-f, --pfbox-beige-b, --pfbox-pink-f, --pfbox-pink-b,
+    --pfbox-orange-f, --pfbox-orange-b, --pfbox-paper-1, --pfbox-paper-2, --pfbox-paper-3, --pfbox-paper-line,
+    --pfbox-flap-hi, --pfbox-crease;
+}
+
+.pfbox[data-theme="dark"] {
+  --pfbox-bg: #17130f;
+  --pfbox-ink: #0b0907;
+  --pfbox-focus: #f3e6d3;
+  --pfbox-grain-blend: screen;
+  --pfbox-grain-o: 0.07;
+
+  --pfbox-face-front-1: #4a3f33;
+  --pfbox-face-front-2: #3b3228;
+  --pfbox-face-side-1: #352c23;
+  --pfbox-face-side-2: #2a231c;
+  --pfbox-rim: #5e5142;
+  --pfbox-hollow-1: #15110d;
+  --pfbox-hollow-2: #050403;
+  --pfbox-hollow-side-1: #060504;
+  --pfbox-hollow-side-2: #110e0b;
+  --pfbox-hole: #0b0907;
+  --pfbox-shadow-wide: #000000;
+  --pfbox-shadow-wide-o: 0.55;
+  --pfbox-shadow-tight: #000000;
+  --pfbox-shadow-tight-o: 0.6;
+  --pfbox-occ: #000000;
+  --pfbox-occ-o: 0.6;
+
+  --pfbox-green-f: #1e8f55;
+  --pfbox-green-b: #13663a;
+  --pfbox-beige-f: #cdb896;
+  --pfbox-beige-b: #a88f69;
+  --pfbox-pink-f: #c98fd0;
+  --pfbox-pink-b: #a56fad;
+  --pfbox-orange-f: #d99520;
+  --pfbox-orange-b: #b0750c;
+  --pfbox-paper-1: #e6dfd2;
+  --pfbox-paper-2: #cfc7b8;
+  --pfbox-paper-3: #eee8dd;
+  --pfbox-paper-line: #9c917f;
+  --pfbox-flap-hi: rgb(255 255 255 / 0.18);
+  --pfbox-crease: rgb(0 0 0 / 0.3);
+}
+
+/* filling its container: the field is the whole box and the scene centres in it */
+.pfbox[data-fill] {
+  height: 100%;
+  aspect-ratio: auto;
+}
+
+.pfbox__poster {
+  position: relative;
+  width: min(100cqw, 100cqh);
+  aspect-ratio: 1;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.pfbox[data-ready] .pfbox__poster {
+  opacity: 1;
+}
+
+.pfbox__art {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  stroke: var(--pfbox-ink);
+}
+
+.pfbox__grain {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  mix-blend-mode: var(--pfbox-grain-blend);
+  opacity: var(--pfbox-grain-o);
+}
+
+.pfbox__hit {
+  cursor: pointer;
+  outline: none;
+}
+
+.pfbox__hit:focus-visible .pfbox__hitBase {
+  stroke: var(--pfbox-focus);
+  stroke-width: 2;
+  stroke-dasharray: 5 5;
+  stroke-opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pfbox,
+  .pfbox__poster {
+    transition: none;
+  }
+}

@@ -1,0 +1,258 @@
+/* ===========================================================================
+   Liquid Voice.
+
+   A WebGL 2 sky with a liquid-glass pill on it, and the pill's controls laid
+   over the glass in HTML. The box is 16:10 (capped to the window's height),
+   or the whole container when it fills. The controls' colours are tokens that
+   swap on data-theme="dark"; the sky and the glass are lit by the theme in the
+   shader. Until the first GPU frame — and for good without WebGL 2 — the sky
+   is a CSS gradient and the pill a backdrop-filter glass.
+=========================================================================== */
+
+.plvoice {
+  --plvoice-bar: #050b14;
+  --plvoice-x-bg: #060606;
+  --plvoice-x-ink: #ffffff;
+  --plvoice-act-bg: rgb(255 255 255 / 0.3);
+  --plvoice-act-ring: rgb(255 255 255 / 0.55);
+  --plvoice-act-ink: #0b2440;
+  --plvoice-focus: #ffffff;
+  --plvoice-fallback:
+    radial-gradient(60% 55% at 0% 105%, #cfe6f6 0%, transparent 70%),
+    radial-gradient(50% 50% at 105% 0%, #8fd6f3 0%, transparent 70%),
+    linear-gradient(100deg, #1667c4 0%, #0a4fae 45%, #2f9fdc 80%, #49bfe9 100%);
+  --plvoice-fallback-glass: rgb(160 215 250 / 0.35);
+
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  max-height: 72vh;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #0d5bb5;
+  background-image: var(--plvoice-fallback);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.plvoice[data-theme="dark"] {
+  --plvoice-bar: #e9f2ff;
+  --plvoice-x-bg: #eef4ff;
+  --plvoice-x-ink: #07101f;
+  --plvoice-act-bg: rgb(255 255 255 / 0.12);
+  --plvoice-act-ring: rgb(255 255 255 / 0.28);
+  --plvoice-act-ink: #dce9ff;
+  --plvoice-focus: #9fc8ff;
+  --plvoice-fallback:
+    radial-gradient(60% 55% at 0% 105%, #1b3157 0%, transparent 70%),
+    radial-gradient(50% 50% at 105% 0%, #164a78 0%, transparent 70%),
+    linear-gradient(100deg, #0a1636 0%, #050b1f 45%, #0b2c55 80%, #0f416d 100%);
+  --plvoice-fallback-glass: rgb(120 160 220 / 0.16);
+  background-color: #060b1c;
+}
+
+/* filling its container: the sky is the whole box, edge to edge */
+.plvoice[data-fill] {
+  height: 100%;
+  aspect-ratio: auto;
+  max-height: none;
+  border-radius: 0;
+}
+
+.plvoice *,
+.plvoice *::before,
+.plvoice *::after {
+  box-sizing: border-box;
+}
+
+.plvoice__gl {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.plvoice[data-gl="ready"] .plvoice__gl {
+  opacity: 1;
+}
+
+/* the pill: placed and sized by the frame loop, over the glass the shader draws */
+.plvoice__pill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  width: 72px;
+  height: 72px;
+  border-radius: 999px;
+  opacity: 0;
+  will-change: transform, width, height;
+}
+
+.plvoice:not([data-gl="ready"]) .plvoice__pill {
+  background: var(--plvoice-fallback-glass);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  backdrop-filter: blur(14px) saturate(1.4);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.5),
+    inset 0 -1px 0 rgb(255 255 255 / 0.18),
+    0 14px 30px -12px rgb(0 20 60 / 0.35);
+}
+
+.plvoice__clip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.plvoice__btn {
+  position: absolute;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  cursor: pointer;
+  will-change: transform;
+  -webkit-appearance: none;
+  appearance: none;
+  transition:
+    background-color 0.4s ease,
+    color 0.4s ease;
+}
+
+.plvoice__btn:focus-visible {
+  outline: 2px solid var(--plvoice-focus);
+  outline-offset: 3px;
+}
+
+.plvoice__btn svg {
+  pointer-events: none;
+}
+
+.plvoice__x {
+  width: 46px;
+  height: 46px;
+  margin-top: -23px;
+  background: var(--plvoice-x-bg);
+  color: var(--plvoice-x-ink);
+}
+
+.plvoice__mic {
+  left: 50%;
+  margin-left: -23px;
+  opacity: 0;
+}
+
+.plvoice__cancel {
+  left: 19px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.plvoice__act {
+  right: 27px;
+  width: 38px;
+  height: 38px;
+  margin-top: -19px;
+  background: var(--plvoice-act-bg);
+  color: var(--plvoice-act-ink);
+  box-shadow:
+    inset 0 1px 0 var(--plvoice-act-ring),
+    inset 0 0 0 1px rgb(255 255 255 / 0.14);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.plvoice__ico {
+  position: absolute;
+}
+
+.plvoice__wave {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3.5px;
+  width: 140px;
+  height: 28px;
+  margin: -14px 0 0 -70px;
+  pointer-events: none;
+  contain: strict;
+}
+
+.plvoice__bar {
+  width: 2.2px;
+  height: 3.5px;
+  border-radius: 99px;
+  background: var(--plvoice-bar);
+  opacity: 0;
+}
+
+.plvoice__dots {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 24px;
+  height: 24px;
+  margin: -12px 0 0 -12px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.plvoice__spin {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.plvoice__dot {
+  position: absolute;
+  border-radius: 99px;
+  background: var(--plvoice-bar);
+}
+
+.plvoice__done {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin: -16px 0 0 -16px;
+  color: var(--plvoice-bar);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.plvoice__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plvoice__gl,
+  .plvoice__btn {
+    transition: none;
+  }
+}

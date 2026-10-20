@@ -49,6 +49,11 @@ const CARD = { w: 272, h: 219 };
  * card is measured for two rows.
  */
 const PINS = LIBRARY.filter((entry) => entry.clip && entry.hero !== false);
+/*
+ * The card is measured for two rows of three, so it previews the newest six —
+ * as a board does — while the count still says how many there are.
+ */
+const BOARD = PINS.slice(0, 6);
 /** How far it sits from the pointer, and how close it may come to the edge. */
 const OFFSET = { x: 18, y: 18 };
 const MARGIN = 12;
@@ -186,7 +191,7 @@ export default function PinterestPeek({
                 </p>
 
                 <div className="peek__grid">
-                  {PINS.map((entry, i) => (
+                  {BOARD.map((entry, i) => (
                     <motion.span
                       className="peek__tile"
                       key={entry.slug}

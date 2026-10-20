@@ -35,6 +35,16 @@ const SPEEDS = [16, 19, 14, 17];
 
 const CLIPS = LIBRARY.filter((entry) => entry.clip);
 
+/*
+ * Which rows get the library first. The wall has room for every clip once
+ * (four rows of six), so each tile is a different component — newest first,
+ * into the row that reads strongest and sits wholly above the fold (the third,
+ * at 80%), then the full-strength row under it, then the faint upper rows.
+ * Past twenty-four the oldest wait their turn; under it, the shelf wraps.
+ */
+const ROW_RANK = [3, 2, 0, 1];
+const tileFor = (r: number, c: number) => CLIPS[(ROW_RANK[r] * COLS + c) % CLIPS.length];
+
 export default function HeroWall() {
   const reduced = useReducedMotion();
   const wallRef = useRef<HTMLDivElement>(null);
@@ -147,8 +157,7 @@ export default function HeroWall() {
   return (
     <div className="hwall" ref={wallRef} aria-hidden="true">
       {ROWS.map((opacity, r) => {
-        /* each row starts further along the shelf, so no column repeats a clip */
-        const row = Array.from({ length: COLS }, (_, c) => CLIPS[(r * 3 + c * 2 + r) % CLIPS.length]);
+        const row = Array.from({ length: COLS }, (_, c) => tileFor(r, c));
         return (
           <motion.div
             key={r}

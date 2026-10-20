@@ -65,6 +65,8 @@ const FACES: Record<string, string | null> = {
   "progress-image": "Inter (500 and 600)",
   magnify: "Inter (700) for the letter, with Helvetica Neue for the micro-type (Arial where it is missing)",
   "task-card": "Inter (400 to 600)",
+  "file-box": null,
+  "liquid-voice": null,
   "copy-paste-pad": "Inter (400 and 500) for the overlays, with Varela Round for the keycap legends (Arial Rounded where it is missing)",
 };
 
@@ -140,6 +142,20 @@ function docsFor(entry: Entry): string {
     lines.push(
       "",
       "It renders with three.js's WebGPU renderer (three 0.186 or newer — earlier WebGPU builds can leave a keycap on stale lighting after the theme changes), falling back to WebGL 2 on its own, and imports three when it mounts. Pass onThemeChange so ⌘V can change your theme. ⌘C and ⌘V are only taken while the pad is hovered or focused.",
+    );
+  }
+
+  if (entry.slug === "file-box") {
+    lines.push(
+      "",
+      "Its colours are registered as typed CSS custom properties (@property) so a theme change cross-fades; a browser without @property simply switches instantly. Pass fill to have it take its container's whole box, with the scene centred in the largest square that fits.",
+    );
+  }
+
+  if (entry.slug === "liquid-voice") {
+    lines.push(
+      "",
+      "The glass is drawn in WebGL 2; without it the component falls back to a CSS gradient and backdrop-filter glass on its own. There is no microphone: the waveform is generated. Wire onSend and onCancel to your own recorder if you need real audio. Pass fill to have the sky take its container's whole box.",
     );
   }
 
