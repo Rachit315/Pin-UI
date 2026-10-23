@@ -37,8 +37,8 @@ const nextConfig = {
    * static.
    */
   outputFileTracingIncludes: {
-    "/components/[slug]": ["./components/library/*.tsx", "./components/library/*.css"],
-    "/r/[slug]": ["./components/library/*.tsx", "./components/library/*.css"],
+    "/components/[slug]": ["./components/library/*.tsx", "./components/library/*.ts", "./components/library/*.css"],
+    "/r/[slug]": ["./components/library/*.tsx", "./components/library/*.ts", "./components/library/*.css"],
     "/blocx/[slug]": [
       "./components/blocks/demo/*.tsx",
       "./components/blocks/demo/*.ts",

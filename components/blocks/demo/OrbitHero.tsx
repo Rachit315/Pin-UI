@@ -2,7 +2,8 @@
 
 import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
 import { AnimatePresence, motion, type Variants } from "motion/react";
-import { Geist, Instrument_Serif } from "next/font/google";
+import { Instrument_Serif } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
 import { startGlobe } from "./orbit-globe";
 import "./orbit-hero.css";
 
@@ -19,7 +20,7 @@ import "./orbit-hero.css";
  * It fills the viewport it is given; below 1024px the nav folds into a sheet.
  */
 
-const sans = Geist({ subsets: ["latin"], weight: ["400", "500"], variable: "--oh-geist", display: "swap" });
+/* Geist ships with the `geist` package and loads from local files, so nothing is fetched from Google at build time */
 const serif = Instrument_Serif({ subsets: ["latin"], weight: "400", style: "italic", variable: "--oh-serif", display: "swap" });
 
 /* the pictures, served from /public */
@@ -291,7 +292,7 @@ export default function Hero() {
   };
 
   return (
-    <section id="experience" className={`oh-hero ${sans.variable} ${serif.variable}`} aria-labelledby="hero-title">
+    <section id="experience" className={`oh-hero ${GeistSans.variable} ${serif.variable}`} aria-labelledby="hero-title">
       <header className="oh-hero__header">
         <motion.div
           className="oh-logo"

@@ -9,7 +9,7 @@
   --ink: #0d2800;
   --ink-60: rgba(13, 40, 0, 0.6);
   --green: #0abc05;
-  --font: var(--cmf-geist), "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font: var(--font-geist-sans), "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   /* 1 Figma px; the footer frame is 1440 × 772 */
   --u: min(calc(100vw / 1440), calc(100svh / 772));
 

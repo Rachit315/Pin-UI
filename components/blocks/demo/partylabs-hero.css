@@ -10,7 +10,7 @@
   --plh-line: rgba(17, 17, 16, 0.08);
   --plh-glass: rgba(255, 255, 255, 0.62);
   --plh-ring: #6f6af8;
-  --plh-font: var(--plh-geist), "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --plh-font: var(--font-geist-sans), "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --plh-gutter: clamp(16px, 3vw, 32px);
   --plh-nav-h: clamp(56px, 7vh, 68px);
 

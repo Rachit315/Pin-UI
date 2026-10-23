@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, type Variants } from "motion/react";
-import { Geist } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
 import { ICON_PATHS, WORDMARK_PATH } from "./caremetric-mark";
 import "./caremetric-footer.css";
 
@@ -15,7 +15,7 @@ import "./caremetric-footer.css";
  * becomes a flowing layout, and on a phone the links fold to two columns.
  */
 
-const geist = Geist({ subsets: ["latin"], weight: "500", variable: "--cmf-geist", display: "swap" });
+/* Geist ships with the `geist` package and loads from local files, so nothing is fetched from Google at build time */
 const LOGO = "/blocx/caremetric-footer/logo.svg";
 const TEXTURE = "/blocx/caremetric-footer/texture.webp";
 
@@ -42,7 +42,7 @@ const fade: Variants = {
 
 export default function Footer2() {
   return (
-    <main className={`cmf-page ${geist.variable}`}>
+    <main className={`cmf-page ${GeistSans.variable}`}>
       <footer className="cmf" aria-label="CareMetric">
         {/* the rounded panel rises into place */}
         <motion.div

@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { animate, AnimatePresence, motion, MotionConfig, useReducedMotion, type Variants } from "motion/react";
-import { Geist } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
 import "./partylabs-hero.css";
 
 /**
@@ -20,7 +20,7 @@ import "./partylabs-hero.css";
  * Photos: Unsplash License, shipped in /blocx/partylabs-hero.
  */
 
-const geist = Geist({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--plh-geist", display: "swap" });
+/* Geist ships with the `geist` package and loads from local files, so nothing is fetched from Google at build time */
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const PHOTO_DIR = "/blocx/partylabs-hero";
@@ -318,7 +318,7 @@ export default function PartylabsHero() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <main ref={heroRef} className={`plh ${geist.variable}`} id="plh-top">
+      <main ref={heroRef} className={`plh ${GeistSans.variable}`} id="plh-top">
         <div ref={fieldRef} className="plh-field" aria-hidden>
           {cards.map(({ c, i, src, order }) => {
             const [x, y, d, r, p] = c;
