@@ -65,6 +65,7 @@ const FACES: Record<string, string | null> = {
   "progress-image": "Inter (500 and 600)",
   magnify: "Inter (700) for the letter, with Helvetica Neue for the micro-type (Arial where it is missing)",
   "task-card": "Inter (400 to 600)",
+  "desk-computer": "the system UI face for its corners, with Arial drawn into the screen and the badges",
   "file-box": null,
   "liquid-voice": null,
   "copy-paste-pad": "Inter (400 and 500) for the overlays, with Varela Round for the keycap legends (Arial Rounded where it is missing)",
@@ -142,6 +143,13 @@ function docsFor(entry: Entry): string {
     lines.push(
       "",
       "It renders with three.js's WebGPU renderer (three 0.186 or newer — earlier WebGPU builds can leave a keycap on stale lighting after the theme changes), falling back to WebGL 2 on its own, and imports three when it mounts. Pass onThemeChange so ⌘V can change your theme. ⌘C and ⌘V are only taken while the pad is hovered or focused.",
+    );
+  }
+
+  if (entry.slug === "desk-computer") {
+    lines.push(
+      "",
+      "The drawing is not part of this package: it is ~480KB of SVG, fetched at mount from `src` (default /library/desk-computer.svg). Copy it from https://github.com/Rachit315/Pin-UI/tree/main/public/library/desk-computer.svg into your own public folder, or point `src` at wherever you serve it. desk-computer-engine.ts is everything it does and must sit beside the component. Its sounds are synthesised with Web Audio and only ever answer the visitor's own input; pass sound={false} to silence them. It was built with the Anatomy skill's kit (MIT, © 2026 Ryan): https://github.com/wheresryan22/anatomy",
     );
   }
 

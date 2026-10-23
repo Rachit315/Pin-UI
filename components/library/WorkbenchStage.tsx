@@ -29,6 +29,7 @@ import Magnify from "./Magnify";
 import TaskCard from "./TaskCard";
 import CopyPastePad from "./CopyPastePad";
 import FileBox from "./FileBox";
+import DeskComputer from "./DeskComputer";
 import LiquidVoice from "./LiquidVoice";
 import type { Entry } from "./registry";
 import { LINKS } from "@/lib/links";
@@ -127,6 +128,7 @@ export default function WorkbenchStage({
           {entry.slug === "prompt-composer" && <PromptComposer theme={theme} />}
           {entry.slug === "progress-image" && <ProgressImage theme={theme} />}
           {entry.slug === "magnify" && <Magnify theme={theme} />}
+          {entry.slug === "desk-computer" && <DeskComputer theme={theme} sound={sound} fill />}
           {entry.slug === "file-box" && <FileBox theme={theme} fill />}
           {entry.slug === "liquid-voice" && <LiquidVoice theme={theme} fill />}
           {entry.slug === "task-card" && <TaskCard theme={theme} />}

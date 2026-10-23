@@ -159,6 +159,50 @@ export type Entry = {
 
 export const LIBRARY: Entry[] = [
   {
+    slug: "desk-computer",
+    category: "controls",
+    name: "Desk Computer",
+    isNew: true,
+    tagline: "A late-90s desk computer in true isometric that you can actually use.",
+    blurb:
+      "A beige CRT, a mid-tower, a 104-key keyboard, a ball mouse and a CD-R, drawn as one isometric SVG. Type and the keys go down while the text lands in the search box on the screen; drag the mouse and its cable follows while the cursor moves on the CRT; click the jewel case and the disc flies into the drive and AutoPlay opens. It assembles itself piece by piece, and when nobody is touching it, it uses itself.",
+    highlights: ["Type on a real keyboard", "Drag the mouse, the cable follows", "CD flies into the drive", "Assembles itself"],
+    /* recorded in light: a remocn edit of a frame-exact recording of the live figure — it assembles,
+       the mouse is dragged, a search is typed, and the CD flies into the drive as AutoPlay opens */
+    clip: "/clips/loop/desk-computer.mp4",
+    poster: "/clips/loop/desk-computer.jpg",
+    sound: true,
+    zoom: 1,
+    stage: "#ffffff",
+    clipStage: "#ffffff",
+    stageDark: "#0f1013",
+    /* a scene: it fills the stage and fits the drawing to it */
+    fill: true,
+    usage: `import DeskComputer from "@/components/library/DeskComputer";
+
+<DeskComputer theme={theme} sound />`,
+    props: [
+      { name: "theme", type: "\"light\" | \"dark\"", fallback: "\"light\"", note: "Beige plastic on white, or the same machine in a dark room. Every colour is a token with a value for each; changing it assembles the system again." },
+      { name: "sound", type: "boolean", fallback: "true", note: "Key clicks and thocks, the CRT's power-on hum and power-off zap — synthesised, and only ever for your own input." },
+      { name: "fill", type: "boolean", fallback: "false", note: "Take the container's whole box, fitting the drawing to it. Without it the component keeps the drawing's own 1000:760 shape." },
+      { name: "src", type: "string", fallback: "\"/library/desk-computer.svg\"", note: "Where the ~480KB drawing is served from; it is fetched at mount rather than bundled." },
+    ],
+    files: [
+      { name: "DeskComputer.tsx", lang: "tsx" },
+      { name: "desk-computer-engine.ts", lang: "tsx" },
+      { name: "desk-computer.css", lang: "css" },
+    ],
+    info: {
+      paragraphs: [
+        "The whole machine is one SVG in true isometric — monitor, tower, keyboard, mouse and pad, speaker, CD-R and floppy disks, and the cables between them — built and audited with the Anatomy skill's kit, so every part is a solid with its own faces, shading and depth order. The drawing is fetched when the component mounts and the engine runs on it in place: keys and the mouse move along the projection's own axes, and the CD's tray and disc are redrawn as true isometric solids frame by frame.",
+        "Focus it and type: each key goes down on a spring and the text lands in the search box on the CRT, scrolling when it overflows; Enter searches and the tower's hard-drive LED flickers. Drag the mouse around its pad and its cable re-routes over the pad's edge while an arrow moves on the screen — an I-beam over the search box — and a click on the mouse clicks the screen. Click the jewel case: the tray slides out, the disc flies over on an arc and drops in, the tray shuts, the drive LED reads and AutoPlay opens. Click the drive to eject it and the disc flies home.",
+        "Escape or the monitor's power button collapses the picture to a line and then a dot, and turns it back on. On arrival and on every theme change the system assembles itself — shadows first, then each piece drops in, a wave runs across the keys and the cables come last — and the CRT warms up. Every sound is synthesised with Web Audio and answers only your own input; left alone, it aims the mouse, types, searches and loads the CD by itself, and gives way the moment you touch it.",
+      ],
+      credit: { label: "built with Anatomy", href: "https://github.com/wheresryan22/anatomy" },
+    },
+    origin: { label: "Port · desk computer" },
+  },
+  {
     slug: "liquid-voice",
     category: "media",
     name: "Liquid Voice",
