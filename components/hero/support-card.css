@@ -1,0 +1,445 @@
+/* ===========================================================================
+   The "star Pin UI on GitHub" note on the landing page.
+
+   A card in the middle of the screen over a soft scrim. Its top is a dotted
+   board with three component posters pinned to it by the Pin UI pin and a
+   star sticker on the middle one; under that, a line on Pin UI and two
+   answers. Corners are the site's leaf — two rounded, two square — and the
+   shadow stays low. Light and crimson faces through the tokens below, which
+   follow the site's theme switch.
+=========================================================================== */
+
+.spc {
+  --spc-scrim: rgb(10 10 10 / 0.38);
+  --spc-card: #ffffff;
+  --spc-ink: #0a0a0a;
+  --spc-dim: rgb(10 10 10 / 0.6);
+  --spc-edge: rgb(10 10 10 / 0.07);
+  --spc-shadow: 0 24px 48px -28px rgb(10 10 10 / 0.35), 0 2px 6px rgb(10 10 10 / 0.05);
+  --spc-board: #f1f1ef;
+  --spc-board-dot: rgb(10 10 10 / 0.085);
+  --spc-shot-frame: #ffffff;
+  --spc-shot-edge: rgb(10 10 10 / 0.08);
+  --spc-close: rgb(255 255 255 / 0.86);
+  --spc-close-ink: #0a0a0a;
+  --spc-badge: #0a0a0a;
+  --spc-badge-ink: #ffffff;
+  --spc-chip: rgb(230 0 36 / 0.1);
+  --spc-chip-ink: #e60024;
+  --spc-sticker: #e60024;
+  --spc-sticker-star: #ffffff;
+  --spc-sticker-ring: #ffffff;
+  --spc-spark: #e60024;
+  --spc-cta: #e60024;
+  --spc-cta-hover: #c8001f;
+  --spc-cta-ink: #ffffff;
+  --spc-count: rgb(255 255 255 / 0.2);
+  --spc-later: rgb(10 10 10 / 0.62);
+  --spc-later-hover: rgb(10 10 10 / 0.05);
+  --spc-ring: #e60024;
+
+  position: fixed;
+  inset: 0;
+  /* above the page and its rail */
+  z-index: 2147482000;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: var(--spc-scrim);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  color: var(--spc-ink);
+  font-family: var(--pin-font);
+  -webkit-font-smoothing: antialiased;
+}
+
+:root[data-pin-theme="crimson"] .spc {
+  --spc-scrim: rgb(0 0 0 / 0.62);
+  --spc-card: #0f1014;
+  --spc-ink: #f5f5f5;
+  --spc-dim: rgb(245 245 245 / 0.62);
+  --spc-edge: rgb(255 255 255 / 0.09);
+  --spc-shadow: 0 28px 56px -30px rgb(0 0 0 / 0.9), 0 2px 6px rgb(0 0 0 / 0.4);
+  --spc-board: #15171d;
+  --spc-board-dot: rgb(255 255 255 / 0.07);
+  --spc-shot-frame: #1d1f26;
+  --spc-shot-edge: rgb(255 255 255 / 0.1);
+  --spc-close: rgb(15 16 20 / 0.82);
+  --spc-close-ink: #f5f5f5;
+  --spc-badge: #ffffff;
+  --spc-badge-ink: #0a0a0a;
+  --spc-chip: rgb(230 0 36 / 0.22);
+  --spc-chip-ink: #ff8d9f;
+  --spc-sticker: #ffffff;
+  --spc-sticker-star: #e60024;
+  --spc-sticker-ring: #0f1014;
+  --spc-spark: #ff8d9f;
+  --spc-cta: #ffffff;
+  --spc-cta-hover: #ffe3e8;
+  --spc-cta-ink: #e60024;
+  --spc-count: rgb(230 0 36 / 0.12);
+  --spc-later: rgb(245 245 245 / 0.66);
+  --spc-later-hover: rgb(255 255 255 / 0.07);
+  --spc-ring: #ffffff;
+}
+
+.spc *,
+.spc *::before,
+.spc *::after {
+  box-sizing: border-box;
+}
+
+.spc__card {
+  position: relative;
+  width: min(420px, 100%);
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  padding: 8px;
+  border-radius: 22px 0 22px 0;
+  background: var(--spc-card);
+  box-shadow: 0 0 0 1px var(--spc-edge), var(--spc-shadow);
+  outline: none;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.spc__card::-webkit-scrollbar {
+  display: none;
+}
+
+/* --- the board: three posters pinned up ------------------------------------ */
+
+.spc__board {
+  position: relative;
+  height: 196px;
+  overflow: hidden;
+  border-radius: 15px 0 15px 0;
+  background-color: var(--spc-board);
+  background-image: radial-gradient(var(--spc-board-dot) 1px, transparent 1.2px);
+  background-size: 14px 14px;
+}
+
+/* the fan's shared anchor: each poster is placed from the middle */
+.spc__fan {
+  position: absolute;
+  left: 50%;
+  top: 38px;
+  width: 44%;
+  translate: -50% 0;
+}
+
+.spc__shot {
+  position: absolute;
+  inset: 0 0 auto;
+  display: block;
+  padding: 4px;
+  border-radius: 9px;
+  background: var(--spc-shot-frame);
+  box-shadow: 0 0 0 1px var(--spc-shot-edge), 0 12px 24px -14px rgb(0 0 0 / 0.45);
+  transform-origin: 50% 0;
+}
+
+.spc__photo {
+  display: block;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 6px;
+}
+
+.spc__photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* the Pin UI pin, pushed into the top of each poster */
+.spc__pin {
+  position: absolute;
+  left: 50%;
+  top: -9px;
+  width: 17px;
+  margin-left: -8.5px;
+  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 0.28));
+}
+
+.spc__pin img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* the sticker sits on the middle poster's corner */
+.spc__sticker-anchor {
+  position: absolute;
+  right: -12px;
+  bottom: -14px;
+  width: 46px;
+  height: 46px;
+}
+
+.spc__sticker {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--spc-sticker);
+  color: var(--spc-sticker-star);
+  box-shadow: 0 0 0 3px var(--spc-sticker-ring), 0 8px 16px -6px rgb(0 0 0 / 0.4);
+}
+
+.spc__sticker svg {
+  width: 24px;
+  height: 24px;
+}
+
+.spc__spark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  color: var(--spc-spark);
+  pointer-events: none;
+}
+
+.spc__spark svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.spc__close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--spc-close);
+  color: var(--spc-close-ink);
+  box-shadow: 0 0 0 1px var(--spc-edge);
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  transition: scale 0.2s ease, background-color 0.2s ease;
+}
+
+/* a 44px target around the 30px circle, for a thumb */
+.spc__close::before {
+  content: "";
+  position: absolute;
+  inset: -7px;
+}
+
+.spc__close svg {
+  width: 14px;
+  height: 14px;
+}
+
+.spc__close:active {
+  scale: 0.92;
+}
+
+/* --- the words and the answers -------------------------------------------- */
+
+.spc__body {
+  padding: 18px 14px 10px;
+}
+
+.spc__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.spc__badge {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 5px 0 5px 0;
+  background: var(--spc-badge);
+  color: var(--spc-badge-ink);
+}
+
+.spc__badge svg {
+  width: 13px;
+  height: 13px;
+}
+
+.spc__chip {
+  padding: 2px 7px;
+  border-radius: 5px 0 5px 0;
+  background: var(--spc-chip);
+  color: var(--spc-chip-ink);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 15px;
+  letter-spacing: 0.01em;
+}
+
+.spc__title {
+  margin: 12px 0 0;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.spc__text {
+  margin: 8px 0 0;
+  color: var(--spc-dim);
+  font-size: 14.5px;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  text-wrap: pretty;
+}
+
+.spc__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.spc__star,
+.spc__later {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 18px;
+  border: 0;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.spc__star {
+  flex: 1;
+  border-radius: 12px 0 12px 0;
+  background: var(--spc-cta);
+  color: var(--spc-cta-ink);
+  transition: background-color 0.2s ease, scale 0.2s ease;
+}
+
+.spc__star-icon {
+  width: 17px;
+  height: 17px;
+  transition: rotate 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), scale 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.spc__count {
+  min-width: 22px;
+  padding: 2px 7px;
+  border-radius: 6px 0 6px 0;
+  background: var(--spc-count);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 16px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+  text-align: center;
+}
+
+.spc__star:active {
+  scale: 0.98;
+}
+
+.spc__later {
+  border-radius: 12px 0 12px 0;
+  background: transparent;
+  color: var(--spc-later);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+@media (hover: hover) {
+  .spc__star:hover {
+    background: var(--spc-cta-hover);
+  }
+
+  /* the star gives a little turn, as if it is being handed over */
+  .spc__star:hover .spc__star-icon {
+    rotate: -18deg;
+    scale: 1.15;
+  }
+
+  .spc__later:hover {
+    background: var(--spc-later-hover);
+    color: var(--spc-ink);
+  }
+
+  .spc__close:hover {
+    scale: 1.06;
+  }
+}
+
+.spc__close:focus-visible,
+.spc__star:focus-visible,
+.spc__later:focus-visible {
+  outline: 2px solid var(--spc-ring);
+  outline-offset: 2px;
+}
+
+/* --- a phone ---------------------------------------------------------------- */
+
+@media (max-width: 420px) {
+  .spc {
+    padding: 12px;
+  }
+
+  .spc__board {
+    height: 170px;
+  }
+
+  .spc__fan {
+    top: 32px;
+    width: 46%;
+  }
+
+  .spc__title {
+    font-size: 22px;
+  }
+
+  .spc__text {
+    font-size: 14px;
+  }
+
+  .spc__actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+
+  /* stacked, the main answer keeps its own height rather than sharing a row */
+  .spc__star {
+    flex: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spc__close,
+  .spc__star,
+  .spc__star-icon,
+  .spc__later {
+    transition: none;
+  }
+}

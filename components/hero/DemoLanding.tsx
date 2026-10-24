@@ -6,7 +6,7 @@ import SiteRail from "./SiteRail";
 import LenisScroll from "./LenisScroll";
 import Testimonials from "./Testimonials";
 import UniqueSection from "./UniqueSection";
-import BlocxIntro from "./BlocxIntro";
+import SupportCard from "./SupportCard";
 
 /**
  * The landing page.
@@ -24,8 +24,8 @@ export default function DemoLanding() {
       <SiteFooter />
       <SiteRail />
       <LenisScroll />
-      {/* once per visitor: Blocx is new */}
-      <BlocxIntro />
+      {/* once per visit: Pin UI is open source — a star on GitHub helps */}
+      <SupportCard />
     </div>
   );
 }
