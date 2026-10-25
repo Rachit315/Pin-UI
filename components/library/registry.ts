@@ -122,7 +122,11 @@ export type Entry = {
    * recorded in its dark theme.
    */
   clipStage?: string;
-  /** Recently added: flagged with a "New" tag in the sidebar and on the shelf. */
+  /**
+   * Flagged with a "New" tag on the shelf, in the sidebar and on its page.
+   * Never written by hand: it is set below for exactly the components the
+   * landing page shows, so the two can never disagree.
+   */
   isNew?: boolean;
   /** Which shelf it sits on, in the sidebar and on the index page. */
   category: CategoryId;
@@ -157,12 +161,89 @@ export type Entry = {
   };
 };
 
-export const LIBRARY: Entry[] = [
+const ENTRIES: Entry[] = [
+  {
+    slug: "search-card",
+    category: "controls",
+    name: "Search Card",
+    tagline: "A centred search bar that rises and morphs open into a card of recent searches.",
+    blurb:
+      "A small search pill with a ⌘K hint, resting in the middle of the stage. Focus it and it rises as the same surface grows into a card: a panel of recent searches unfolds under it, each with its own drawn tile, and a row of category chips below. One sheet glides between the rows under the pointer, a trash button slides in with a tooltip, and the chip count rolls as you remove them.",
+    highlights: ["Rises and morphs into a card", "⌘K from anywhere", "One gliding hover sheet", "Rolling chip count"],
+    /* a remocn edit of a frame-exact recording of the live card: it rises open, the sheet glides, a row is
+       binned, a chip goes and the count rolls, "set" filters the list, and it folds back into the middle */
+    clip: "/clips/loop/search-card.mp4",
+    poster: "/clips/loop/search-card.jpg",
+    sound: false,
+    zoom: 1,
+    stage: "#ececef",
+    clipStage: "#ececef",
+    stageDark: "#0b0b0d",
+    usage: `import SearchCard from "@/components/library/SearchCard";
+
+<SearchCard theme={theme} corner={26} rows={3} />`,
+    props: [
+      { name: "theme", type: "\"light\" | \"dark\"", fallback: "\"light\"", note: "A pale card on a soft grey, or a graphite one on near-black. The tiles and chips keep their own colours in both." },
+      { name: "corner", type: "number", fallback: "26", note: "The card's corner radius, 0–40. The panel inside follows it, 6px tighter." },
+      { name: "rows", type: "number", fallback: "3", note: "How many recent searches it starts with, up to four." },
+      { name: "shortcut", type: "boolean", fallback: "true", note: "Listen for ⌘K / Ctrl K anywhere on the page to open and close it." },
+    ],
+    files: [
+      { name: "SearchCard.tsx", lang: "tsx" },
+      { name: "search-card.css", lang: "css" },
+    ],
+    info: {
+      paragraphs: [
+        "The bar and the card are one surface with a Motion layout animation between a 300px pill and a 420px card, on an iOS sheet curve. At rest the bar sits in the middle of the room the open card needs; focused, it lifts off and rises to the top on a soft-start, long-settle curve while it widens, and everything below the search row unfolds and fades in a beat later. Closing folds it all back up and lowers it into the middle again, so the page around it never moves.",
+        "There is one hover sheet for the whole list rather than one per row: it glides to whichever row the pointer or focus is on, appears in place when it was hidden rather than sliding in from somewhere stale, and hides the dividers either side of it. The trash button slides in on that row with a delayed tooltip; removing a row collapses its height, and Clear all and Restore swap with a roll.",
+        "Typing filters the recent searches by title and description, with an empty state that names what was searched. Escape clears the query first, then closes; a press anywhere outside folds it back into the bar, and ⌘K / Ctrl K opens and closes it from anywhere on the page. The motion is eased tweens throughout — no springs — and it follows reduced motion.",
+      ],
+    },
+    origin: { label: "Folder · search card" },
+  },
+  {
+    slug: "selection-list",
+    category: "lists",
+    name: "Selection List",
+    tagline: "A single-choice list whose halves snap together like magnets.",
+    blurb:
+      "Each row is a coloured swatch and a grey label held a few pixels apart. Pick one and the two halves accelerate into each other, recoil a hair on contact and settle, the colour wiping across the label the moment they touch. Pick another and the old one's colour leaves through the right before its halves spring apart.",
+    highlights: ["Magnetic snap", "Colour wipes in on contact", "Wipes out through the right", "Arrow keys and Escape"],
+    /* a remocn edit of a frame-exact recording of the live list: the rows arrive, then each one is picked in turn and the choice cleared */
+    clip: "/clips/loop/selection-list.mp4",
+    poster: "/clips/loop/selection-list.jpg",
+    sound: false,
+    zoom: 1,
+    stage: "#f6f4f1",
+    clipStage: "#f6f4f1",
+    stageDark: "#221f20",
+    usage: `import SelectionList from "@/components/library/SelectionList";
+
+<SelectionList theme={theme} onChange={(index) => console.log(index)} />`,
+    props: [
+      { name: "theme", type: "\"light\" | \"dark\"", fallback: "\"light\"", note: "Pale label chips that read on a warm off-white or on a warm near-black field." },
+      { name: "items", type: "{ label, accent, dark, activeText }[]", fallback: "Chat · Questions · Articles · Communities", note: "Each row's label, its swatch and fill colour, the dark tone for its dot and picked swatch, and the label's colour once picked." },
+      { name: "defaultValue", type: "number | null", fallback: "0", note: "Which row fills once the list has arrived; null leaves them all empty." },
+      { name: "onChange", type: "(index | null) => void", note: "Called with the picked row, or null when the choice is cleared — picking the same row again, or Escape." },
+      { name: "label", type: "string", fallback: "\"Content types\"", note: "What the group is announced as." },
+    ],
+    files: [
+      { name: "SelectionList.tsx", lang: "tsx" },
+      { name: "selection-list.css", lang: "css" },
+    ],
+    info: {
+      paragraphs: [
+        "Every row is 32px and everything else is derived from it: a square swatch with a dot, and a label held 4px away. Picking a row moves each half half the gap plus half a pixel, so the two overlap and no hairline shows — accelerating in, recoiling a hair on contact and settling, on one keyframed tween. The label's colour, the swatch's darker tone and the dot's pop all wait for that moment of contact.",
+        "The fill is a clip-path with two edges. Picking wipes it in from the left; letting go wipes it out through the right; and interrupting either one reverses from wherever the edges are, so quick changes never jump. Only one row is picked at a time — the old one lets go as the new one snaps — and picking it again clears the choice.",
+        "Hovering a row nudges it right, pops its dot and teases its halves a little closer together. The rows take the arrow keys, Home and End, report their state as pressed buttons, and Escape clears the choice. On arrival the rows slide in one after another and the first one fills; with reduced motion it all simply lands.",
+      ],
+    },
+    origin: { label: "Folder · selection list" },
+  },
   {
     slug: "desk-computer",
     category: "controls",
     name: "Desk Computer",
-    isNew: true,
     tagline: "A late-90s desk computer in true isometric that you can actually use.",
     blurb:
       "A beige CRT, a mid-tower, a 104-key keyboard, a ball mouse and a CD-R, drawn as one isometric SVG. Type and the keys go down while the text lands in the search box on the screen; drag the mouse and its cable follows while the cursor moves on the CRT; click the jewel case and the disc flies into the drive and AutoPlay opens. It assembles itself piece by piece, and when nobody is touching it, it uses itself.",
@@ -206,7 +287,6 @@ export const LIBRARY: Entry[] = [
     slug: "liquid-voice",
     category: "media",
     name: "Liquid Voice",
-    isNew: true,
     tagline: "A voice-input pill of real liquid glass that stretches into a recorder.",
     blurb:
       "A drop of glass on a moving sky. Tap the mic and it stretches into a recording bar — cancel, a live waveform, send — then gathers the waveform up, spins while it sends, ticks and melts back into a drop. The glass is drawn in WebGL 2: it bends, blurs and splits the sky behind it, and night spreads out from the pill when the theme changes.",
@@ -247,7 +327,6 @@ export const LIBRARY: Entry[] = [
     slug: "file-box",
     category: "cards",
     name: "File Box",
-    isNew: true,
     tagline: "A cardboard file box whose folders lift out by their tabs.",
     blurb:
       "Five colourful folders standing in a cardboard file box, drawn as one SVG. Hover one and it is pulled up by its tab, the flap falls open a beat later and its sheets of paper trail behind on looser springs while its neighbours give way; click for a tug. The whole scene tilts with the pointer, and a theme change cross-fades every face and shadow.",
@@ -287,7 +366,6 @@ export const LIBRARY: Entry[] = [
     slug: "copy-paste-pad",
     category: "controls",
     name: "Copy Paste Pad",
-    isNew: true,
     tagline: "A 3-D aluminium macro pad whose ⌘C and ⌘V copy and paste the theme.",
     blurb:
       "Three keys — cmd, C and V — on a machined aluminium plate, rendered live with three.js's WebGPU renderer. ⌘C copies the current theme; switch it, and ⌘V pastes the copied one back. The keys travel on springs and click, and when the theme flips the one key light sweeps across the back of the pad from a warm sun to a cool moon, dragging the shadow with it.",
@@ -329,7 +407,6 @@ export const LIBRARY: Entry[] = [
     slug: "task-card",
     category: "cards",
     name: "Task Card",
-    isNew: true,
     tagline: "A task with subtasks on a connector tree, progress, priority and status.",
     blurb:
       "A task card with its subtasks hung off one pixel-crisp connector tree. Tick one and its ring fills on a spring while the progress pill counts up and its bar fills; finish them all and the status turns to Done by itself. Priority and Status are coloured pills whose labels roll over as their width follows, and the ⋯ menu completes or resets everything.",
@@ -374,7 +451,6 @@ export const LIBRARY: Entry[] = [
     slug: "magnify",
     category: "cards",
     name: "Magnify",
-    isNew: true,
     tagline: "A type specimen you inspect with a real magnifying glass.",
     blurb:
       "One huge letter on a paper poster — and under the glass it turns out to be printed from rows of tiny characters. The lens carries its own copy of the poster at the zoom you set, so the magnification is real, not a blurred scale. It tilts with its own speed, floats at rest, and its shadow lifts when you hold it; click to push the zoom further.",
@@ -423,7 +499,6 @@ export const LIBRARY: Entry[] = [
     slug: "progress-image",
     category: "controls",
     name: "Progress Image",
-    isNew: true,
     tagline: "A rollout card whose photograph is the progress bar.",
     blurb:
       "The rollout percentage is how far the picture has resolved: drag the slider and the photograph builds itself up — or falls back apart — under your finger. Pick the look of the resolve from the bar under the card: a pixel quadtree, fog, a pencil sketch, a halftone print, a grain dissolve or bleeding ink. The presets share one liquid indicator that stretches into a drop between them.",
@@ -467,7 +542,6 @@ export const LIBRARY: Entry[] = [
     slug: "prompt-composer",
     category: "controls",
     name: "Prompt Composer",
-    isNew: true,
     tagline: "An assistant's field with its quick actions fanned out behind it.",
     blurb:
       "Five tilted cards stand behind an Ask anything field — create an image, add a note, create an event, voice mode, analyse docs. Hover one and it lifts and straightens while its neighbours lean away; pick it and the fan sinks behind the field as the action arrives inside it as a chip. Voice turns the field into a recorder with a live, scrolling waveform.",
@@ -511,7 +585,6 @@ export const LIBRARY: Entry[] = [
     slug: "calendar-card",
     category: "cards",
     name: "Calendar",
-    isNew: true,
     tagline: "A month card where the selected day glides from date to date.",
     blurb:
       "A soft, double-walled month card that opens on today, by the visitor's own clock. The selected day is one red square that glides to whichever date you pick, the big number above rolls a digit at a time, the month name swaps through a blur and the bar fills to how far through the month you are. Tap the month to pick any month and year, or press the little calendar in the corner to tear a page off to the next month.",
@@ -553,7 +626,6 @@ export const LIBRARY: Entry[] = [
     requestedBy: { handle: "hrstwt", url: "https://x.com/hrstwt" },
     category: "lists",
     name: "Chat Room",
-    isNew: true,
     tagline: "A stack of faces that morphs into a voice chat card, and back.",
     blurb:
       "A pill of faces that grows into a voice chat card. The faces fly to their seats, the hidden ones rise into the grid after them, the live badge parks in the corner and the count dissolves on the way in — then the whole thing folds back into the pill. One spring drives every piece, so they all land together, each step with its own soft synthesised sound.",
@@ -596,7 +668,6 @@ export const LIBRARY: Entry[] = [
     requestedBy: { handle: "hrstwt", url: "https://x.com/hrstwt" },
     category: "controls",
     name: "Dynamic Drop Zone",
-    isNew: true,
     tagline: "A file drop zone that turns into a magnetic black hole.",
     blurb:
       "Carry a file over it and the paper dims into ink: eight dashed rings fall into a tunnel that bends toward your pointer while debris spirals in from the rim. Drop it and the hole swallows the file, flashes back to paper and stacks its rings into an upload pill, with a spinner that turns into a drawn check.",
@@ -637,7 +708,6 @@ export const LIBRARY: Entry[] = [
     slug: "swap-card",
     category: "cards",
     name: "Swap Card",
-    isNew: true,
     tagline: "A token swap card where every number rolls and the button is liquid.",
     blurb:
       "Swap, Buy and Stake on one card. The quote rolls in like an odometer, flipping the pair sends the two token pills gliding past each other, and the token list opens out of its pill through a blur. The button is liquid: light drifts across it, it ripples where you press, shakes when it can't swap and bursts when a swap lands.",
@@ -675,7 +745,6 @@ export const LIBRARY: Entry[] = [
     slug: "liquid-tabs",
     category: "lists",
     name: "Liquid Tabs",
-    isNew: true,
     tagline: "A notifications card whose active tab is liquid, flowing from tab to tab.",
     blurb:
       "The card and its active tab are one liquid shape: switch tabs and the tab slides under the next label, flowing into the card on the way. Rows leave toward where you came from and arrive from where you went, through a blur; the selected row's avatar inverts with a bounce, and the chevron swaps the third tab from an overflow menu.",
@@ -715,7 +784,6 @@ export const LIBRARY: Entry[] = [
     slug: "thermal-dial",
     category: "cards",
     name: "Thermal Dial",
-    isNew: true,
     tagline: "A thermal dial that undulates with heat and rolls through the seasons.",
     blurb:
       "Grab the dial and drag: 96 radial ticks undulate with a travelling wave and trailing comet while the needle sweeps. The season title staggers through a blur, the numbers roll per digit, and the ambient wash breathes with dynamic temperature gradient colors.",
@@ -759,7 +827,6 @@ export const LIBRARY: Entry[] = [
     slug: "lamp-switch",
     category: "controls",
     name: "Lamp Switch",
-    isNew: true,
     tagline: "A hanging ceramic lamp that swings on a cord and toggles with a liquid switch.",
     blurb:
       "A ceramic pendant lamp that drops in on its cord, lands into a stretch and a swing, and switches itself on. Pull the lamp down past the detent to click the light like a pull-chain, or drag the liquid switch with elastic rubber-banding. Turning it on flickers the bulb to life, casting a warm beam and ambient glow.",
@@ -1176,6 +1243,17 @@ export const LIBRARY: Entry[] = [
     origin: { label: "Cart" },
   },
 ];
+
+/**
+ * How many of the newest components the landing page shows under the hero.
+ * Those, and only those, wear the "New" tag — on the landing shelf, the
+ * library index, the sidebar and their own pages. Add a component to the top
+ * of the list and the oldest of them hands its tag on.
+ */
+export const LANDING_SHOWN = 5;
+
+/** The library, newest first, with "New" set on the ones the landing page shows. */
+export const LIBRARY: Entry[] = ENTRIES.map((entry, i) => ({ ...entry, isNew: i < LANDING_SHOWN }));
 
 
 export const bySlug = (slug: string) => LIBRARY.find((entry) => entry.slug === slug);

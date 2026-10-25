@@ -157,6 +157,30 @@ export const BLOCKS: Block[] = [
     stack: "Next.js · React · CSS · Motion",
     canvas: "#0b0b0b",
   },
+  {
+    slug: "halo-sign-in",
+    name: "Halo Sign In",
+    category: "auth",
+    thumb: "/blocx/thumbs/halo-sign-in.webp",
+    files: ["HaloSignIn.tsx", "halo-sign-in.css"],
+    summary: "A soft card in a tray, its mark in turning dots.",
+    isNew: true,
+    note: "A white sign-in card in a pale tray: an app mark in a slowly turning field of dots, email and password with a show / hide toggle, a black Sign In button and Google, Facebook and Apple under a dashed rule, with the sign-up line on the tray's lip. The mark springs in and draws its house; the rows rise and un-blur on a stagger, and the button rolls to \"Signing in…\" and \"Welcome back\". Pass onSubmit to wire it to your own auth.",
+    stack: "Next.js · React · CSS · Motion",
+    canvas: "#ffffff",
+  },
+  {
+    slug: "pixelkit-sign-in",
+    name: "Pixelkit Sign In",
+    category: "auth",
+    thumb: "/blocx/thumbs/pixelkit-sign-in.webp",
+    files: ["PixelkitSignIn.tsx", "pixelkit-sign-in.css"],
+    summary: "A lime tile, three providers and a magic link.",
+    isNew: true,
+    note: "A quiet one-column sign-in with no card: a lime app tile whose four pixels pop in, Google, GitHub and Apple side by side, an \"or\" rule, and an email field with a black Continue button for a magic link, then the terms. The rows rise and un-blur on a stagger, and the button rolls to \"Sending link…\" and \"Check your inbox\". Pass onSubmit to send the link.",
+    stack: "Next.js · React · CSS · Motion",
+    canvas: "#ffffff",
+  },
   /*
    * Waiting on their component files and thumbnails (QuantroHero.tsx, quantro-hero.css, quantro-mark.tsx;
    * ForahHero.tsx): parked so the build stays green. Uncomment once the files are in.
@@ -190,7 +214,7 @@ export const BLOCKS: Block[] = [
 ];
 
 /** The shelves on the index, in the order the index shows them, empty ones left out. */
-export const SHELF_ORDER: BlockCategoryId[] = ["hero", "pricing", "contact", "footer"];
+export const SHELF_ORDER: BlockCategoryId[] = ["hero", "pricing", "contact", "auth", "footer"];
 
 export function blockBySlug(slug: string): Block | undefined {
   return BLOCKS.find((block) => block.slug === slug);

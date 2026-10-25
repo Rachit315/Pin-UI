@@ -4,7 +4,7 @@ import { motion, useReducedMotion } from "motion/react";
 import { softSpring } from "@/lib/motion";
 import ComponentCard from "../library/ComponentCard";
 import ViewAllCard from "./ViewAllCard";
-import { LIBRARY } from "../library/registry";
+import { LANDING_SHOWN, LIBRARY } from "../library/registry";
 
 /**
  * The component shelf under the hero.
@@ -17,8 +17,9 @@ import { LIBRARY } from "../library/registry";
  *
  * The shelf is a preview — Figma 502:291: the newest five, and a sixth cell
  * that opens the whole library, so the grid closes on two full rows of three.
+ * The same count decides which components wear the "New" tag (registry.ts).
  */
-const SHOWN = 5;
+const SHOWN = LANDING_SHOWN;
 export default function UniqueSection() {
   const reduced = useReducedMotion();
 

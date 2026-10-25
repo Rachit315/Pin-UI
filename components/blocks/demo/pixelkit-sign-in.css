@@ -1,0 +1,349 @@
+/* Pixelkit Sign In — one 340-wide column, centred in the window, with no card around it.
+   A 72px lime tile, a 24 / 26px title, three providers side by side, an "or" rule, an outlined email field
+   and a near-black button, then the terms. On a short window the gaps tighten and the tile shrinks to 64
+   so the column still fits. */
+
+.pksi {
+  --pksi-paper: #ffffff;
+  --pksi-ink: #09090b;
+  --pksi-text: #18181b;
+  --pksi-body: #52525b;
+  --pksi-small: #3f3f46;
+  --pksi-faint: #a1a1aa;
+  --pksi-line: #e4e4e7;
+  --pksi-line-hover: #d4d4d8;
+  --pksi-line-focus: #a1a1aa;
+  --pksi-lime: #d8f34e;
+  --pksi-button-hover: #27272a;
+  --pksi-family: var(--pksi-font), "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  color-scheme: light;
+  display: grid;
+  /* one column that can shrink below the fields' intrinsic width, so nothing overflows a 320px phone */
+  grid-template-columns: minmax(0, 1fr);
+  place-items: center;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0;
+  padding: max(24px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+  background: var(--pksi-paper);
+  color: var(--pksi-text);
+  font-family: var(--pksi-family);
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  text-rendering: optimizeLegibility;
+}
+
+.pksi *,
+.pksi *::before,
+.pksi *::after {
+  box-sizing: border-box;
+}
+
+.pksi button,
+.pksi input {
+  margin: 0;
+  font: inherit;
+}
+
+.pksi button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.pksi__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.pksi__col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 340px;
+  text-align: center;
+}
+
+/* ---------- the tile and the words ---------- */
+
+.pksi__logo {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  background: var(--pksi-lime);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.5),
+    0 10px 24px -10px rgb(132 160 0 / 0.7);
+}
+
+.pksi__logo svg {
+  display: block;
+  width: 36px;
+  height: 36px;
+}
+
+.pksi__title {
+  margin: 32px 0 0;
+  color: var(--pksi-ink);
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.33;
+  letter-spacing: -0.02em;
+}
+
+.pksi__lede {
+  margin: 12px 0 0;
+  color: var(--pksi-body);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* ---------- the providers ---------- */
+
+.pksi__providers {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  width: 100%;
+  margin-top: 32px;
+}
+
+.pksi__provider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+  height: 44px;
+  padding: 0 8px;
+  border: 1px solid var(--pksi-line);
+  border-radius: 12px;
+  background: #ffffff;
+  color: #27272a;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.pksi__provider-icon {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.pksi__provider-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.pksi__provider-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pksi__or {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  margin: 20px 0;
+  color: var(--pksi-text);
+  font-size: 14px;
+}
+
+.pksi__rule {
+  flex: 1;
+  height: 1px;
+  background: var(--pksi-line);
+}
+
+/* ---------- the form ---------- */
+
+.pksi__form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.pksi__input {
+  width: 100%;
+  height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--pksi-line);
+  border-radius: 12px;
+  background: #ffffff;
+  color: var(--pksi-text);
+  font-size: 15px;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.pksi__input::placeholder {
+  color: var(--pksi-faint);
+  opacity: 1;
+}
+
+.pksi__input:focus {
+  border-color: var(--pksi-line-focus);
+  box-shadow: 0 0 0 4px rgb(24 24 27 / 0.06);
+}
+
+/* keep browser autofill from painting over the field */
+.pksi__input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
+  -webkit-text-fill-color: var(--pksi-text);
+  transition: background-color 9999s;
+}
+
+.pksi__submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 44px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 12px;
+  background: var(--pksi-ink);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.1),
+    0 6px 16px -8px rgb(0 0 0 / 0.5);
+  transition: background-color 0.2s ease;
+}
+
+.pksi__submit:disabled {
+  cursor: default;
+}
+
+.pksi__submit-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pksi__spinner {
+  width: 16px;
+  height: 16px;
+  animation: pksi-spin 0.7s linear infinite;
+}
+
+@keyframes pksi-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+.pksi__terms {
+  max-width: 280px;
+  margin: 20px 0 0;
+  color: var(--pksi-small);
+  font-size: 12px;
+  line-height: 1.625;
+}
+
+.pksi__terms a {
+  border-radius: 3px;
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s ease;
+}
+
+/* ---------- hover and focus ---------- */
+
+@media (hover: hover) {
+  .pksi__provider:hover {
+    border-color: var(--pksi-line-hover);
+    box-shadow: 0 4px 12px -4px rgb(0 0 0 / 0.12);
+  }
+
+  .pksi__input:hover:not(:focus) {
+    border-color: var(--pksi-line-hover);
+  }
+
+  .pksi__submit:not(:disabled):hover {
+    background: var(--pksi-button-hover);
+  }
+
+  .pksi__terms a:hover {
+    color: var(--pksi-ink);
+  }
+}
+
+.pksi__provider:focus-visible {
+  outline: 2px solid rgb(24 24 27 / 0.4);
+  outline-offset: 2px;
+}
+
+.pksi__submit:focus-visible {
+  outline: 2px solid var(--pksi-ink);
+  outline-offset: 2px;
+}
+
+.pksi__terms a:focus-visible {
+  outline: 2px solid rgb(24 24 27 / 0.3);
+  outline-offset: 1px;
+}
+
+/* ---------- sizes ---------- */
+
+@media (min-width: 640px) {
+  .pksi {
+    padding-right: 24px;
+    padding-left: 24px;
+  }
+
+  .pksi__title {
+    font-size: 26px;
+  }
+}
+
+/* a short window: the gaps tighten and the tile shrinks so the column still fits */
+@media (max-height: 640px) {
+  .pksi__logo {
+    width: 64px;
+    height: 64px;
+  }
+
+  .pksi__title {
+    margin-top: 20px;
+  }
+
+  .pksi__lede {
+    margin-top: 8px;
+  }
+
+  .pksi__providers {
+    margin-top: 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pksi__spinner {
+    animation-duration: 1.6s;
+  }
+}

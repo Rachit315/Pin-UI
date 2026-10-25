@@ -1,0 +1,128 @@
+/* ===========================================================================
+   Selection List.
+
+   32px rows, everything else derived from them: a square swatch and a grey
+   label held 4px apart, which a picked row closes with transforms. The
+   labels are pale chips on either field; the field and the hover tone are
+   tokens, and the dark set swaps in on data-theme="dark".
+=========================================================================== */
+
+.psel {
+  --psel-h: 32px;
+  --psel-gap: 4px;
+  --psel-idle: #e8e5e1;
+  --psel-idle-hover: #dedad5;
+  --psel-ring: #1a1718;
+
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  font-family: "Inter Tight", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.psel[data-theme="dark"] {
+  --psel-idle: #eeeeee;
+  --psel-idle-hover: #e2e2e2;
+  --psel-ring: #f4f1ee;
+}
+
+.psel *,
+.psel *::before,
+.psel *::after {
+  box-sizing: border-box;
+}
+
+.psel__list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.psel__row {
+  display: flex;
+  align-items: stretch;
+  height: var(--psel-h);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  outline: none;
+  /* the entrance brings each row in; until then it waits unseen */
+  opacity: 0;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.psel__row + .psel__row {
+  margin-top: 6px;
+}
+
+.psel__row:focus-visible {
+  outline: 2px solid var(--psel-ring);
+  outline-offset: 3px;
+}
+
+.psel__swatch {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: var(--psel-h);
+  height: var(--psel-h);
+}
+
+.psel__dot {
+  display: block;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+}
+
+.psel__label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: var(--psel-h);
+  /* the idle gap; a picked row closes it magnetically with transforms */
+  margin-left: var(--psel-gap);
+  padding: 0 12px 0 9px;
+  overflow: hidden;
+  background: var(--psel-idle);
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+  transition: background-color 0.3s ease;
+}
+
+.psel__label--hover {
+  background: var(--psel-idle-hover);
+}
+
+.psel__fill {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(0% 100% 0% 0%);
+}
+
+.psel__text {
+  position: relative;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .psel__row {
+    opacity: 1;
+  }
+
+  .psel__label {
+    transition: none;
+  }
+}

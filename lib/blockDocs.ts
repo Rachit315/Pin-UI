@@ -288,4 +288,80 @@ export const BLOCK_DOCS: Record<string, BlockDocs> = {
       "Below 720px the newsletter drops under the brand and the fine print stacks",
     ],
   },
+
+  "halo-sign-in": {
+    component: "HaloSignIn",
+    file: "HaloSignIn",
+    use: [
+      "A sign-in page for a consumer app — rentals, bookings, a marketplace — that wants to feel soft and trustworthy",
+      "Email and password sign-in with three social providers alongside",
+    ],
+    avoid: [
+      "Passwordless or magic-link flows — there is a password field and a show / hide toggle built in",
+      "Dark sites; the tray, wells and shadows are drawn for white",
+    ],
+    usage: `<HaloSignIn
+  onSubmit={async ({ email, password }) => {
+    await signIn(email, password);
+  }}
+  onProvider={(provider) => signInWith(provider)}
+/>`,
+    props: [
+      { name: "onSubmit", type: "({ email, password }) => Promise<void> | void", note: "Called with the form once the browser has validated it; throw to put the button back. Left out, the demo waits a moment and says welcome back" },
+      { name: "onProvider", type: "(\"google\" | \"facebook\" | \"apple\") => void", note: "Called when a social button is pressed" },
+    ],
+    customize: "The title, the line under it and the sign-up link are written in HaloSignIn.tsx; the mark is the small house SVG in Halo().",
+    accessibility: [
+      "The section is labelled by its title; both fields have real labels, visually hidden, and the browser validates them",
+      "The show / hide toggle names what it will do and reports aria-pressed",
+      "The social buttons are named by their providers, and the submit button's label is a polite live region as it changes",
+    ],
+    motion: [
+      "The tray rises in, the dot field unwinds into place and keeps turning slowly, and the mark springs in and draws its house",
+      "Each row rises and un-blurs on a stagger; the button rolls its label through Signing in… and Welcome back",
+      "Reduced motion drops the travel and keeps the fades",
+    ],
+    responsive: [
+      "A 392px card centred in the window; below 400px its padding and title come in",
+      "On a window shorter than 640px the halo and the gaps tighten so the card still fits without scrolling",
+    ],
+  },
+
+  "pixelkit-sign-in": {
+    component: "PixelkitSignIn",
+    file: "PixelkitSignIn",
+    use: [
+      "Passwordless sign-in: providers first, then a magic link by email",
+      "A product with a strong app icon that can carry the page on its own",
+    ],
+    avoid: [
+      "Flows that need a password field — there is none",
+      "Dark sites; it is drawn for white",
+    ],
+    usage: `<PixelkitSignIn
+  onSubmit={async (email) => {
+    await sendMagicLink(email);
+  }}
+  onProvider={(provider) => signInWith(provider)}
+/>`,
+    props: [
+      { name: "onSubmit", type: "(email) => Promise<void> | void", note: "Called with a valid address; throw to put the button back. Left out, the demo waits a moment and says to check the inbox" },
+      { name: "onProvider", type: "(\"google\" | \"github\" | \"apple\") => void", note: "Called when a provider button is pressed" },
+    ],
+    customize: "The brand name, the copy and the terms links are written in PixelkitSignIn.tsx; the tile's colour is --pksi-lime and the mark is the four rects in Logo().",
+    accessibility: [
+      "The section is labelled by its title; the email field has a real label, visually hidden, and the browser validates it",
+      "The tile's mark is an image named Pixelkit; the \"or\" rule is hidden from screen readers",
+      "The submit button's label is a polite live region as it changes",
+    ],
+    motion: [
+      "The tile drops in on a spring and its four pixels pop in one after another, the rounded last one with a little overshoot",
+      "Each row rises and un-blurs on a stagger; the button rolls its label through Sending link… and Check your inbox",
+      "Reduced motion drops the travel and keeps the fades",
+    ],
+    responsive: [
+      "One 340px column centred in the window; the three providers share its width on any phone",
+      "On a window shorter than 640px the tile shrinks and the gaps tighten so it still fits",
+    ],
+  },
 };

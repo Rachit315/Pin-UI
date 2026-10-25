@@ -28,6 +28,8 @@ const PREVIEWS: Record<string, ComponentType> = {
   "smart-pricing": dynamic(() => import("@/components/blocks/demo/SmartPricing")),
   "contact-form": dynamic(() => import("@/components/blocks/demo/ContactForm")),
   "synais-footer": dynamic(() => import("@/components/blocks/demo/SynaisFooter")),
+  "halo-sign-in": dynamic(() => import("@/components/blocks/demo/HaloSignIn")),
+  "pixelkit-sign-in": dynamic(() => import("@/components/blocks/demo/PixelkitSignIn")),
   /* parked until their files arrive — see lib/blocks.ts */
   // "quantro-hero": dynamic(() => import("@/components/blocks/demo/QuantroHero")),
   // "forah-hero": dynamic(() => import("@/components/blocks/demo/ForahHero")),

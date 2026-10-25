@@ -1,0 +1,561 @@
+/* ===========================================================================
+   Search Card.
+
+   A 300-wide bar that grows into a 420-wide card. The component keeps the
+   room the open card needs: the bar rests in its middle and rises to its top
+   as the card opens, so opening it never pushes what sits around it. Every colour is a token, and the dark set swaps in on
+   data-theme="dark"; the tiles and chips keep their own colours in both.
+=========================================================================== */
+
+.psearch {
+  --psearch-card: #f8f8f9;
+  --psearch-card-ring: rgb(0 0 0 / 0.05);
+  --psearch-card-shadow: 0 24px 60px -24px rgb(0 0 0 / 0.22), 0 2px 6px -2px rgb(0 0 0 / 0.06);
+  --psearch-panel: rgb(255 255 255 / 0.8);
+  --psearch-panel-border: rgb(0 0 0 / 0.06);
+  --psearch-text: #1d1d1f;
+  --psearch-muted: #6e6e73;
+  --psearch-faint: #9a9aa0;
+  --psearch-placeholder: #b0b0b6;
+  --psearch-divider: rgb(0 0 0 / 0.065);
+  --psearch-sheet: #ffffff;
+  --psearch-sheet-shadow: 0 10px 26px -10px rgb(0 0 0 / 0.16), 0 1px 3px rgb(0 0 0 / 0.05);
+  --psearch-btn: #e9e9eb;
+  --psearch-btn-hover: #dfdfe2;
+  --psearch-btn-fg: #55555b;
+  --psearch-accent: #1a7fd4;
+  --psearch-danger: #e46a2e;
+  --psearch-tip-bg: #111113;
+  --psearch-tip-fg: #ffffff;
+  --psearch-kbd-bg: rgb(0 0 0 / 0.04);
+  --psearch-kbd-border: rgb(0 0 0 / 0.08);
+
+  display: flex;
+  /* at rest the bar sits in the middle; open, the card rises to the top (Motion animates the move) */
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  color: var(--psearch-text);
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.psearch--open {
+  align-items: flex-start;
+}
+
+.psearch[data-theme="dark"] {
+  --psearch-card: #161619;
+  --psearch-card-ring: rgb(255 255 255 / 0.07);
+  --psearch-card-shadow: 0 30px 70px -24px rgb(0 0 0 / 0.8), 0 2px 6px -2px rgb(0 0 0 / 0.5);
+  --psearch-panel: #1d1d21;
+  --psearch-panel-border: rgb(255 255 255 / 0.06);
+  --psearch-text: #f2f2f4;
+  --psearch-muted: #a1a1aa;
+  --psearch-faint: #74747c;
+  --psearch-placeholder: #5d5d65;
+  --psearch-divider: rgb(255 255 255 / 0.06);
+  --psearch-sheet: #29292e;
+  --psearch-sheet-shadow: 0 12px 28px -10px rgb(0 0 0 / 0.7), inset 0 1px 0 rgb(255 255 255 / 0.05);
+  --psearch-btn: #26262b;
+  --psearch-btn-hover: #303036;
+  --psearch-btn-fg: #c4c4ca;
+  --psearch-accent: #4ea6ff;
+  --psearch-danger: #f28a55;
+  --psearch-tip-bg: #f2f2f4;
+  --psearch-tip-fg: #111113;
+  --psearch-kbd-bg: rgb(255 255 255 / 0.05);
+  --psearch-kbd-border: rgb(255 255 255 / 0.1);
+}
+
+.psearch *,
+.psearch *::before,
+.psearch *::after {
+  box-sizing: border-box;
+}
+
+.psearch :where(button) {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* ---------------------------------------------------------------- the morphing card */
+
+/* the shadow lives here rather than being animated per frame, and the layer is promoted so the morph runs on the compositor */
+.psearch__card {
+  position: relative;
+  width: min(300px, 100%);
+  overflow: hidden;
+  background: var(--psearch-card);
+  box-shadow: var(--psearch-card-shadow), 0 0 0 1px var(--psearch-card-ring);
+  cursor: text;
+  will-change: transform;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.psearch__card--open {
+  width: min(420px, 100%);
+  cursor: auto;
+}
+
+.psearch__bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 50px;
+  padding: 0 10px 0 16px;
+}
+
+.psearch__glass {
+  display: flex;
+  flex-shrink: 0;
+  color: var(--psearch-faint);
+  transition: color 0.2s ease;
+}
+
+.psearch__card--open .psearch__glass {
+  color: var(--psearch-text);
+}
+
+.psearch__input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--psearch-text);
+  caret-color: var(--psearch-accent);
+  font: inherit;
+  /* 16px would stop iOS zooming in; the design's 15 holds everywhere else */
+  font-size: 15px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.psearch__input::placeholder {
+  color: var(--psearch-placeholder);
+  opacity: 1;
+}
+
+.psearch__input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.psearch__close {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  background: var(--psearch-btn);
+  color: var(--psearch-btn-fg);
+  outline: none;
+  transition: background-color 0.2s ease;
+}
+
+.psearch__kbd {
+  flex-shrink: 0;
+  margin-right: 4px;
+  padding: 2px 6px;
+  border: 1px solid var(--psearch-kbd-border);
+  border-radius: 6px;
+  background: var(--psearch-kbd-bg);
+  color: var(--psearch-faint);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 16px;
+}
+
+/* ---------------------------------------------------------------- the body */
+
+.psearch__body {
+  width: 100%;
+}
+
+.psearch__panel {
+  position: relative;
+  margin: 0 6px;
+  overflow: hidden;
+  border: 1px solid var(--psearch-panel-border);
+  background: var(--psearch-panel);
+}
+
+.psearch__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 40px;
+  padding: 0 16px;
+}
+
+.psearch__head-label {
+  color: var(--psearch-faint);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.psearch__action {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  color: var(--psearch-accent);
+  font-size: 12.5px;
+  font-weight: 500;
+  outline: none;
+  transition: opacity 0.2s ease;
+}
+
+.psearch__foot {
+  height: 6px;
+}
+
+/* ---------------------------------------------------------------- the list */
+
+.psearch__list {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.psearch__sheet {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 2;
+  background: var(--psearch-sheet);
+  box-shadow: var(--psearch-sheet-shadow);
+  pointer-events: none;
+}
+
+.psearch__row {
+  position: relative;
+  overflow: hidden;
+  list-style: none;
+}
+
+.psearch__row--leaving {
+  pointer-events: none;
+}
+
+.psearch__divider {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: var(--psearch-divider);
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.psearch__row-body {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  cursor: pointer;
+}
+
+.psearch__row-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.psearch__row-title,
+.psearch__row-sub {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.psearch__row-title {
+  color: var(--psearch-text);
+  font-size: 14.5px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: -0.01em;
+}
+
+.psearch__row-sub {
+  margin-top: 2px;
+  color: var(--psearch-muted);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.psearch__remove-slot {
+  position: relative;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+}
+
+.psearch__remove {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: var(--psearch-danger);
+  outline: none;
+  transition: background-color 0.2s ease;
+}
+
+.psearch__remove--idle {
+  pointer-events: none;
+}
+
+.psearch__tip {
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 8px);
+  z-index: 10;
+  /* translate, not transform: Motion owns the transform for the tooltip's slide and scale */
+  translate: 0 -50%;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--psearch-tip-bg);
+  color: var(--psearch-tip-fg);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  font-size: 11.5px;
+  font-weight: 500;
+  line-height: 16px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.psearch__tip-arrow {
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  width: 8px;
+  height: 8px;
+  border-radius: 1px;
+  background: var(--psearch-tip-bg);
+  transform: translate(-4px, -50%) rotate(45deg);
+}
+
+.psearch__empty {
+  overflow: hidden;
+  list-style: none;
+}
+
+.psearch__empty > div {
+  padding: 28px 16px;
+  border-top: 1px solid var(--psearch-divider);
+  color: var(--psearch-faint);
+  font-size: 13px;
+  text-align: center;
+}
+
+/* ---------------------------------------------------------------- tiles: drawn at 76px, shown at 44 */
+
+.psearch__tile {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+}
+
+.psearch__tile-art {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  overflow: hidden;
+  border-radius: 20px;
+  transform: scale(0.5789);
+  transform-origin: 0 0;
+}
+
+.psearch__tile-art > span {
+  position: absolute;
+}
+
+.psearch__window {
+  overflow: hidden;
+}
+
+.psearch__window-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 16px;
+  padding-left: 7px;
+  background: #7ec0fb;
+}
+
+.psearch__window-bar i {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #1f5fd6;
+}
+
+.psearch__window-line {
+  display: block;
+  width: 100%;
+  height: 3px;
+  background: #a8d2fb;
+}
+
+.psearch__switch {
+  display: flex;
+  align-items: center;
+}
+
+.psearch__switch--on {
+  justify-content: flex-end;
+  padding-right: 3px;
+}
+
+.psearch__switch--off {
+  padding-left: 3px;
+}
+
+.psearch__switch i {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+}
+
+.psearch__switch--on i {
+  background: #2fa83f;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.2);
+}
+
+.psearch__switch--off i {
+  border: 3px solid #3fbf50;
+  background: #ffffff;
+}
+
+/* ---------------------------------------------------------------- chips */
+
+.psearch__chips {
+  display: flex;
+  gap: 8px;
+  padding: 14px 16px 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 64px), transparent calc(100% - 12px));
+  mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 64px), transparent calc(100% - 12px));
+}
+
+.psearch__chips::-webkit-scrollbar {
+  display: none;
+}
+
+.psearch__chip {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 14px 0 5px;
+  border-radius: 999px;
+  box-shadow: inset 0 1px 1px rgb(255 255 255 / 0.6);
+  color: #1d1d1f;
+  font-size: 13.5px;
+  font-weight: 500;
+  outline: none;
+  transition: filter 0.2s ease;
+}
+
+.psearch__chip--lead {
+  background: linear-gradient(90deg, #f39a72 0%, #f7b48c 100%);
+  box-shadow: inset 0 1px 1px rgb(255 255 255 / 0.55);
+}
+
+.psearch__count,
+.psearch__chip-x {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  box-shadow: inset 0 1px 1px rgb(255 255 255 / 0.9), 0 1px 2px rgb(0 0 0 / 0.08);
+}
+
+.psearch__count {
+  position: relative;
+  overflow: hidden;
+  background: rgb(255 255 255 / 0.8);
+  color: #3a2a20;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.psearch__chip-x {
+  background: rgb(255 255 255 / 0.75);
+  color: #1d1d1f;
+  outline: none;
+  transition: background-color 0.2s ease;
+}
+
+/* ---------------------------------------------------------------- hover and focus */
+
+@media (hover: hover) {
+  .psearch__close:hover {
+    background: var(--psearch-btn-hover);
+  }
+
+  .psearch__action:hover {
+    opacity: 0.7;
+  }
+
+  .psearch__remove:hover {
+    background: color-mix(in srgb, var(--psearch-danger) 12%, transparent);
+  }
+
+  .psearch__chip:hover {
+    filter: brightness(1.04);
+  }
+
+  .psearch__chip-x:hover {
+    background: #ffffff;
+  }
+}
+
+.psearch__close:focus-visible,
+.psearch__action:focus-visible {
+  box-shadow: 0 0 0 2px var(--psearch-accent);
+}
+
+.psearch__remove:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--psearch-danger) 40%, transparent);
+}
+
+.psearch__chip:focus-visible,
+.psearch__chip-x:focus-visible {
+  box-shadow: 0 0 0 2px rgb(0 0 0 / 0.2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .psearch__card,
+  .psearch__glass,
+  .psearch__divider {
+    transition: none;
+  }
+}

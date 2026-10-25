@@ -31,6 +31,8 @@ import CopyPastePad from "./CopyPastePad";
 import FileBox from "./FileBox";
 import DeskComputer from "./DeskComputer";
 import LiquidVoice from "./LiquidVoice";
+import SelectionList from "./SelectionList";
+import SearchCard from "./SearchCard";
 import type { Entry } from "./registry";
 import { LINKS } from "@/lib/links";
 import { setTheme as setSiteTheme, usePinTheme } from "@/lib/theme";
@@ -132,6 +134,8 @@ export default function WorkbenchStage({
           {entry.slug === "file-box" && <FileBox theme={theme} fill />}
           {entry.slug === "liquid-voice" && <LiquidVoice theme={theme} fill />}
           {entry.slug === "task-card" && <TaskCard theme={theme} />}
+          {entry.slug === "selection-list" && <SelectionList theme={theme} />}
+          {entry.slug === "search-card" && <SearchCard theme={theme} />}
           {/* ⌘V on the pad pastes the copied theme into the site's own switch */}
           {entry.slug === "copy-paste-pad" && (
             <CopyPastePad

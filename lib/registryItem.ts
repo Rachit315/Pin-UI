@@ -68,6 +68,8 @@ const FACES: Record<string, string | null> = {
   "desk-computer": "the system UI face for its corners, with Arial drawn into the screen and the badges",
   "file-box": null,
   "liquid-voice": null,
+  "selection-list": "Inter Tight (500)",
+  "search-card": "Inter (400 to 600)",
   "copy-paste-pad": "Inter (400 and 500) for the overlays, with Varela Round for the keycap legends (Arial Rounded where it is missing)",
 };
 
@@ -164,6 +166,13 @@ function docsFor(entry: Entry): string {
     lines.push(
       "",
       "The glass is drawn in WebGL 2; without it the component falls back to a CSS gradient and backdrop-filter glass on its own. There is no microphone: the waveform is generated. Wire onSend and onCancel to your own recorder if you need real audio. Pass fill to have the sky take its container's whole box.",
+    );
+  }
+
+  if (entry.slug === "search-card") {
+    lines.push(
+      "",
+      "It listens for ⌘K / Ctrl K on the whole window while it is mounted; pass shortcut={false} if your app already uses that key. It keeps the room the open card needs — the bar rests in the middle of it and rises to the top as the card opens — so give it that height rather than overlaying it on content. A press outside closes it — anything marked data-keep-open (a theme switch, say) is left alone.",
     );
   }
 

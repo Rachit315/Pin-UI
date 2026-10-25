@@ -1,0 +1,466 @@
+/* Halo Sign In — a 392-wide white card in a pale tray, centred in the window.
+   The tray is a 6px zinc lip around the card that also holds the sign-up line under it. Fields are filled
+   zinc wells that turn white with a ring on focus; the button is near-black. On a short window the halo
+   and the gaps tighten so the whole card still fits; on a narrow one the card's padding comes in. */
+
+.hsi {
+  --hsi-paper: #ffffff;
+  --hsi-tray: rgb(244 244 245 / 0.8);
+  --hsi-tray-ring: rgb(228 228 231 / 0.7);
+  --hsi-well: #f4f4f5;
+  --hsi-well-hover: rgb(228 228 231 / 0.6);
+  --hsi-ring: #d4d4d8;
+  --hsi-halo: rgb(24 24 27 / 0.06);
+  --hsi-ink: #18181b;
+  --hsi-title: #27272a;
+  --hsi-icon-on: #3f3f46;
+  --hsi-muted: #71717a;
+  --hsi-faint: #a1a1aa;
+  --hsi-button: #09090b;
+  --hsi-button-hover: #27272a;
+  --hsi-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --hsi-family: var(--hsi-font), "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  color-scheme: light;
+  display: grid;
+  /* one column that can shrink below the fields' intrinsic width, so nothing overflows a 320px phone */
+  grid-template-columns: minmax(0, 1fr);
+  place-items: center;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0;
+  padding: max(24px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+  background: var(--hsi-paper);
+  color: var(--hsi-ink);
+  font-family: var(--hsi-family);
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  text-rendering: optimizeLegibility;
+}
+
+.hsi *,
+.hsi *::before,
+.hsi *::after {
+  box-sizing: border-box;
+}
+
+.hsi button,
+.hsi input {
+  margin: 0;
+  font: inherit;
+}
+
+.hsi button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.hsi__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- the tray and the card ---------- */
+
+.hsi__tray {
+  width: 100%;
+  max-width: 392px;
+  padding: 6px;
+  border-radius: 30px;
+  background: var(--hsi-tray);
+  box-shadow: 0 0 0 1px var(--hsi-tray-ring);
+}
+
+.hsi__card {
+  padding: 20px 20px 24px;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow:
+    0 0 0 1px rgb(24 24 27 / 0.04),
+    0 1px 2px rgb(0 0 0 / 0.04),
+    0 8px 24px -6px rgb(0 0 0 / 0.08);
+}
+
+/* ---------- the halo ---------- */
+
+.hsi__halo {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+}
+
+.hsi__dots {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: var(--hsi-faint);
+  -webkit-mask-image: radial-gradient(circle, #000 35%, transparent 72%);
+  mask-image: radial-gradient(circle, #000 35%, transparent 72%);
+}
+
+.hsi__mark {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 15px;
+  background: linear-gradient(to bottom, #71717a, #3f3f46);
+  box-shadow:
+    0 0 0 1px rgb(39 39 42 / 0.4),
+    inset 0 1px 0 rgb(255 255 255 / 0.25),
+    inset 0 -2px 4px rgb(0 0 0 / 0.25),
+    0 2px 4px rgb(0 0 0 / 0.12),
+    0 10px 20px -8px rgb(0 0 0 / 0.45);
+}
+
+.hsi__mark svg {
+  display: block;
+  width: 28px;
+  height: 28px;
+}
+
+/* ---------- the title ---------- */
+
+.hsi__head {
+  margin-top: 4px;
+  text-align: center;
+}
+
+.hsi__title {
+  margin: 0;
+  color: var(--hsi-title);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.hsi__lede {
+  max-width: 30ch;
+  margin: 6px auto 0;
+  color: var(--hsi-faint);
+  font-size: 15px;
+  line-height: 1.375;
+  text-wrap: balance;
+}
+
+/* ---------- the form ---------- */
+
+.hsi__form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.hsi__field {
+  --autofill-bg: var(--hsi-well);
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--hsi-well);
+  box-shadow: 0 0 0 1px transparent;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.hsi__field:focus-within {
+  --autofill-bg: #ffffff;
+  background: #ffffff;
+  box-shadow:
+    0 0 0 1px var(--hsi-ring),
+    0 0 0 4px var(--hsi-halo);
+}
+
+.hsi__field-icon {
+  display: flex;
+  padding-left: 14px;
+  color: var(--hsi-faint);
+  pointer-events: none;
+  transition: color 0.2s ease;
+}
+
+.hsi__field-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.hsi__field:focus-within .hsi__field-icon {
+  color: var(--hsi-icon-on);
+}
+
+.hsi__input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 10px;
+  border: 0;
+  background: transparent;
+  color: var(--hsi-ink);
+  font-size: 15px;
+  outline: none;
+}
+
+.hsi__input::placeholder {
+  color: var(--hsi-muted);
+  opacity: 1;
+}
+
+/* keep browser autofill from painting over the wells */
+.hsi__input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px var(--autofill-bg) inset;
+  -webkit-text-fill-color: var(--hsi-ink);
+  transition: background-color 9999s;
+}
+
+.hsi__trailing {
+  padding-right: 6px;
+}
+
+.hsi__peek {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--hsi-faint);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.hsi__peek-icon {
+  display: grid;
+}
+
+.hsi__peek-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.hsi__submit-row {
+  margin-top: 8px;
+}
+
+.hsi__submit {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 44px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 12px;
+  background: var(--hsi-button);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.12),
+    0 1px 2px rgb(0 0 0 / 0.2),
+    0 6px 16px -6px rgb(0 0 0 / 0.45);
+  transition: background-color 0.2s ease;
+}
+
+.hsi__submit:disabled {
+  cursor: default;
+}
+
+.hsi__submit-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hsi__spinner {
+  width: 16px;
+  height: 16px;
+  animation: hsi-spin 0.7s linear infinite;
+}
+
+@keyframes hsi-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+/* ---------- the other ways in ---------- */
+
+.hsi__or {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+  color: var(--hsi-faint);
+  font-size: 13px;
+}
+
+.hsi__or > span:not(.hsi__rule) {
+  flex-shrink: 0;
+}
+
+.hsi__rule {
+  flex: 1;
+  height: 1px;
+  background: repeating-linear-gradient(90deg, #d4d4d8 0 4px, transparent 4px 8px);
+}
+
+.hsi__socials {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.hsi__social {
+  display: grid;
+  place-items: center;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #09090b;
+  cursor: pointer;
+  box-shadow:
+    0 0 0 1px rgb(228 228 231 / 0.8),
+    0 1px 2px rgb(0 0 0 / 0.05);
+  transition: box-shadow 0.2s ease;
+}
+
+.hsi__social svg {
+  width: 20px;
+  height: 20px;
+}
+
+.hsi__foot {
+  margin: 0;
+  padding: 14px 16px;
+  color: var(--hsi-muted);
+  font-size: 14px;
+  line-height: 20px;
+  text-align: center;
+}
+
+.hsi__link {
+  border-radius: 4px;
+  color: var(--hsi-ink);
+  font-weight: 500;
+  text-decoration: none;
+  text-underline-offset: 4px;
+}
+
+/* ---------- hover and focus ---------- */
+
+@media (hover: hover) {
+  .hsi__field:hover:not(:focus-within) {
+    background: var(--hsi-well-hover);
+  }
+
+  .hsi__peek:hover {
+    color: #52525b;
+  }
+
+  .hsi__submit:not(:disabled):hover {
+    background: var(--hsi-button-hover);
+  }
+
+  .hsi__social:hover {
+    box-shadow:
+      0 0 0 1px #d4d4d8,
+      0 4px 12px -4px rgb(0 0 0 / 0.12);
+  }
+
+  .hsi__link:hover {
+    text-decoration: underline;
+  }
+}
+
+.hsi__peek:focus-visible,
+.hsi__link:focus-visible {
+  outline: 2px solid rgb(24 24 27 / 0.3);
+  outline-offset: 0;
+}
+
+.hsi__submit:focus-visible {
+  outline: 2px solid var(--hsi-button);
+  outline-offset: 2px;
+}
+
+.hsi__social:focus-visible {
+  outline: 2px solid rgb(24 24 27 / 0.4);
+  outline-offset: 2px;
+}
+
+/* ---------- sizes ---------- */
+
+@media (min-width: 400px) {
+  .hsi__card {
+    padding: 20px 28px 28px;
+  }
+
+  .hsi__title {
+    font-size: 24px;
+  }
+
+  .hsi__lede {
+    max-width: none;
+  }
+}
+
+@media (min-width: 640px) {
+  .hsi {
+    padding-right: 24px;
+    padding-left: 24px;
+  }
+}
+
+/* a short window: the halo and the gaps tighten so the card still fits */
+@media (max-height: 640px) {
+  .hsi__card {
+    padding-top: 12px;
+    padding-bottom: 20px;
+  }
+
+  .hsi__halo {
+    width: 100px;
+    height: 100px;
+  }
+
+  .hsi__form {
+    margin-top: 16px;
+  }
+
+  .hsi__or {
+    margin-top: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hsi__spinner {
+    animation-duration: 1.6s;
+  }
+}
