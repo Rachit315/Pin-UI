@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import { Caveat, Manrope } from "next/font/google";
 import { LINKS } from "@/lib/links";
@@ -197,6 +198,11 @@ export default function RootLayout({
           in development it stays in debug mode and sends nothing.
         */}
         <Analytics />
+        <Script
+          src="https://talvess.vercel.app/script.js"
+          data-website-id="2043c2d9-4be2-4309-be82-d112d8a108ea"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
