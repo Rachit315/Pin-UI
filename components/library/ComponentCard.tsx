@@ -3,9 +3,8 @@
 import type React from "react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { motion, useReducedMotion } from "motion/react";
-import { softSpring } from "@/lib/motion";
-import type { Entry } from "./registry";
+import { useReducedMotion } from "motion/react";
+import { thumbOf, type Entry } from "./registry";
 import CreatorDot from "./CreatorDot";
 
 /**
@@ -22,7 +21,16 @@ import CreatorDot from "./CreatorDot";
  * Nothing moves for someone who has asked for reduced motion, or who has
  * asked the browser to save data; a hidden tab pauses everything.
  */
-export default function ComponentCard({ entry, index }: { entry: Entry; index: number }) {
+export default function ComponentCard({
+  entry,
+  index,
+  priority = false,
+}: {
+  entry: Entry;
+  index: number;
+  /** In the first row a page opens on: its still loads straight away, ahead of everything else. */
+  priority?: boolean;
+}) {
   const reduced = useReducedMotion();
   const videoRef = useRef<HTMLVideoElement>(null);
   const cellRef = useRef<HTMLLIElement>(null);
@@ -87,26 +95,43 @@ export default function ComponentCard({ entry, index }: { entry: Entry; index: n
   }, [sync]);
 
   return (
-    <motion.li
-      className="shelf__cell"
-      ref={cellRef}
-      initial={reduced ? undefined : { opacity: 0, y: 28 }}
-      whileInView={reduced ? undefined : { opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{ ...softSpring, delay: index * 0.08 }}
-    >
+    /*
+     * The card rises in as it scrolls into view — a CSS scroll-driven animation
+     * (.pin-reveal, globals.css), not a JS observer, so a card that is already
+     * on screen is painted at first paint rather than held hidden until
+     * hydration. Cards side by side are staggered by their column.
+     */
+    <li className="shelf__cell pin-reveal" ref={cellRef} style={{ "--reveal-i": index % 3 } as React.CSSProperties}>
       <Link className="card" href={`/components/${entry.slug}`}>
         {/* the recording's own field shows behind a clip zoomed out below 1 */}
         <span className="card__frame" style={{ background: entry.clipStage ?? entry.stage }}>
-          {entry.clip ? (
+          {/*
+            The still is a real image rather than the video's poster: a poster
+            cannot be lazy, so every card on the page used to fetch its still at
+            once and the first one queued behind the rest. This loads only as
+            the card comes near (or first, for the opening row), before any
+            script has run; the clip lays over it once it has frames.
+          */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className="card__video"
+            src={thumbOf(entry.poster)}
+            /* the zoom is a token so the hover lift can compose with it */
+            style={{ "--card-zoom": entry.zoom } as React.CSSProperties}
+            alt=""
+            width={768}
+            height={432}
+            loading={priority ? "eager" : "lazy"}
+            fetchPriority={priority ? "high" : "auto"}
+            decoding="async"
+            aria-hidden="true"
+          />
+          {entry.clip && (
             <video
-              className="card__video"
+              className="card__video card__clip"
               ref={videoRef}
               src={near ? entry.clip : undefined}
-              /* the zoom is a token so the hover lift can compose with it */
               style={{ "--card-zoom": entry.zoom } as React.CSSProperties}
-              /* the still is there from the first paint, before the clip is even requested */
-              poster={entry.poster}
               muted
               playsInline
               loop
@@ -114,20 +139,6 @@ export default function ComponentCard({ entry, index }: { entry: Entry; index: n
               onLoadedData={sync}
               preload={near ? "auto" : "none"}
               tabIndex={-1}
-              aria-hidden="true"
-            />
-          ) : (
-            /* not recorded yet: a screenshot, which takes the same hover lift */
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              className="card__video"
-              src={entry.poster}
-              style={{ "--card-zoom": entry.zoom } as React.CSSProperties}
-              alt=""
-              width={960}
-              height={540}
-              loading="lazy"
-              decoding="async"
               aria-hidden="true"
             />
           )}
@@ -153,6 +164,6 @@ export default function ComponentCard({ entry, index }: { entry: Entry; index: n
           </span>
         </span>
       </Link>
-    </motion.li>
+    </li>
   );
 }

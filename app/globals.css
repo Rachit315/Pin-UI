@@ -1,4 +1,35 @@
 /*
+ * Switzer, the stand-in for Neue Montreal — the same @font-face rules
+ * Fontshare's CSS API returns (switzer@400,500,600, display=swap), written
+ * here so the page no longer waits on a render-blocking stylesheet from
+ * another origin before it can paint. The files are still served by
+ * Fontshare's CDN; if they ever move, the text falls back to the system sans.
+ */
+@font-face {
+  font-family: "Switzer";
+  src: url("https://cdn.fontshare.com/wf/BLNB4FAQFNK56DWWNF7PMGTCOTZHOEII/ST3WKSSDMBK2MIQQO3MAVYWLF4FTOLFV/6IN5WOLRCYP4G4MOCOHOMXNON6Q7MDAR.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Switzer";
+  src: url("https://cdn.fontshare.com/wf/OYB4CXKJQXKTNSLJMTDQOIVUL2V5EL7S/WYO2P7DQVV5RNXGMCUO2HL4RJP4VFUAS/6XPIMU23OJVRY676OG5YVJMWEHWICATX.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Switzer";
+  src: url("https://cdn.fontshare.com/wf/5SZVFDB7V52TI6ULVC6J3WQZQCIZVDV5/ODYPSTCUDMKSTYIPTV4CLQ7URIK7XYBJ/YS3VPNVO4B3TOJMEXDGFZQ4TLZGGSRZC.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+/*
  * The two faces the library's components are drawn in, self-hosted.
  *
  * They are declared under their real family names rather than through a
@@ -1380,4 +1411,67 @@ html::-webkit-scrollbar-thumb {
 
 html::-webkit-scrollbar-thumb:hover {
   background: var(--pin-scroll-thumb-hover);
+}
+
+/* ===========================================================================
+   Scroll reveal.
+
+   A section or a card rises in as it is scrolled to, driven by the scroll
+   itself (animation-timeline: view()) rather than a JavaScript observer —
+   so nothing is ever held hidden waiting for hydration, and whatever is
+   already on the first screen is painted at first paint. Where scroll-driven
+   animation is not supported, or motion is reduced, it is simply there.
+   --reveal-i staggers cards that sit side by side.
+=========================================================================== */
+
+@keyframes pin-reveal {
+  /* a rise without a fade: whatever is already on screen is painted at once, and type never dips below its contrast */
+  from {
+    transform: translateY(28px);
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .pin-reveal {
+      animation: pin-reveal linear both;
+      animation-timeline: view();
+      animation-range: entry calc(var(--reveal-i, 0) * 8%) entry calc(55% + var(--reveal-i, 0) * 8%);
+    }
+  }
+}
+
+/* ===========================================================================
+   Entrance rise.
+
+   Page furniture — a masthead, a mark, a heading — rising into place on
+   arrival, as CSS keyframes rather than Motion, so it moves from the very
+   first paint instead of waiting for hydration. Delay it with --rise-d.
+=========================================================================== */
+
+/*
+ * Nothing on the first screen starts invisible. A browser does not count
+ * opacity-0 text or pictures as painted, so a fade from nothing holds the
+ * page's first and largest paints back until it ends; starting from a faint
+ * state and rising looks the same and is painted from the very first frame.
+ */
+@keyframes pin-rise {
+  from {
+    opacity: 0.3;
+    transform: translateY(16px);
+  }
+}
+
+/* the claim rises out of its mask from half-way: it reads as the same rise, and the headline is painted from the first frame */
+
+/* the soft spring the hero used, as a curve: settles without overshoot */
+.pin-rise {
+  animation: pin-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--rise-d, 0s) backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pin-rise {
+    animation: none;
+  }
 }

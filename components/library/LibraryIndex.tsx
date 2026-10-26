@@ -168,7 +168,7 @@ export default function LibraryIndex() {
           </div>
         </div>
 
-        {SHELVES.map((shelf) => (
+        {SHELVES.map((shelf, si) => (
           <section className="lib__shelf" id={shelf.id} key={shelf.id} aria-labelledby={`${shelf.id}-title`}>
             <header className="lib__shelfHead">
               <h2 className="lib__shelfTitle" id={`${shelf.id}-title`}>
@@ -179,7 +179,8 @@ export default function LibraryIndex() {
             </header>
             <ul className="shelf__grid">
               {shelf.entries.map((entry, i) => (
-                <ComponentCard key={entry.slug} entry={entry} index={i % 3} />
+                /* the first row the page opens on loads its stills first */
+                <ComponentCard key={entry.slug} entry={entry} index={i % 3} priority={si === 0 && i < 3} />
               ))}
             </ul>
           </section>

@@ -857,8 +857,9 @@ span.blx-mark__badge {
   margin: 0;
   padding: 0 12px;
   border: 0;
-  background: rgb(255 255 255 / 0.6);
-  color: var(--blx-red);
+  /* nearly white with a deeper red label, so the idle tab reads at 4.8:1 */
+  background: rgb(255 255 255 / 0.9);
+  color: #cf001e;
   font: inherit;
   font-size: 12px;
   cursor: pointer;
@@ -867,6 +868,8 @@ span.blx-mark__badge {
 
 .blx .blx-tab[data-on] {
   background: transparent;
+  /* the chosen tab keeps the brand red on its white pill (4.7:1) */
+  color: var(--blx-red);
 }
 
 .blx-tab__on {
@@ -889,7 +892,7 @@ span.blx-mark__badge {
 
 @media (hover: hover) {
   .blx .blx-tab:not([data-on]):hover {
-    background: rgb(255 255 255 / 0.78);
+    background: #ffffff;
   }
 }
 

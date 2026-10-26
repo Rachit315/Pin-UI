@@ -130,6 +130,7 @@
 }
 
 .hwall__tile {
+  position: relative;
   flex: 0 0 auto;
   width: 23.97em;
   height: 14.175em;
@@ -142,6 +143,12 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+/* the clip lies over the tile's still and paints nothing until it has frames */
+.hwall__clip {
+  position: absolute;
+  inset: 0;
 }
 
 /*

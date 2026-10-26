@@ -8,7 +8,7 @@ import GitHubStars from "./GitHubStars";
 import ThemeMark from "../ThemeMark";
 import MobileMenu from "../MobileMenu";
 import ThemeHint from "../ThemeHint";
-import { softSpring, spring } from "@/lib/motion";
+import { softSpring } from "@/lib/motion";
 import { useRailed } from "./useRailed";
 
 /** Where the "submit a design" line goes: the request form. */
@@ -32,15 +32,13 @@ export default function HeroSection() {
   const reduced = useReducedMotion();
   const { railed, instant } = useRailed();
 
-  /** Everything in the hero enters on the same curve, just at its own time. */
-  const rise = (delay: number) =>
-    reduced
-      ? {}
-      : ({
-          initial: { opacity: 0, y: 16 },
-          animate: { opacity: 1, y: 0 },
-          transition: { ...softSpring, delay },
-        } as const);
+  /*
+   * Everything in the hero enters on the same curve, just at its own time —
+   * as CSS keyframes (app/hero.css), not Motion, so the first screen is
+   * painted and moving before any JavaScript has run: a phone sees the hero
+   * at first paint instead of after hydration.
+   */
+  const rise = (delay: number) => ({ "--rise-d": `${delay}s` }) as React.CSSProperties;
 
   return (
     <main className="hero" id="top">
@@ -75,7 +73,7 @@ export default function HeroSection() {
               /* a page restored part-way down corrects itself without a show */
               transition={instant ? { duration: 0 } : softSpring}
             >
-              <motion.div className="hero__brand" {...rise(0.05)}>
+              <div className="hero__brand pin-rise" style={rise(0.05)}>
                 {/* the mark is the switch; the wordmark beside it is plain type */}
                 <ThemeMark
                   buttonClassName="hero__markButton"
@@ -86,9 +84,9 @@ export default function HeroSection() {
                 <span className="hero__wordmark">Pin UI</span>
                 {/* under, not over: the frame's edge sits right above the lockup and would cut an arc */}
                 <ThemeHint mark=".hero__markButton" word=".hero__wordmark" under />
-              </motion.div>
+              </div>
 
-              <motion.nav className="hero__nav" {...rise(0.12)}>
+              <nav className="hero__nav pin-rise" style={rise(0.12)}>
                 <a className="hero__navLink" href="#top">
                   Home
                 </a>
@@ -99,29 +97,23 @@ export default function HeroSection() {
                 <a className="hero__navLink" href="#testimonials">
                   Testimonials
                 </a>
-              </motion.nav>
+              </nav>
 
               {/* the octocat lifts away on hover and the star count rises into its place */}
-              <GitHubStars {...rise(0.18)} />
+              <GitHubStars className="pin-rise" style={rise(0.18)} />
 
               {/* on a phone the links and the square fold into the menu */}
-              <motion.div className="hero__menu" {...rise(0.18)}>
+              <div className="hero__menu pin-rise" style={rise(0.18)}>
                 <MobileMenu />
-              </motion.div>
+              </div>
             </motion.header>
           )}
         </AnimatePresence>
 
         <div className="hero__center">
-          <motion.a
-            className="hero__submit"
-            href={SUBMIT_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            {...rise(0.2)}
-          >
+          <a className="hero__submit pin-rise" href={SUBMIT_URL} target="_blank" rel="noopener noreferrer" style={rise(0.2)}>
             Want to submit a design?? <span aria-hidden="true">→</span>
-          </motion.a>
+          </a>
 
           {/*
             The claim rises out of a clipping mask a line at a time, so the
@@ -129,36 +121,23 @@ export default function HeroSection() {
           */}
           <h1 className="hero__claim">
             <span className="hero__line">
-              <motion.span
-                className="hero__lineInner"
-                initial={reduced ? false : { y: "110%" }}
-                animate={{ y: "0%" }}
-                transition={{ ...softSpring, delay: 0.26 }}
-              >
+              <span className="hero__lineInner hero-line-in" style={rise(0.26)}>
                 We turn{" "}
                 <PinterestPeek />{" "}
                 static designs
-              </motion.span>
+              </span>
             </span>
             <span className="hero__line">
-              <motion.span
-                className="hero__lineInner"
-                initial={reduced ? false : { y: "110%" }}
-                animate={{ y: "0%" }}
-                transition={{ ...softSpring, delay: 0.34 }}
-              >
+              <span className="hero__lineInner hero-line-in" style={rise(0.34)}>
                 into reusable components
-              </motion.span>
+              </span>
             </span>
           </h1>
 
           {/* the stamp goes to the shelf on this page, gliding there */}
           <motion.a
-            className="hero__stamp"
+            className="hero__stamp hero-stamp-in"
             href="#components"
-            initial={reduced ? false : { opacity: 0, scale: 0.88, rotate: -3 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            transition={{ ...spring, delay: 0.46 }}
             whileHover={reduced ? undefined : { scale: 1.04, rotate: -1.5 }}
             whileTap={reduced ? undefined : { scale: 0.97 }}
           >

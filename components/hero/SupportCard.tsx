@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion, type Transition } from "motion/react";
-import { LIBRARY } from "@/components/library/registry";
+import { LIBRARY, thumbOf } from "@/components/library/registry";
 import { LINKS } from "@/lib/links";
 import { lenisRef } from "@/lib/lenis";
 import { formatStars, useGitHubStars } from "@/lib/useGitHubStars";
@@ -38,7 +38,7 @@ const settle: Transition = { type: "spring", visualDuration: 0.6, bounce: 0.22 }
 const slap: Transition = { type: "spring", visualDuration: 0.42, bounce: 0.45 };
 
 /* every component with a recording has a lively poster: those are the pictures to pin */
-const POOL = LIBRARY.filter((entry) => entry.clip).map((entry) => ({ slug: entry.slug, poster: entry.poster, field: entry.clipStage ?? entry.stage }));
+const POOL = LIBRARY.filter((entry) => entry.clip).map((entry) => ({ slug: entry.slug, poster: thumbOf(entry.poster), field: entry.clipStage ?? entry.stage }));
 /* where each picture lands on the board: x and y in %, then degrees */
 const FAN = [
   [-50, 14, -9],
@@ -104,7 +104,14 @@ export default function SupportCard() {
   const starRef = useRef<HTMLAnchorElement>(null);
   const returnTo = useRef<HTMLElement | null>(null);
 
-  /* on every visit, once the hero has had its moment — unless this browser has already gone to star it */
+  /*
+   * On every visit, once the hero has had its moment — unless this browser
+   * has already gone to star it. The moment is counted from the visitor's
+   * first move (a scroll, a touch, the pointer, a key) rather than from the
+   * load, so the card never lands on a page that is still arriving: someone
+   * reading the hero sees it a beat after they start, and a page that loads
+   * with nobody there is never interrupted.
+   */
   useEffect(() => {
     if (shownThisLoad || POOL.length < 3) return;
     let starred = false;
@@ -114,13 +121,23 @@ export default function SupportCard() {
       /* blocked storage: ask, as on a first visit */
     }
     if (starred) return;
-    const t = window.setTimeout(() => {
-      shownThisLoad = true;
-      returnTo.current = document.activeElement as HTMLElement | null;
-      setPicks(pickThree());
-      setOpen(true);
-    }, DELAY_MS);
-    return () => window.clearTimeout(t);
+    let t = 0;
+    const EVENTS = ["pointermove", "pointerdown", "scroll", "keydown", "touchstart", "wheel"] as const;
+    const stop = () => EVENTS.forEach((e) => window.removeEventListener(e, start));
+    function start() {
+      stop();
+      t = window.setTimeout(() => {
+        shownThisLoad = true;
+        returnTo.current = document.activeElement as HTMLElement | null;
+        setPicks(pickThree());
+        setOpen(true);
+      }, DELAY_MS);
+    }
+    EVENTS.forEach((e) => window.addEventListener(e, start, { passive: true }));
+    return () => {
+      stop();
+      window.clearTimeout(t);
+    };
   }, []);
 
   const close = useCallback(() => setOpen(false), []);

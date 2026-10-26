@@ -1252,6 +1252,16 @@ const ENTRIES: Entry[] = [
  */
 export const LANDING_SHOWN = 5;
 
+/**
+ * The card-sized WebP of a poster: "/clips/loop/x.jpg?v=2" → "/clips/thumb/x.webp?v=2".
+ * Wherever a poster is shown at card size — the shelf, the hero wall, the
+ * Pinterest peek, the star card — this is what is loaded: 768×432 rather than
+ * the 1280×720 JPEG, about a fifth of the bytes. scripts/make-thumbs.py makes them.
+ */
+export function thumbOf(poster: string): string {
+  return poster.replace(/^\/clips\/loop\/([^/?]+)\.jpg/, "/clips/thumb/$1.webp");
+}
+
 /** The library, newest first, with "New" set on the ones the landing page shows. */
 export const LIBRARY: Entry[] = ENTRIES.map((entry, i) => ({ ...entry, isNew: i < LANDING_SHOWN }));
 

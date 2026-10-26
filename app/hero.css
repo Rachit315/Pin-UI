@@ -774,3 +774,57 @@
   }
 }
 
+
+/* ===========================================================================
+   The hero's entrance, as CSS rather than Motion.
+
+   Keyframes start at first paint, before any JavaScript has run, so a phone
+   sees the hero straight away instead of after hydration — the claim used to
+   sit hidden below its clipping mask until React woke up. Each keeps the
+   choreography it had: the masthead, the line asking for designs, the claim a
+   line at a time out of its mask, the stamp, and the wall row by row, each
+   at its own delay (--rise-d). `backwards` holds only the start state, during
+   the delay; once a keyframe ends the element is itself again, so the stamp's
+   hover and press (Motion) are never fought over.
+=========================================================================== */
+
+@keyframes hero-line {
+  from {
+    transform: translateY(52%);
+  }
+}
+
+@keyframes hero-stamp {
+  from {
+    opacity: 0.3;
+    transform: scale(0.88) rotate(-3deg);
+  }
+}
+
+/* the rows already sit at their own faint opacity; they rise into place rather than fading from nothing */
+@keyframes hwall-in {
+  from {
+    transform: translateY(24px);
+  }
+}
+
+.hero-line-in {
+  animation: hero-line 0.95s cubic-bezier(0.22, 1, 0.36, 1) var(--rise-d, 0s) backwards;
+}
+
+/* the stamp's stiffer spring: a little overshoot as it lands */
+.hero-stamp-in {
+  animation: hero-stamp 0.62s cubic-bezier(0.34, 1.45, 0.64, 1) 0.46s backwards;
+}
+
+.hwall-in {
+  animation: hwall-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) var(--rise-d, 0s) backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-line-in,
+  .hero-stamp-in,
+  .hwall-in {
+    animation: none;
+  }
+}

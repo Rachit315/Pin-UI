@@ -147,13 +147,11 @@ export default function RootLayout({
         {/*
           Neue Montreal is the design's typeface; Switzer is the closest freely
           hosted match and stands in for anyone without Neue Montreal installed.
+          Its @font-face rules live in globals.css (they used to come from
+          Fontshare's CSS API, a render-blocking stylesheet on another origin);
+          the files still come from Fontshare's CDN, warmed up here.
         */}
-        <link rel="preconnect" href="https://api.fontshare.com" />
         <link rel="preconnect" href="https://cdn.fontshare.com" crossOrigin="" />
-        <link
-          rel="stylesheet"
-          href="https://api.fontshare.com/v2/css?f%5B%5D=switzer@400,500,600&display=swap"
-        />
         {/*
           Written by hand rather than through Next's `icons` metadata so the
           pre-paint script below has stable ids to swap. React must not reclaim

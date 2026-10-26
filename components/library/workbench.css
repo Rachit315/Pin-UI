@@ -13,7 +13,7 @@
 
 .site.site--wb {
   --wb-title: #e60024;
-  --wb-item: rgb(0 0 0 / 0.6);
+  --wb-item: rgb(0 0 0 / 0.78);
   --wb-icon: #e60024;
   --wb-rail: rgb(0 0 0 / 0.4);
   --wb-pin: #e60024;
@@ -393,7 +393,8 @@
  * at full strength on every row, not only on the one you are looking at.
  */
 .wbnav__text {
-  opacity: 0.55;
+  /* dimmed, but never below 4.5:1 against the rail in either theme */
+  opacity: 0.72;
   transition: opacity 0.25s ease;
 }
 

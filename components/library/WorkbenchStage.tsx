@@ -1,41 +1,50 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import CodeBlock, { type CodePane } from "./CodeBlock";
 import InstallBlock from "./InstallBlock";
-import BalanceCard from "./BalanceCard";
-import CartCard from "./CartCard";
-import SessionList from "./SessionList";
-import Chips from "./Chips";
 import ChipsEditor, { type ChipsSettings } from "./ChipsEditor";
-import OtpInput from "./OtpInput";
-import AddMember from "./AddMember";
-import Weather from "./Weather";
-import Recorder from "./Recorder";
-import Taxi from "./Taxi";
-import Joystick from "./Joystick";
-import LiquidTabs from "./LiquidTabs";
-import ThermalDial from "./ThermalDial";
-import LampSwitch from "./LampSwitch";
-import ChatRoom from "./ChatRoom";
-import DynamicDropZone from "./DynamicDropZone";
-import SwapCard from "./SwapCard";
 import RequestChip from "./RequestChip";
 import StageBar from "./StageBar";
-import CalendarCard from "./CalendarCard";
-import PromptComposer from "./PromptComposer";
-import ProgressImage from "./ProgressImage";
-import Magnify from "./Magnify";
-import TaskCard from "./TaskCard";
-import CopyPastePad from "./CopyPastePad";
-import FileBox from "./FileBox";
-import DeskComputer from "./DeskComputer";
-import LiquidVoice from "./LiquidVoice";
-import SelectionList from "./SelectionList";
-import SearchCard from "./SearchCard";
 import type { Entry } from "./registry";
 import { LINKS } from "@/lib/links";
 import { setTheme as setSiteTheme, usePinTheme } from "@/lib/theme";
+
+/*
+ * Each component is its own chunk. A component's page used to load every
+ * component in the library — 30 of them, ~114KB gzipped — to show one; now it
+ * loads the one it shows (still rendered on the server, so the stage paints
+ * exactly as before), and a prefetch from elsewhere on the site is that much
+ * lighter too.
+ */
+const BalanceCard = dynamic(() => import("./BalanceCard"));
+const CartCard = dynamic(() => import("./CartCard"));
+const SessionList = dynamic(() => import("./SessionList"));
+const Chips = dynamic(() => import("./Chips"));
+const OtpInput = dynamic(() => import("./OtpInput"));
+const AddMember = dynamic(() => import("./AddMember"));
+const Weather = dynamic(() => import("./Weather"));
+const Recorder = dynamic(() => import("./Recorder"));
+const Taxi = dynamic(() => import("./Taxi"));
+const Joystick = dynamic(() => import("./Joystick"));
+const LiquidTabs = dynamic(() => import("./LiquidTabs"));
+const ThermalDial = dynamic(() => import("./ThermalDial"));
+const LampSwitch = dynamic(() => import("./LampSwitch"));
+const ChatRoom = dynamic(() => import("./ChatRoom"));
+const DynamicDropZone = dynamic(() => import("./DynamicDropZone"));
+const SwapCard = dynamic(() => import("./SwapCard"));
+const CalendarCard = dynamic(() => import("./CalendarCard"));
+const PromptComposer = dynamic(() => import("./PromptComposer"));
+const ProgressImage = dynamic(() => import("./ProgressImage"));
+const Magnify = dynamic(() => import("./Magnify"));
+const TaskCard = dynamic(() => import("./TaskCard"));
+const CopyPastePad = dynamic(() => import("./CopyPastePad"));
+const FileBox = dynamic(() => import("./FileBox"));
+const DeskComputer = dynamic(() => import("./DeskComputer"));
+const LiquidVoice = dynamic(() => import("./LiquidVoice"));
+const SelectionList = dynamic(() => import("./SelectionList"));
+const SearchCard = dynamic(() => import("./SearchCard"));
 
 /**
  * The stage — Figma 345:21.

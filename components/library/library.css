@@ -12,6 +12,8 @@
   --lib-dim: rgb(10 10 10 / 0.56);
   --lib-faint: rgb(10 10 10 / 0.12);
   --lib-accent: #e60024;
+  /* the accent as small type: the brand red passes on white as it is */
+  --lib-accent-ink: #e60024;
   --lib-paper: #ffffff;
   /* the bar's wordmark, links and theme note: red on white, white in the dark */
   --lib-chrome: #e60024;
@@ -34,6 +36,8 @@
   --lib-dim: rgb(255 255 255 / 0.6);
   --lib-faint: rgb(255 255 255 / 0.14);
   --lib-accent: #e60024;
+  /* on black the brand red falls just short of 4.5:1 for small type; a touch brighter reads at 5.5 */
+  --lib-accent-ink: #ff1f3d;
   --lib-paper: #000000;
   --lib-chrome: #ffffff;
   --pin-mark: #ffffff;
@@ -176,7 +180,7 @@
 
 .lib__eyebrow {
   margin: 0 0 1em;
-  color: var(--lib-accent);
+  color: var(--lib-accent-ink);
   font-size: 0.85em;
   font-weight: 600;
   letter-spacing: 0.16em;
@@ -335,7 +339,7 @@
 
 .lib__shelfCount {
   margin-left: 0.35em;
-  color: var(--lib-accent);
+  color: var(--lib-accent-ink);
   font-size: 0.55em;
   font-weight: 500;
   letter-spacing: 0;

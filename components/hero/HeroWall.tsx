@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useReducedMotion } from "motion/react";
-import { softSpring } from "@/lib/motion";
-import { LIBRARY } from "../library/registry";
+import { useReducedMotion } from "motion/react";
+import { LIBRARY, thumbOf } from "../library/registry";
 
 /**
  * The wall of recordings behind the hero's claim — Figma 501:915.
@@ -49,7 +48,12 @@ export default function HeroWall() {
   const reduced = useReducedMotion();
   const wallRef = useRef<HTMLDivElement>(null);
   const trackRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [passes, setPasses] = useState(2);
+  /*
+   * The server renders one pass of each row — what the frame shows — and the
+   * copies the seamless loop needs are added straight after, once the wall
+   * has been measured, so the first load hydrates half the tiles.
+   */
+  const [passes, setPasses] = useState(1);
   /* one pass's width plus the gap after it, per row: the distance a row wraps at */
   const spans = useRef<number[]>(ROWS.map(() => 0));
 
@@ -76,7 +80,8 @@ export default function HeroWall() {
   /* the weave: one loop, one transform per row per frame, only while the hero is on screen */
   useEffect(() => {
     const wall = wallRef.current;
-    if (!wall || reduced) return;
+    /* the drift wraps a whole pass, so it waits for the copies the measure adds */
+    if (!wall || reduced || passes < 2) return;
     let frame = 0;
     let last = 0;
     let onScreen = true;
@@ -159,12 +164,11 @@ export default function HeroWall() {
       {ROWS.map((opacity, r) => {
         const row = Array.from({ length: COLS }, (_, c) => tileFor(r, c));
         return (
-          <motion.div
+          /* fades up row by row as CSS keyframes (app/hero.css), so the wall is there at first paint */
+          <div
             key={r}
-            className="hwall__row"
-            initial={reduced ? false : { opacity: 0, y: 24 }}
-            animate={{ opacity, y: 0 }}
-            transition={{ ...softSpring, delay: 0.1 + r * 0.08 }}
+            className="hwall__row hwall-in"
+            style={{ opacity, "--rise-d": `${0.1 + r * 0.08}s` } as React.CSSProperties}
           >
             <div
               className="hwall__track"
@@ -176,14 +180,32 @@ export default function HeroWall() {
                 <div key={p} className="hwall__pass">
                   {row.map((entry, c) => (
                     <div key={c} className="hwall__tile" style={{ background: entry.clipStage ?? entry.stage }}>
-                      {r === 0 ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img className="hwall__media" src={entry.poster} alt="" width={384} height={227} decoding="async" />
-                      ) : (
+                      {/*
+                        Every tile's still is an image under its clip: the first
+                        pass, which the frame opens on, loads at once, and the
+                        copies further along the track only as the drift brings
+                        them near. The rows below the faint top one lay their clip
+                        over the still once it plays.
+                      */}
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        className="hwall__media"
+                        src={thumbOf(entry.poster)}
+                        alt=""
+                        width={384}
+                        height={227}
+                        /*
+                         * The opening tiles of each row — all a phone's frame shows at
+                         * first — are fetched at once; the rest of the track lazily, as
+                         * it comes near, so they never queue ahead of the page itself.
+                         */
+                        loading={p === 0 && c < 2 ? "eager" : "lazy"}
+                        decoding="async"
+                      />
+                      {r !== 0 && (
                         <video
-                          className="hwall__media"
+                          className="hwall__media hwall__clip"
                           data-src={entry.clip}
-                          poster={entry.poster}
                           muted
                           playsInline
                           loop
@@ -196,7 +218,7 @@ export default function HeroWall() {
                 </div>
               ))}
             </div>
-          </motion.div>
+          </div>
         );
       })}
     </div>

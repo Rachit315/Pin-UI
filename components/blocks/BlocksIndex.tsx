@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useReducedMotion, type Transition } from "motion/react";
 import BlocxMark from "./BlocxMark";
 import BlocxFooter from "./BlocxFooter";
 import GitHubStars from "../hero/GitHubStars";
@@ -10,7 +9,6 @@ import { useSaved } from "./useSaved";
 import { SHELF_ORDER, blocksIn, shelfName, type Block } from "@/lib/blocks";
 import "./blocks.css";
 
-const rise: Transition = { type: "spring", stiffness: 210, damping: 28, mass: 0.9 };
 
 /**
  * Blocx — the shelf.
@@ -22,7 +20,6 @@ const rise: Transition = { type: "spring", stiffness: 210, damping: 28, mass: 0.
  * bookmarked wears the bookmark in the picture's corner.
  */
 export default function BlocksIndex() {
-  const reduced = useReducedMotion();
   const { isSaved } = useSaved();
 
   return (
@@ -32,21 +29,13 @@ export default function BlocksIndex() {
           <IconArrowLeft />
           Back to Pin UI
         </Link>
-        <motion.div
-          className="blx-head__mark"
-          initial={reduced ? false : { opacity: 0, y: -10, filter: "blur(6px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={rise}
-        >
+        {/* rises in as CSS (globals.css), so it is painted from the first frame rather than after hydration */}
+        <div className="blx-head__mark pin-rise">
           <BlocxMark size="lg" />
-        </motion.div>
+        </div>
         {/* the repository, as in Pin UI's masthead: the octocat lifts away and the stars rise in */}
         <div className="blx-head__end">
-          <GitHubStars
-            initial={reduced ? false : { opacity: 0, y: -10, filter: "blur(6px)" }}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            transition={{ ...rise, delay: 0.08 }}
-          />
+          <GitHubStars className="pin-rise" style={{ "--rise-d": "0.08s" } as React.CSSProperties} />
         </div>
       </header>
 
@@ -56,27 +45,16 @@ export default function BlocksIndex() {
           if (!blocks.length) return null;
           return (
             <section key={category} id={category} className="blx-shelf" aria-labelledby={`shelf-${category}`}>
-              <motion.h2
-                id={`shelf-${category}`}
-                className="blx-shelf__title"
-                initial={reduced ? false : { opacity: 0, y: 14 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.6 }}
-                transition={{ ...rise, delay: s === 0 ? 0.1 : 0 }}
-              >
+              {/* titles and cards rise as they scroll in (.pin-reveal, globals.css): never hidden waiting for script */}
+              <h2 id={`shelf-${category}`} className="blx-shelf__title pin-reveal">
                 {shelfName(category)}:
-              </motion.h2>
+              </h2>
               <ul className="blx-grid">
                 {blocks.map((block, i) => (
-                  <motion.li
-                    key={block.slug}
-                    initial={reduced ? false : { opacity: 0, y: 22, filter: "blur(6px)" }}
-                    whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                    viewport={{ once: true, amount: 0.3 }}
-                    transition={{ ...rise, delay: (s === 0 ? 0.16 : 0.04) + i * 0.07 }}
-                  >
-                    <BlockCard block={block} saved={isSaved(block.slug)} />
-                  </motion.li>
+                  <li key={block.slug} className="pin-reveal" style={{ "--reveal-i": i % 3 } as React.CSSProperties}>
+                    {/* the first shelf's opening row loads its pictures first */}
+                    <BlockCard block={block} saved={isSaved(block.slug)} priority={s === 0 && i < 3} />
+                  </li>
                 ))}
               </ul>
             </section>
@@ -89,12 +67,21 @@ export default function BlocksIndex() {
   );
 }
 
-function BlockCard({ block, saved }: { block: Block; saved: boolean }) {
+function BlockCard({ block, saved, priority = false }: { block: Block; saved: boolean; priority?: boolean }) {
   return (
     <Link className="blx-card" href={`/blocx/${block.slug}`} aria-label={`${block.name}${block.isNew ? ", new" : ""} — ${block.summary}`}>
       <span className="blx-card__frame" style={{ background: block.canvas }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="blx-card__img" src={block.thumb} alt="" width={960} height={756} loading="lazy" decoding="async" />
+        <img
+          className="blx-card__img"
+          src={block.thumb}
+          alt=""
+          width={960}
+          height={756}
+          loading={priority ? "eager" : "lazy"}
+          fetchPriority={priority ? "high" : "auto"}
+          decoding="async"
+        />
         {saved && (
           <span className="blx-card__saved" title="Bookmarked">
             <IconBookmark filled />

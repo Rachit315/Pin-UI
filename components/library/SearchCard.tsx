@@ -527,7 +527,6 @@ export default function SearchCard({ theme = "light", corner = 26, rows = 3, sho
             }}
             placeholder={open ? "UI Elements, Flows..." : "Search"}
             aria-label="Search"
-            aria-expanded={open}
             className="psearch__input"
           />
 

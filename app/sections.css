@@ -166,6 +166,7 @@ html[data-pin-scroll="smooth"] {
 }
 
 .card__frame {
+  position: relative;
   display: block;
   overflow: hidden;
   border-radius: 0.7em;
@@ -187,6 +188,12 @@ html[data-pin-scroll="smooth"] {
   background: #000000;
   transform: scale(var(--card-zoom, 1));
   transition: transform 0.5s cubic-bezier(0.22, 0.68, 0.16, 1);
+}
+
+/* the clip lies over its still; until it has frames it paints nothing, so the still shows through */
+.card__clip {
+  position: absolute;
+  inset: 0;
 }
 
 .card__foot {

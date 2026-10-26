@@ -1,7 +1,5 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
-import { softSpring } from "@/lib/motion";
 import ComponentCard from "../library/ComponentCard";
 import ViewAllCard from "./ViewAllCard";
 import { LANDING_SHOWN, LIBRARY } from "../library/registry";
@@ -9,11 +7,11 @@ import { LANDING_SHOWN, LIBRARY } from "../library/registry";
 /**
  * The component shelf under the hero.
  *
- * The heading and the note enter once they have actually been scrolled to
- * rather than on page load, and `once` so the section does not re-animate
- * every time it passes the viewport — a shelf that replays itself on every
- * scroll up reads as a glitch rather than a flourish. Each card handles its own
- * entrance, because each also owns when its clip is allowed to load.
+ * The heading and the note rise in as they are scrolled to — a CSS
+ * scroll-driven animation (.pin-reveal), so on a phone, where the heading is
+ * already on the first screen, it is painted at once instead of waiting for
+ * JavaScript. Each card handles its own entrance, because each also owns
+ * when its clip is allowed to load.
  *
  * The shelf is a preview — Figma 502:291: the newest five, and a sixth cell
  * that opens the whole library, so the grid closes on two full rows of three.
@@ -21,18 +19,6 @@ import { LANDING_SHOWN, LIBRARY } from "../library/registry";
  */
 const SHOWN = LANDING_SHOWN;
 export default function UniqueSection() {
-  const reduced = useReducedMotion();
-
-  const rise = (delay = 0) =>
-    reduced
-      ? {}
-      : ({
-          initial: { opacity: 0, y: 28 },
-          whileInView: { opacity: 1, y: 0 },
-          viewport: { once: true, amount: 0.3 },
-          transition: { ...softSpring, delay },
-        } as const);
-
   return (
     <section className="shelf" id="components" aria-labelledby="components-heading">
       {/*
@@ -40,12 +26,12 @@ export default function UniqueSection() {
         pair is briefly further apart than it ends up, and the shelf reads as
         badly spaced for as long as that lasts.
       */}
-      <motion.div className="shelf__head" {...rise()}>
+      <div className="shelf__head pin-reveal">
         <h2 id="components-heading" className="shelf__title">Components worth building with</h2>
         <p className="shelf__lead">
           Thoughtfully crafted UI components designed to give your next project a distinctive edge.
         </p>
-      </motion.div>
+      </div>
 
       <ul className="shelf__grid">
         {LIBRARY.slice(0, SHOWN).map((entry, i) => (

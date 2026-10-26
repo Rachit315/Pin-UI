@@ -52,7 +52,7 @@ export default function GitHubStars(props: HTMLMotionProps<"a">) {
     <motion.a
       {...props}
       ref={boxRef}
-      className="ghs"
+      className={props.className ? `ghs ${props.className}` : "ghs"}
       href={LINKS.github}
       target="_blank"
       rel="noopener noreferrer"
