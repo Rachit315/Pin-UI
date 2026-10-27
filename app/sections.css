@@ -472,12 +472,13 @@ html[data-pin-scroll="smooth"] {
   /*
    * One spacing for the whole pill: the mark, each hairline and the GitHub
    * square all stand the same distance apart, and the pill is as wide as its
-   * longest link plus an even margin — "Testimonials" sat almost on the edge
-   * of a fixed 7em pill once it joined the list.
+   * longest link plus an even margin. The margins are generous on purpose:
+   * the pill's ends are full semicircles, so the mark and the GitHub square
+   * need clear room from the curve, and "Testimonials" needs room from the
+   * sides — at a tighter setting both sat on the rim and the pill read cramped.
    */
-  /* compact: a small, quiet pill that stays out of the page's way */
-  gap: 0.75em;
-  padding: 0.95em 0.72em;
+  gap: 0.95em;
+  padding: 1.3em 1.15em;
   width: max-content;
   border: 1px solid var(--rail-edge);
   /* a full pill, the way the design draws it */
@@ -546,7 +547,7 @@ html[data-pin-scroll="smooth"] {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.42em;
+  gap: 0.5em;
 }
 
 .rail__link {
