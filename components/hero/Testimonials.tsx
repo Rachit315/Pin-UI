@@ -297,19 +297,13 @@ export default function Testimonials() {
           ))}
         </motion.ul>
 
-        {/* the hero band's edge, the same six layers: a soft blur, no wash */}
+        {/* a soft blur at either edge, no wash: three bands (testimonials.css) */}
         <div className="tq__edge tq__edge--start" aria-hidden="true">
-          <i />
-          <i />
-          <i />
           <i />
           <i />
           <i />
         </div>
         <div className="tq__edge tq__edge--end" aria-hidden="true">
-          <i />
-          <i />
-          <i />
           <i />
           <i />
           <i />

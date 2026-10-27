@@ -15,13 +15,12 @@ import { LIBRARY, thumbOf } from "../library/registry";
  * one under it left, then right, then left — a slow weave rather than one band
  * sliding past. Each row is a pass of six tiles repeated as many times as the
  * frame needs, and its offset wraps at exactly one pass width measured from
- * the DOM, so the seam can never be seen. The offsets are written from one
- * frame loop rather than by CSS animations: the visibility checks below have
- * to see where a tile really is, and a compositor-only animation would hide
- * that from them.
+ * the DOM, so the seam can never be seen. The drift is a CSS animation, run
+ * by the compositor at the screen's own rate; since an IntersectionObserver
+ * cannot follow a compositor-only move, the clips below read each tile's
+ * real place a few times a second instead.
  *
- * Only what can be seen moves. The top row, at a tenth of its strength, shows
- * stills; every other tile fetches its clip once it is in the frame and plays
+ * Only what can be seen moves. Every tile fetches its clip once it is in the frame and plays
  * only while it stays there, so the wall never decodes more than it shows. The
  * loop itself stops whenever the hero is off screen. Reduced motion, a hidden
  * tab or a data-saver hold everything still.
@@ -70,6 +69,13 @@ export default function HeroWall() {
       });
       const width = spans.current[0];
       if (width) setPasses(Math.max(2, Math.ceil(wall.clientWidth / width) + 1));
+      /* the drift is a CSS animation over one pass, at each row's own pace */
+      trackRefs.current.forEach((track, r) => {
+        const span = spans.current[r];
+        if (!track || !span) return;
+        track.style.setProperty("--span", `${span}px`);
+        track.style.animationDuration = `${span / SPEEDS[r]}s`;
+      });
     };
     measure();
     const observer = new ResizeObserver(measure);
@@ -77,85 +83,101 @@ export default function HeroWall() {
     return () => observer.disconnect();
   }, []);
 
-  /* the weave: one loop, one transform per row per frame, only while the hero is on screen */
+  /*
+   * The weave. Each row drifts by a CSS animation (landing.css) rather than a
+   * transform written from script every frame: the browser runs it on the
+   * compositor at the screen's own refresh rate, and a busy frame elsewhere on
+   * the page can no longer make the wall stutter. It starts once the copies
+   * the seamless wrap needs exist, and pauses while the hero is off screen.
+   */
+  const [drifting, setDrifting] = useState(false);
   useEffect(() => {
-    const wall = wallRef.current;
-    /* the drift wraps a whole pass, so it waits for the copies the measure adds */
-    if (!wall || reduced || passes < 2) return;
-    let frame = 0;
-    let last = 0;
-    let onScreen = true;
-    const offsets = ROWS.map(() => 0);
-
-    const tick = (now: number) => {
-      const dt = last ? Math.min(now - last, 64) / 1000 : 0;
-      last = now;
-      trackRefs.current.forEach((track, r) => {
-        const span = spans.current[r];
-        if (!track || !span) return;
-        offsets[r] = (offsets[r] + SPEEDS[r] * dt) % span;
-        /* even rows (the first, the third) travel right, odd rows left */
-        const x = r % 2 === 0 ? offsets[r] - span : -offsets[r];
-        track.style.transform = `translate3d(${x}px, 0, 0)`;
-      });
-      if (onScreen) frame = requestAnimationFrame(tick);
-    };
-
-    const visibility = new IntersectionObserver(([entry]) => {
-      const was = onScreen;
-      onScreen = Boolean(entry?.isIntersecting);
-      if (onScreen && !was) {
-        last = 0;
-        frame = requestAnimationFrame(tick);
-      }
-    });
-    visibility.observe(wall);
-    frame = requestAnimationFrame(tick);
-    return () => {
-      cancelAnimationFrame(frame);
-      visibility.disconnect();
-    };
+    setDrifting(!reduced && passes >= 2);
   }, [reduced, passes]);
 
-  /* clips: fetched and played only while their tile is inside the frame */
   useEffect(() => {
     const wall = wallRef.current;
     if (!wall || typeof IntersectionObserver === "undefined") return;
+    const visibility = new IntersectionObserver(([entry]) => {
+      wall.toggleAttribute("data-paused", !entry?.isIntersecting);
+    });
+    visibility.observe(wall);
+    return () => visibility.disconnect();
+  }, []);
+
+  /*
+   * Clips: fetched and played only while their tile is inside the frame.
+   *
+   * The drift runs on the compositor, where an IntersectionObserver cannot see
+   * it, so a tile's place is read from the page itself — a few times a second,
+   * and on scroll, only while the hero is on screen. A playing tile is a video
+   * being decoded every frame; this keeps that to the ones in view.
+   */
+  useEffect(() => {
+    const wall = wallRef.current;
+    if (!wall) return;
     const videos = Array.from(wall.querySelectorAll<HTMLVideoElement>("video"));
-    const seen = new Map<HTMLVideoElement, boolean>();
 
     const still = () =>
       reduced ||
       document.hidden ||
       (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
 
-    const sync = (video: HTMLVideoElement) => {
-      if (seen.get(video) && !still()) {
-        if (!video.getAttribute("src")) {
-          video.src = video.dataset.src ?? "";
-          video.preload = "auto";
-        }
-        if (video.paused) void video.play().catch(() => {});
-      } else if (!video.paused) {
-        video.pause();
+    const play = (video: HTMLVideoElement) => {
+      if (!video.getAttribute("src")) {
+        video.src = video.dataset.src ?? "";
+        video.preload = "auto";
+      }
+      if (video.paused) void video.play().catch(() => {});
+    };
+
+    let onScreen = true;
+    const sample = () => {
+      const frame = wall.getBoundingClientRect();
+      const top = Math.max(frame.top, 0);
+      const bottom = Math.min(frame.bottom, window.innerHeight);
+      const quiet = still() || !onScreen;
+      for (const video of videos) {
+        const r = video.getBoundingClientRect();
+        const w = Math.min(r.right, frame.right) - Math.max(r.left, frame.left);
+        const h = Math.min(r.bottom, bottom) - Math.max(r.top, top);
+        /* in view: at least a fiftieth of the tile is inside the frame */
+        const seen = w > 0 && h > 0 && (w * h) / (r.width * r.height || 1) > 0.02;
+        if (seen && !quiet) play(video);
+        else if (!video.paused) video.pause();
       }
     };
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          seen.set(e.target as HTMLVideoElement, e.isIntersecting && e.intersectionRatio > 0.02);
-          sync(e.target as HTMLVideoElement);
-        }
-      },
-      { threshold: [0, 0.02, 0.3] },
-    );
-    videos.forEach((v) => observer.observe(v));
-    const onVisibility = () => videos.forEach(sync);
-    document.addEventListener("visibilitychange", onVisibility);
+    let queued = 0;
+    const onScroll = () => {
+      if (queued) return;
+      queued = requestAnimationFrame(() => {
+        queued = 0;
+        sample();
+      });
+    };
+
+    /* the wall itself does not move, so whether the hero is on screen is the observer's to say */
+    const visibility =
+      typeof IntersectionObserver === "undefined"
+        ? null
+        : new IntersectionObserver(([entry]) => {
+            onScreen = Boolean(entry?.isIntersecting);
+            sample();
+          });
+    visibility?.observe(wall);
+    const timer = window.setInterval(() => {
+      if (onScreen) sample();
+    }, 350);
+    sample();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    document.addEventListener("visibilitychange", sample);
     return () => {
-      observer.disconnect();
-      document.removeEventListener("visibilitychange", onVisibility);
+      window.clearInterval(timer);
+      cancelAnimationFrame(queued);
+      visibility?.disconnect();
+      window.removeEventListener("scroll", onScroll);
+      document.removeEventListener("visibilitychange", sample);
     };
   }, [reduced, passes]);
 
@@ -171,7 +193,9 @@ export default function HeroWall() {
             style={{ opacity, "--rise-d": `${0.1 + r * 0.08}s` } as React.CSSProperties}
           >
             <div
-              className="hwall__track"
+              /* even rows (the first, the third) travel right, odd rows left */
+              className={`hwall__track ${r % 2 === 0 ? "hwall__track--right" : "hwall__track--left"}`}
+              data-drift={drifting || undefined}
               ref={(el) => {
                 trackRefs.current[r] = el;
               }}
@@ -184,8 +208,8 @@ export default function HeroWall() {
                         Every tile's still is an image under its clip: the first
                         pass, which the frame opens on, loads at once, and the
                         copies further along the track only as the drift brings
-                        them near. The rows below the faint top one lay their clip
-                        over the still once it plays.
+                        them near. Every tile lays its clip over the still once it
+                        plays.
                       */}
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
@@ -202,7 +226,12 @@ export default function HeroWall() {
                         loading={p === 0 && c < 2 ? "eager" : "lazy"}
                         decoding="async"
                       />
-                      {r !== 0 && (
+                      {/*
+                        Every row plays: even the faint top row is plainly seen on
+                        the dark page, and a frozen tile there reads as broken. The
+                        loops are 960px, and only tiles inside the frame play.
+                      */}
+                      {(
                         <video
                           className="hwall__media hwall__clip"
                           data-src={entry.clip}

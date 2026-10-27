@@ -140,34 +140,26 @@
   inset: 0;
 }
 
+/*
+ * Three bands, not six. A backdrop blur is redrawn for everything under it
+ * on every frame the row drifts, and the cost climbs steeply with the radius:
+ * the old 4.5–12px bands stalled the page for a fifth of a second as the
+ * section scrolled in. Three gentler bands across the same width read as the
+ * same soft dissolve into the margin.
+ */
 .tq__edge i:nth-child(1) {
-  backdrop-filter: blur(0.5px);
-  mask-image: linear-gradient(to left, transparent 0%, #000 18%);
+  backdrop-filter: blur(0.75px);
+  mask-image: linear-gradient(to left, transparent 0%, #000 30%);
 }
 
 .tq__edge i:nth-child(2) {
-  backdrop-filter: blur(1.25px);
-  mask-image: linear-gradient(to left, transparent 15%, #000 34%);
+  backdrop-filter: blur(1.75px);
+  mask-image: linear-gradient(to left, transparent 30%, #000 64%);
 }
 
 .tq__edge i:nth-child(3) {
-  backdrop-filter: blur(2.5px);
-  mask-image: linear-gradient(to left, transparent 31%, #000 50%);
-}
-
-.tq__edge i:nth-child(4) {
-  backdrop-filter: blur(4.5px);
-  mask-image: linear-gradient(to left, transparent 47%, #000 66%);
-}
-
-.tq__edge i:nth-child(5) {
-  backdrop-filter: blur(7.5px);
-  mask-image: linear-gradient(to left, transparent 63%, #000 82%);
-}
-
-.tq__edge i:nth-child(6) {
-  backdrop-filter: blur(12px);
-  mask-image: linear-gradient(to left, transparent 79%, #000 100%);
+  backdrop-filter: blur(3px);
+  mask-image: linear-gradient(to left, transparent 62%, #000 100%);
 }
 
 /*

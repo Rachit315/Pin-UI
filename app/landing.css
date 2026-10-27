@@ -82,11 +82,9 @@
   --pin-mark-star: #e60024;
 }
 
-/* on black paper the pill needs a deeper shadow to lift off it */
+/* on black paper the pill needs a deeper shadow to lift off it — tight, as in sections.css, so it costs nothing to draw */
 :root[data-pin-theme="crimson"] .landing .rail {
-  box-shadow:
-    0 0.15em 0.4em rgb(0 0 0 / 0.4),
-    0 0.8em 1.8em rgb(0 0 0 / 0.5);
+  box-shadow: 0 0.15em 0.45em rgb(0 0 0 / 0.55);
 }
 
 /* the paper itself turns, under every section */
@@ -127,6 +125,54 @@
 
 .hwall__track {
   will-change: transform;
+}
+
+/*
+ * The drift: one pass's width (--span, measured) over its own duration, on a
+ * loop. A pass and the copy beside it are identical, so the wrap from the end
+ * back to the start lands the same tile under the same pixels — no seam. Run
+ * as a CSS animation, it is the compositor's work, not the page's.
+ */
+@keyframes hwall-right {
+  from {
+    transform: translate3d(calc(var(--span) * -1), 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes hwall-left {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(calc(var(--span) * -1), 0, 0);
+  }
+}
+
+.hwall__track[data-drift] {
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.hwall__track--right[data-drift] {
+  animation-name: hwall-right;
+}
+
+.hwall__track--left[data-drift] {
+  animation-name: hwall-left;
+}
+
+/* off screen, the wall holds still */
+.hwall[data-paused] .hwall__track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hwall__track[data-drift] {
+    animation: none;
+  }
 }
 
 .hwall__tile {

@@ -484,9 +484,13 @@ html[data-pin-scroll="smooth"] {
   border-radius: 999px;
   background: var(--rail-fill);
   color: var(--rail-ink);
-  box-shadow:
-    0 0.15em 0.4em rgb(0 0 0 / 0.06),
-    0 0.8em 1.8em rgb(0 0 0 / 0.08);
+  /*
+   * One tight shadow. The rail is fixed over the page with a backdrop blur, and
+   * a wide soft shadow under that made its first appearance — mid-scroll, as
+   * the hero hands over to it — stall the page for a fifth of a second while
+   * the browser built it. The tight one keeps the lift for a fraction of that.
+   */
+  box-shadow: 0 0.15em 0.4em rgb(0 0 0 / 0.08);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
