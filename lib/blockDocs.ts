@@ -33,6 +33,37 @@ export type BlockDocs = {
 };
 
 export const BLOCK_DOCS: Record<string, BlockDocs> = {
+  "storybook-hero": {
+    component: "StorybookHero",
+    file: "StorybookHero",
+    use: [
+      "A landing page for a creative, writing or note-taking product that wants to feel warm and handmade",
+      "A single-screen hero with one illustration at its centre rather than a product shot",
+    ],
+    avoid: [
+      "Dark sites — the parchment, the grain and the brown ink are drawn for a light page",
+      "Products that need a screenshot above the fold; the arch is the only picture here",
+    ],
+    usage: "<StorybookHero />",
+    props: [],
+    customize:
+      "The links are NAV_LINKS and the headline is HEADLINE (a list of lines, each a list of words) at the top of StorybookHero.tsx; the palette is the custom properties on .sbh in storybook-hero.css. The arch and the logo are served from /blocx/storybook-hero/ — swap the files to change them, and move STARS if your artwork's stars sit elsewhere.",
+    accessibility: [
+      "The section is labelled by its headline, which keeps its full sentence while its words animate",
+      "The nav is a labelled list; on a phone the menu button reports aria-expanded and controls the sheet, which is inert while closed",
+      "Escape or a press outside closes the sheet; the illustration and its glows are decorative and hidden from screen readers",
+    ],
+    motion: [
+      "The nav drops in, the headline rises a word at a time out of its mask, and the copy and buttons un-blur after it",
+      "The arch lifts into place and floats; the sky breathes, the windows flicker and the stars twinkle, each on its own timing",
+      "Everything is CSS animation; reduced motion holds the page still and hides the stars",
+    ],
+    responsive: [
+      "One screen tall: the headline and buttons keep their place and the arch takes the height that is left",
+      "Below 820px the links fold into a sheet; below 520px the nav's button goes and the two buttons share the width",
+    ],
+  },
+
   "partylabs-hero": {
     component: "PartylabsHero",
     file: "PartylabsHero",

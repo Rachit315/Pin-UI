@@ -20,6 +20,7 @@ export const metadata: Metadata = {
  * block it shows.
  */
 const PREVIEWS: Record<string, ComponentType> = {
+  "storybook-hero": dynamic(() => import("@/components/blocks/demo/StorybookHero")),
   "partylabs-hero": dynamic(() => import("@/components/blocks/demo/PartylabsHero")),
   "luna-hero": dynamic(() => import("@/components/blocks/demo/LunaHeroPreview")),
   "orbit-hero": dynamic(() => import("@/components/blocks/demo/OrbitHero")),

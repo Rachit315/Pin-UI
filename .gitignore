@@ -31,28 +31,11 @@ Thumbs.db
 .claude
 CLAUDE.md
 *.claude*
-# local prototypes
-Add member/
-Chips/
-OTP/
-/Record/
-/Taxi/
-/Joystick/
-/On,off/
-/Temp/
-/tab/
-/chat-room/
-/dynamic-drop-zone/
-/swap-card/
-/exports/
-/Blocx/
-/*.zip
-/blocks-vault/
-/Folder/
-/Port/
-/section/
+# local work that stays off GitHub:
+# the demo-video project (Remotion), drafts not yet on the site, blocks held
+# back from the shelf, and exports
 /Progress img/
-/Magnify/
-/Checkbox/
-/bar/
-/bb/
+/drafts/
+/blocks-vault/
+/exports/
+/*.zip

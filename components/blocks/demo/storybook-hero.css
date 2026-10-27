@@ -1,0 +1,700 @@
+/* Storybook Hero — a parchment hero with an engraved arch at its foot.
+   One screen tall: the nav, a two-line headline, the copy and two buttons, then the arch takes whatever
+   height is left. Every class is prefixed .sbh, and the palette lives on the block itself, so it can sit on
+   any page without its styles reaching anything else. */
+
+.sbh *,
+.sbh *::before,
+.sbh *::after {
+  box-sizing: border-box;
+}
+
+/* the resets carry no weight (:where), so every rule of the block's own wins over them */
+:where(.sbh) a {
+  color: inherit;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(.sbh) button {
+  font: inherit;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sbh ::selection {
+  background: var(--brown);
+  color: #fff;
+}
+
+/* ---------- layout ---------- */
+
+.sbh {
+  --bg: #eae1d3;
+  --brown: #562b00;
+  --brown-hover: #6b3808;
+  --ink: #452200;
+  --muted: rgba(0, 0, 0, 0.6);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --gutter: clamp(16px, 2.5vw, 48px);
+
+  color-scheme: light;
+  color: var(--ink);
+  font-family: var(--sbh-font), "Neue Montreal", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  height: 100vh;
+  height: 100svh;
+  min-height: 580px;
+  overflow: clip;
+  background: var(--bg);
+}
+
+.sbh__grain {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .34 0 0 0 0 .17 0 0 0 0 0 .09 0 0 0 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- Nav ---------- */
+
+.sbh__nav {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: clamp(12px, 1.5vw, 24px) var(--gutter) 0;
+  animation: sbh-fadeDown 0.9s var(--ease-out) 0.05s both;
+}
+
+.sbh__logo {
+  display: block;
+  width: clamp(26px, 2.4vw, 42px);
+  border-radius: 8px;
+}
+
+.sbh__logo img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.sbh__logo:focus-visible {
+  outline: 2px solid var(--brown);
+  outline-offset: 6px;
+}
+
+.sbh__navRight {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: clamp(24px, 3vw, 48px);
+}
+
+.sbh__links {
+  display: flex;
+  align-items: center;
+  gap: clamp(20px, 2.3vw, 36px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sbh__link {
+  position: relative;
+  display: inline-block;
+  padding: 6px 0;
+  font-size: clamp(14px, calc(0.3vw + 10.2px), 17px);
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  transition: color 0.3s ease;
+}
+
+.sbh__link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 2px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.45s var(--ease-out);
+}
+
+.sbh__link:hover {
+  color: var(--brown);
+}
+
+.sbh__link:hover::after,
+.sbh__link:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.sbh__link:focus-visible {
+  outline: none;
+}
+
+/* ---------- Buttons ---------- */
+
+.sbh__btn {
+  --btn-fs: clamp(14px, calc(0.3vw + 10.2px), 17px);
+
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35em;
+  padding: 0.92em 1.78em;
+  border-radius: 999px;
+  overflow: hidden;
+  font-size: var(--btn-fs);
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    transform 0.4s var(--ease-out),
+    box-shadow 0.4s var(--ease-out),
+    background-color 0.3s ease,
+    color 0.35s ease;
+}
+
+.sbh__btn:focus-visible {
+  outline: 2px solid var(--brown);
+  outline-offset: 3px;
+}
+
+.sbh__btn:active {
+  transform: translateY(0) scale(0.97);
+  transition-duration: 0.12s;
+}
+
+.sbh__btnLabel {
+  position: relative;
+}
+
+.sbh__arrow {
+  position: relative;
+  width: 1em;
+  height: 1em;
+  flex: none;
+  transition: transform 0.45s var(--ease-out);
+}
+
+.sbh__btn:hover .sbh__arrow {
+  transform: translateX(3px);
+}
+
+.sbh__btn--primary {
+  background: var(--brown);
+  color: #fff;
+  box-shadow:
+    inset 0 2px 1px rgba(255, 255, 255, 0.25),
+    inset 0 -2px 1px rgba(0, 0, 0, 0.25);
+}
+
+/* light sweep */
+.sbh__btn--primary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.18) 50%, transparent 70%);
+  transform: translateX(-110%);
+  transition: transform 0.8s var(--ease-out);
+}
+
+.sbh__btn--primary:hover {
+  background: var(--brown-hover);
+  transform: translateY(-2px);
+}
+
+.sbh__btn--primary:hover::after {
+  transform: translateX(110%);
+}
+
+.sbh__btn--lift {
+  box-shadow:
+    inset 0 2px 1px rgba(255, 255, 255, 0.25),
+    inset 0 -2px 1px rgba(0, 0, 0, 0.25),
+    0 1px 2px rgba(60, 30, 0, 0.12),
+    0 6px 12px -4px rgba(60, 30, 0, 0.2);
+}
+
+.sbh__btn--lift:hover {
+  box-shadow:
+    inset 0 2px 1px rgba(255, 255, 255, 0.25),
+    inset 0 -2px 1px rgba(0, 0, 0, 0.25),
+    0 2px 4px rgba(60, 30, 0, 0.12),
+    0 10px 16px -6px rgba(60, 30, 0, 0.24);
+}
+
+.sbh__btn--ghost {
+  color: var(--brown);
+  box-shadow: inset 0 0 0 1px var(--brown);
+}
+
+.sbh__btn--ghost::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--brown);
+  transform: translateY(102%);
+  transition: transform 0.5s var(--ease-out);
+}
+
+.sbh__btn--ghost:hover {
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.sbh__btn--ghost:hover::before {
+  transform: translateY(0);
+}
+
+/* ---------- Mobile menu ---------- */
+
+.sbh__menuBtn {
+  position: relative;
+  display: none;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: inset 0 0 0 1px rgba(86, 43, 0, 0.28);
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.sbh__menuBtn:hover {
+  background: rgba(86, 43, 0, 0.06);
+}
+
+.sbh__menuBtn:focus-visible {
+  outline: 2px solid var(--brown);
+  outline-offset: 3px;
+}
+
+.sbh__menuBtn span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 16px;
+  height: 1.5px;
+  margin-left: -8px;
+  border-radius: 2px;
+  background: var(--brown);
+  transition: transform 0.45s var(--ease-out);
+}
+
+.sbh__menuBtn span:nth-child(1) {
+  transform: translateY(-3.5px);
+}
+
+.sbh__menuBtn span:nth-child(2) {
+  transform: translateY(3.5px);
+}
+
+.sbh__menuBtn[aria-expanded="true"] span:nth-child(1) {
+  transform: rotate(45deg);
+}
+
+.sbh__menuBtn[aria-expanded="true"] span:nth-child(2) {
+  transform: rotate(-45deg);
+}
+
+.sbh__sheet {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  display: none;
+  width: min(300px, calc(100vw - 2 * var(--gutter)));
+  padding: 8px;
+  border-radius: 22px;
+  background: rgba(244, 238, 228, 0.9);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  backdrop-filter: blur(16px) saturate(1.2);
+  box-shadow:
+    0 0 0 1px rgba(86, 43, 0, 0.1),
+    0 24px 48px -16px rgba(60, 30, 0, 0.28);
+  transform-origin: top right;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px) scale(0.96);
+  transition:
+    opacity 0.3s var(--ease-out),
+    transform 0.4s var(--ease-out),
+    visibility 0s linear 0.4s;
+}
+
+.sbh__sheet[data-open="true"] {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition:
+    opacity 0.3s var(--ease-out),
+    transform 0.45s var(--ease-spring),
+    visibility 0s;
+}
+
+.sbh__sheet ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sbh__sheet li {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.3s ease, transform 0.4s var(--ease-out);
+}
+
+.sbh__sheet[data-open="true"] li {
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(0.04s * var(--i) + 0.05s);
+}
+
+.sbh__sheet li a {
+  display: block;
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-size: 17px;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  transition: background-color 0.25s ease;
+}
+
+.sbh__sheet li a:hover,
+.sbh__sheet li a:focus-visible {
+  outline: none;
+  background: rgba(86, 43, 0, 0.07);
+}
+
+.sbh__sheetCta {
+  display: flex;
+  width: 100%;
+  margin-top: 6px;
+}
+
+/* ---------- Content ---------- */
+
+.sbh__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(28px, 7.6svh, 120px) var(--gutter) 0;
+  text-align: center;
+}
+
+.sbh__title {
+  margin: 0;
+  font-size: clamp(40px, min(5vw, 7.8svh), 104px);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+  color: var(--brown);
+  text-wrap: balance;
+}
+
+.sbh__line {
+  display: block;
+}
+
+.sbh__word {
+  display: inline-block;
+  /* room for side bearings (tight tracking) and descenders inside the reveal mask */
+  padding: 0 0.08em 0.12em;
+  margin: 0 -0.08em -0.12em;
+  overflow: clip;
+  vertical-align: top;
+}
+
+.sbh__wordInner {
+  display: inline-block;
+  white-space: pre;
+  animation: sbh-wordUp 1s var(--ease-out) both;
+  animation-delay: calc(0.18s + var(--i) * 0.065s);
+}
+
+.sbh__sub {
+  max-width: 31em;
+  margin: clamp(14px, 2.4svh, 28px) 0 0;
+  font-size: clamp(15px, calc(0.55vw + 9px), 21px);
+  line-height: 1.32;
+  letter-spacing: -0.02em;
+  color: var(--muted);
+  text-wrap: pretty;
+  animation: sbh-fadeUp 0.9s var(--ease-out) 0.6s both;
+}
+
+.sbh__ctas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(12px, 1.5vw, 20px);
+  margin-top: clamp(22px, 3.8svh, 48px);
+  animation: sbh-fadeUp 0.9s var(--ease-out) 0.72s both;
+}
+
+/* ---------- Illustration ---------- */
+
+.sbh__stage {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: 0;
+  padding: clamp(8px, 2svh, 28px) var(--gutter) 0;
+  container-type: size;
+  animation: sbh-stageIn 1.4s var(--ease-out) 0.5s both;
+}
+
+.sbh__art {
+  position: relative;
+  width: min(100cqw, 100cqh * 0.823);
+  aspect-ratio: 930 / 1130;
+}
+
+.sbh__artFloat {
+  position: absolute;
+  inset: 0;
+  animation: sbh-float 7s ease-in-out 2s infinite alternate;
+}
+
+.sbh__artImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent, #000 6%, #000 94%, transparent),
+    linear-gradient(to bottom, transparent, #000 3%, #000 96%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent, #000 6%, #000 94%, transparent),
+    linear-gradient(to bottom, transparent, #000 3%, #000 96%, transparent);
+  mask-composite: intersect;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* golden halo in the arch sky */
+.sbh__artGlow {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 34%;
+  width: 46%;
+  height: 46%;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 214, 140, 0.55), transparent);
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+  animation: sbh-breathe 6s ease-in-out 2s infinite alternate;
+}
+
+.sbh__windowGlow {
+  position: absolute;
+  z-index: 1;
+  left: 49.6%;
+  top: 73%;
+  width: 36%;
+  height: 28%;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 190, 90, 0.5), rgba(255, 190, 90, 0.12) 55%, transparent);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  animation: sbh-flicker 5s ease-in-out 1.8s infinite;
+}
+
+.sbh__star {
+  position: absolute;
+  z-index: 2;
+  width: var(--size);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 232, 170, 0.95), rgba(255, 200, 110, 0.35) 45%, transparent);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  opacity: 0;
+  animation: sbh-twinkle 3.8s ease-in-out infinite;
+  animation-delay: calc(1.6s + var(--delay));
+}
+
+/* ---------- Keyframes ---------- */
+
+@keyframes sbh-fadeDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes sbh-fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+@keyframes sbh-wordUp {
+  from {
+    transform: translateY(105%) rotate(4deg);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes sbh-stageIn {
+  from {
+    opacity: 0;
+    transform: translateY(48px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes sbh-float {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes sbh-breathe {
+  from {
+    opacity: 0.4;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sbh-flicker {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  30% {
+    opacity: 0.9;
+  }
+  45% {
+    opacity: 0.7;
+  }
+  70% {
+    opacity: 1;
+  }
+}
+
+@keyframes sbh-twinkle {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.1);
+  }
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 820px) {
+  .sbh__links {
+    display: none;
+  }
+
+  .sbh__menuBtn,
+  .sbh__sheet {
+    display: block;
+  }
+
+  .sbh__navRight {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 520px) {
+  .sbh__navCta {
+    display: none;
+  }
+
+  .sbh__ctas {
+    width: 100%;
+    max-width: 360px;
+  }
+
+  .sbh__ctas .sbh__btn {
+    flex: 1 1 auto;
+  }
+}
+
+@media (hover: none) {
+  .sbh__btn--primary:hover,
+  .sbh__btn--ghost:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sbh__nav,
+  .sbh__wordInner,
+  .sbh__sub,
+  .sbh__ctas,
+  .sbh__stage,
+  .sbh__artFloat,
+  .sbh__artGlow,
+  .sbh__windowGlow {
+    animation: none;
+  }
+
+  .sbh__star {
+    display: none;
+  }
+}

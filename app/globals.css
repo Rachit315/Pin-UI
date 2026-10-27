@@ -790,105 +790,6 @@ a {
   color: var(--pin-status);
 }
 
-/* --- landing ------------------------------------------------------------- */
-
-.soon {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.soon__line {
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 23px;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-  color: var(--pin-body-ink);
-  transition: color var(--pin-theme-fade) var(--pin-theme-ease);
-}
-
-/* the mark is the theme switch */
-.soon__mark {
-  display: block;
-  padding: 0;
-  border: 0;
-  background: none;
-  line-height: 0;
-  cursor: pointer;
-  border-radius: 8px;
-  perspective: 600px;
-}
-
-.soon__mark:focus-visible {
-  outline: 2px solid var(--pin-ring);
-  outline-offset: 6px;
-}
-
-.soon__flip {
-  display: block;
-  transform-style: preserve-3d;
-}
-
-.soon__pin {
-  display: block;
-  width: 20px;
-  height: 24px;
-}
-
-.soon__brand {
-  font-weight: 500;
-  color: var(--pin-accent);
-  transition: color var(--pin-theme-fade) var(--pin-theme-ease);
-}
-
-.soon__rest {
-  font-weight: 400;
-}
-
-.soon__link {
-  margin-top: 13px;
-  display: inline-flex;
-  align-items: center;
-  font-size: 14px;
-  line-height: 1.4;
-  color: var(--pin-link);
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  text-decoration-thickness: 1px;
-  transition: color 220ms var(--pin-theme-ease);
-}
-
-/* hover and keyboard focus both light it up */
-.soon__link[data-active="true"],
-.soon__link:focus-visible {
-  color: var(--pin-accent);
-}
-
-.soon__link:focus-visible {
-  outline: 2px solid var(--pin-ring);
-  outline-offset: 5px;
-  border-radius: 4px;
-}
-
-/* the arrow has no width until it is wanted, so the label never shifts */
-.soon__arrow {
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-end;
-  overflow: hidden;
-  height: 15px;
-}
-
-.soon__arrow svg {
-  width: 15px;
-  height: 15px;
-  flex: 0 0 auto;
-}
-
 /* --- the card strip ------------------------------------------------------- */
 
 /* Anchored so exactly `--pin-card-peek` of each card shows above the bottom
@@ -1115,20 +1016,6 @@ a {
     margin-top: 20px;
   }
 
-  .soon__line {
-    font-size: 19px;
-    gap: 7px;
-  }
-
-  .soon__pin {
-    width: 17px;
-    height: 20px;
-  }
-
-  .soon__link {
-    font-size: 13px;
-  }
-
   .welcome__title {
     margin-top: 20px;
     font-size: 24px;
@@ -1149,7 +1036,6 @@ a {
     transition: none;
   }
 }
-
 
 /* ---------------------------------------------------------------------------
    The maker's mark — a dot after a component's name that cycles through the

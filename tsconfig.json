@@ -37,15 +37,8 @@
   ],
   "exclude": [
     "node_modules",
-    "chat-room",
-    "dynamic-drop-zone",
-    "swap-card",
-    "Blocx",
     "Progress img",
-    "section",
-    "Magnify",
-    "Checkbox",
-    "bar",
-    "bb"
+    "drafts",
+    "blocks-vault"
   ]
 }

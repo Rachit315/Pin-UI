@@ -66,6 +66,18 @@ export type Block = {
 
 export const BLOCKS: Block[] = [
   {
+    slug: "storybook-hero",
+    name: "Storybook Hero",
+    category: "hero",
+    thumb: "/blocx/thumbs/storybook-hero.webp",
+    files: ["StorybookHero.tsx", "storybook-hero.css"],
+    summary: "A parchment hero with a glowing cottage in an arch.",
+    isNew: true,
+    note: "A warm parchment hero under a film of paper grain: a small nav with a pill call to action, \"Turn Your Ideas Into Something Magical\" rising a word at a time out of its own mask, and an engraved arch at the foot of the screen with a cottage under a crescent moon. The arch lifts in and floats, the sky behind the moon breathes, the windows flicker like lamplight and the stars twinkle on their own clocks. The primary buttons sweep a band of light on hover and the outlined one fills from the bottom; below 820px the links fold into a sheet. Set in Inter Tight as a free stand-in for the design's Neue Montreal.",
+    stack: "Next.js · React · CSS",
+    canvas: "#eae1d3",
+  },
+  {
     slug: "partylabs-hero",
     name: "iPartyLabs Hero",
     category: "hero",
